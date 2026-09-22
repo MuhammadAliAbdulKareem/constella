@@ -26,7 +26,7 @@ window.SITE = {
 
   courses: [
     {
-      id: "python",
+      id: "multimedia",
       title: "Python Fundamentals",
       subtitle: "Multimedia course",
       description: "Programming basics for multimedia students, from your first print() to writing your own functions.",
@@ -36,12 +36,12 @@ window.SITE = {
         {
           week: 1,
           title: "Introduction to Python",
-          topics: ["print and input", "variables and casting", "data types", "operators", "lists and sets", "if / elif / else", "for and while loops", "range", "functions"],
-          file: "decks/python/week-01.html",
-          date: "2026-09-21",
+          topics: ["output & input", "variables", "operators", "collections", "control flow", "functions"],
+          file: "decks/multimedia/Week ⇔ 01/Session ⇔ 01.html",
+          date: "2026-09-22",
           duration: "75 min"
         }
-        // ,{ week: 2, title: "…", topics: ["…"], file: "decks/python/week-02.html", date: "2026-09-28" }
+        // ,{ week: 2, title: "…", topics: ["…"], file: "decks/multimedia/Week ⇔ 02/Session ⇔ 02.html", date: "2026-09-29" }
       ]
     },
 
@@ -56,18 +56,12 @@ window.SITE = {
         {
           week: 1,
           title: "From Structured Programming to Functions",
-          topics: ["sequence", "selection", "repetition", "functions"],
-          file: "decks/data-structures/week-01.html",
-          date: "2026-09-07",
+          topics: ["sequence", "selection", "repetition", "functions", "5 hands-on tasks"],
+          file: "decks/data-structures/Week ⇔ 01/Session ⇔ 01.html",
+          date: "2026-09-22",
           duration: "75 min"
-        },
-        {
-          week: 4,
-          title: "Doubly Linked Lists and Stacks",
-          topics: ["doubly linked lists", "insert and delete", "stacks", "push and pop"],
-          file: "decks/data-structures/week-04.html",
-          date: "2026-09-14"
         }
+        // ,{ week: 2, title: "…", topics: ["…"], file: "decks/data-structures/Week ⇔ 02/Session ⇔ 02.html", date: "2026-09-29" }
       ]
     }
   ]

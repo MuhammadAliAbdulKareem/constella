@@ -1,0 +1,1374 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Multimedia — Session ⇔ 01 · Introduction to Python</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<style>
+:root{
+  color-scheme:dark;
+  /* chapter colour — changes with every chapter */
+  --c:#ec4899; --c-2:#a855f7;
+  --c-grad:linear-gradient(90deg,var(--c),var(--c-2));
+  /* identity constants */
+  --bg:#07070d; --card:rgba(18,18,28,.82); --border:rgba(255,255,255,.07);
+  --tp:#f0eeff; --ts:#9a9ab5; --tm:#6b6b85; --warn:#fb7185;
+  --syntax-grad:linear-gradient(135deg,#6366f1,#a855f7,#ec4899);
+  --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;height:100dvh;background:var(--bg);color:var(--tp);font-family:Inter,system-ui,"Segoe UI",Roboto,Arial,sans-serif;overflow:hidden}
+body{padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px);display:flex;align-items:center;justify-content:center}
+#fitbox{position:relative;flex:none}
+#deck{width:1100px;height:707px;position:absolute;left:0;top:0;transform-origin:top left}
+
+/* brand bar */
+.brand-bar{height:44px;display:flex;justify-content:space-between;align-items:center}
+.brand-left{display:flex;align-items:center;gap:11px}
+.logo{width:30px;height:30px;border-radius:9px;background:var(--syntax-grad);display:grid;place-items:center;font:800 13px var(--mono);color:#fff;letter-spacing:-1px}
+.brand-name{font-size:15px;font-weight:900;background:var(--syntax-grad);-webkit-background-clip:text;background-clip:text;color:transparent;line-height:1.2}
+.brand-sub{font-size:11px;color:var(--tm);font-weight:600}
+.brand-right{font-size:11.5px;color:var(--ts);font-weight:700}
+
+/* 16:9 stage */
+.vp{width:1100px;height:619px;position:relative;border-radius:20px;overflow:hidden;border:1px solid var(--border);background:var(--bg);box-shadow:0 0 0 1px rgba(168,85,247,.08),0 32px 70px rgba(0,0,0,.8)}
+.vp.part-intro{--c:#ec4899;--c-2:#a855f7}
+.vp.part-seq{--c:#6366f1;--c-2:#8b5cf6}
+.vp.part-sel{--c:#f59e0b;--c-2:#fbbf24}
+.vp.part-rep{--c:#22d3ee;--c-2:#06b6d4}
+.vp.part-fn{--c:#10b981;--c-2:#34d399}
+.vp.part-col{--c:#a855f7;--c-2:#c084fc}
+.vp-bg{position:absolute;inset:0;width:100%;height:100%;display:block;z-index:0}
+.vp-progress{position:absolute;top:0;left:0;right:0;height:3px;background:rgba(255,255,255,.05);z-index:6}
+.vp-progress span{display:block;height:100%;width:0;background:var(--syntax-grad);box-shadow:0 0 12px #a855f7;border-radius:0 3px 3px 0;transition:width .45s ease}
+.slide-counter{position:absolute;top:14px;left:50%;transform:translateX(-50%);z-index:6;padding:5px 14px;border-radius:999px;background:rgba(12,12,20,.75);border:1px solid var(--border);font-size:12px;font-weight:800;color:var(--ts)}
+
+/* slide */
+.slide{position:absolute;inset:0;display:none;flex-direction:column;padding:46px 52px 40px;z-index:2}
+.slide.active{display:flex}
+.slide>*{animation:revealUp .6s ease both}
+.slide>*:nth-child(2){animation-delay:.08s}
+.slide>*:nth-child(3){animation-delay:.16s}
+.slide>*:nth-child(4){animation-delay:.24s}
+.slide>*:nth-child(5){animation-delay:.32s}
+@keyframes revealUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.lbl{font-size:12.5px;font-weight:800;color:var(--c);margin-bottom:6px;letter-spacing:.4px;text-transform:uppercase}
+h2{margin:0 0 6px;font-size:27px;font-weight:900;line-height:1.3;letter-spacing:-.3px}
+h2 em{font-style:normal;background:var(--c-grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.sub{margin:0;font-size:14.5px;color:var(--ts);line-height:1.6;max-width:820px}
+.sub strong{color:var(--tp)}
+code,pre.code{font-variant-ligatures:none;font-feature-settings:"liga" 0,"calt" 0}
+code{font-family:var(--mono);font-size:.92em;color:#c7b3ff;background:rgba(255,255,255,.06);padding:1px 6px;border-radius:6px}
+.stage{flex:1;position:relative;min-height:0;margin-top:10px}
+.viz{position:absolute;inset:0}
+.viz canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+
+/* footer */
+.sf{display:flex;align-items:center;justify-content:space-between;font-size:11px;color:var(--tm);font-weight:600;margin-top:10px;height:16px}
+.pd{display:flex;gap:4px;align-items:center}
+.dot{width:5px;height:5px;border-radius:99px;background:rgba(255,255,255,.14);transition:.3s}
+.dot.on{width:18px;background:var(--c-grad)}
+
+/* hero */
+.hero-slide{justify-content:center}
+.hero-slide .lbl{margin-top:auto}
+.hero-slide h1{margin:6px 0 10px;font-size:72px;line-height:1.02;font-weight:900;letter-spacing:-2px}
+.hero-slide h1 em{font-style:normal;background:var(--syntax-grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero-slide .tag{font-size:21px;color:var(--ts);font-weight:600;max-width:760px;line-height:1.45}
+.inst{display:flex;align-items:center;gap:14px;margin-top:30px}
+.avatar{width:56px;height:56px;border-radius:50%;background:var(--syntax-grad);display:grid;place-items:center;font-weight:900;font-size:23px;box-shadow:0 0 24px rgba(168,85,247,.45)}
+.inst small{display:block;font-size:11px;letter-spacing:1.6px;text-transform:uppercase;color:var(--tm);font-weight:800;margin-bottom:2px}
+.inst b{font-size:21px;font-weight:800}
+.chips{display:flex;gap:10px;margin-top:26px;flex-wrap:wrap}
+.chips span{padding:6px 14px;border-radius:999px;border:1px solid var(--border);background:rgba(255,255,255,.04);font-size:13px;font-weight:700;color:var(--ts)}
+.hero-slide .sf{margin-top:auto}
+.herobg{position:absolute;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none}
+
+/* task slides */
+.task{display:grid;grid-template-columns:.92fr 1.08fr;gap:24px;position:absolute;inset:0}
+.tleft{display:flex;flex-direction:column;gap:14px;justify-content:center;min-width:0}
+.chip{align-self:flex-start;padding:5px 13px;border-radius:999px;background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--c);font-weight:800;font-size:11.5px;letter-spacing:.4px;text-transform:uppercase}
+.req{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+.req li{position:relative;padding-left:26px;font-size:15px;line-height:1.5;color:var(--tp)}
+.req li::before{content:'';position:absolute;left:0;top:.42em;width:11px;height:11px;border-radius:3px;background:var(--c-grad)}
+.trap{padding:12px 14px;border-radius:12px;border:1px solid rgba(251,113,133,.4);background:rgba(251,113,133,.08);font-size:13.5px;line-height:1.55;color:var(--tp)}
+.trap b{color:var(--warn)}
+.tright{position:relative;min-height:0}
+.solbtn{position:absolute;top:30px;right:52px;z-index:7;cursor:pointer;padding:8px 16px;border-radius:999px;border:1px solid var(--c);background:rgba(12,12,20,.85);color:var(--tp);font:800 12.5px Inter,system-ui,sans-serif;letter-spacing:.3px}
+.solbtn:hover{background:var(--c);color:#07070d}
+.solbtn kbd{margin-left:6px;padding:1px 6px;border-radius:5px;background:rgba(255,255,255,.1);font:700 11px var(--mono)}
+.sol{display:none;position:absolute;inset:0;background:rgba(7,7,13,.97);padding:34px 52px 40px;z-index:8;flex-direction:column;gap:14px}
+.sol.open{display:flex}
+.slide>.sol{animation-delay:0s}
+.sol-h{display:flex;justify-content:space-between;align-items:center}
+.sol-h .lbl{margin:0;font-size:13px}
+.sol-body{display:grid;grid-template-columns:1.5fr 1fr;gap:20px;flex:1;min-height:0}
+.codecard{background:rgba(12,12,20,.92);border:1px solid var(--border);border-radius:14px;padding:14px 18px;overflow:hidden;min-height:0}
+.notes{display:flex;flex-direction:column;gap:12px;justify-content:center}
+.note-h{font-size:12px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:var(--tm)}
+.note{padding:12px 15px;border-radius:12px;border:1px solid var(--border);border-left:3px solid var(--c);background:rgba(255,255,255,.03);font-size:14px;line-height:1.55}
+
+/* code */
+pre.code{margin:0;font:500 13px/1.5 var(--mono);color:#e8e6ff;white-space:pre;tab-size:4}
+pre.code .k{color:var(--c);font-weight:700}
+pre.code .t{color:#67e8f9}
+pre.code .s{color:#34d399}
+pre.code .n{color:#fbbf24}
+pre.code .c{color:#6b6b85;font-style:italic}
+pre.code .p{color:#a855f7}
+pre.code .f{color:#a5b4fc}
+pre.code .o{color:#f9a8d4}
+
+/* challenge slide */
+.chal{display:grid;grid-template-columns:1.1fr 1fr;gap:20px;position:absolute;inset:0}
+.chal .col{display:flex;flex-direction:column;gap:14px;min-height:0}
+.chal .codecard{flex:none}
+.chal pre.code{font-size:14px}
+.q{padding:16px 18px;border-radius:14px;border:1px solid var(--c);background:rgba(255,255,255,.03);flex:1;display:flex;flex-direction:column;justify-content:center;gap:10px}
+.q b{font-size:18px}
+.q .term{font:600 16px var(--mono);color:var(--ts)}
+.q .term i{display:inline-block;width:9px;height:18px;background:var(--c);vertical-align:-3px;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+
+/* controls */
+.controls{height:44px;display:flex;align-items:center;justify-content:space-between;color:var(--tm);font-size:12px;font-weight:600}
+.controls button{cursor:pointer;padding:7px 16px;border-radius:999px;border:1px solid var(--border);background:rgba(255,255,255,.04);color:var(--ts);font:700 12px Inter,system-ui,sans-serif}
+.controls button:hover{color:var(--tp);border-color:rgba(255,255,255,.25)}
+.controls kbd{padding:1px 6px;border-radius:5px;background:rgba(255,255,255,.08);font:700 11px var(--mono);color:var(--ts)}
+
+/* code walkthrough slides */
+.walk{display:grid;grid-template-columns:1.12fr 1fr;gap:22px;position:absolute;inset:0}
+.walk .codecard{padding:16px 20px;align-self:stretch;display:flex;align-items:center}
+.walk pre.code{font-size:14.5px;line-height:1.75;width:100%}
+pre.code .ln{display:block;padding:0 12px;margin:0 -12px;border-radius:6px;opacity:.5;transition:opacity .25s,background .25s}
+pre.code .ln.on{opacity:1;background:rgba(255,255,255,.08);box-shadow:inset 3px 0 0 var(--c)}
+.steps{display:flex;flex-direction:column;gap:10px;justify-content:center;min-width:0}
+.stp{display:flex;gap:12px;align-items:flex-start;padding:11px 14px;border-radius:12px;border:1px solid var(--border);background:rgba(255,255,255,.02);cursor:pointer;opacity:.5;transition:opacity .25s,border-color .25s,background .25s}
+.stp.on{opacity:1;border-color:var(--c);background:rgba(255,255,255,.06)}
+.stp i{flex:none;width:24px;height:24px;border-radius:50%;background:var(--c-grad);color:#07070d;font:900 12px Inter,system-ui,sans-serif;font-style:normal;display:grid;place-items:center;margin-top:1px}
+.stp b{display:block;font-size:14.5px;margin-bottom:3px}
+.stp code{white-space:pre}
+.stp span b{display:inline;font-size:inherit;margin:0;color:var(--tp)}
+.stp span{font-size:13px;color:var(--ts);line-height:1.5;display:block}
+/* side-by-side code cards */
+.cards{display:grid;gap:18px;position:absolute;inset:0;align-content:center}
+.cc{display:flex;flex-direction:column;gap:10px;min-width:0}
+.cc-h{font-size:12.5px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:var(--c)}
+.cc .codecard{flex:none;padding:16px 16px;min-height:230px}
+.cc pre.code{font-size:var(--fs,13px);line-height:1.7}
+.cc-n{font-size:13px;line-height:1.55;color:var(--ts);min-height:60px}
+.cc-n b{color:var(--tp)}
+/* no font ligatures in code: students must see the real characters  <=  <<  >> */
+pre.code,pre.code *,code,.wr .op,.wr .we,.wr .pp,.wr .wres,.stv,.stn{font-variant-ligatures:none!important;font-feature-settings:"liga" 0,"calt" 0!important}
+
+/* phones: hide chrome, fill the whole screen (landscape) or rotate to fill it (portrait) */
+.mnav{display:none;position:absolute;top:50%;z-index:9;width:38px;height:38px;margin-top:-19px;border-radius:50%;border:1px solid var(--border);background:rgba(12,12,20,.55);color:var(--tp);font:800 20px/1 Inter,system-ui,sans-serif;cursor:pointer;place-items:center;padding:0;opacity:.6}
+.mnav.mp{left:6px}.mnav.mn{right:6px}
+.small .mnav{display:grid}
+.small .brand-bar,.small .controls{display:none}
+.small .vp{border-radius:12px}
+
+/* answer box for the tracing challenge (lives outside the rotated deck, so the phone keyboard works) */
+.ansbtn{align-self:flex-start;cursor:pointer;padding:9px 18px;border-radius:999px;border:1px solid var(--c);background:rgba(255,255,255,.05);color:var(--tp);font:800 13.5px Inter,system-ui,sans-serif}
+.ansbtn:hover{background:var(--c);color:#07070d}
+.ansbtn kbd{margin-left:8px;padding:1px 6px;border-radius:5px;background:rgba(255,255,255,.12);font:700 11px var(--mono)}
+.q .term{cursor:pointer;min-height:24px}
+.q .term .typed{color:var(--tp)}
+.ansmodal{position:fixed;inset:0;z-index:100;display:flex;justify-content:center;align-items:flex-start;padding:8vh 12px 12px;background:rgba(5,5,10,.78)}
+.ansmodal[hidden]{display:none}
+.ans-card{width:min(94vw,460px);background:#0b0b14;border:1px solid rgba(168,85,247,.65);border-radius:16px;padding:18px;box-shadow:0 20px 60px rgba(0,0,0,.7);font-family:Inter,system-ui,sans-serif;color:#f0eeff}
+.ans-h{font-weight:800;font-size:16px;margin-bottom:12px}
+.ans-row{display:flex;align-items:center;gap:8px;background:#05050a;border:1px solid var(--border);border-radius:10px;padding:8px 12px}
+.ans-row span{font:700 16px "JetBrains Mono",ui-monospace,monospace;color:#9a9ab5}
+.ans-row input{flex:1;min-width:0;background:transparent;border:0;outline:0;color:#34d399;font:600 16px "JetBrains Mono",ui-monospace,monospace}
+.ans-fb{font-size:13.5px;line-height:1.55;margin-top:12px;min-height:0}
+.ans-fb.ok{color:#34d399}.ans-fb.bad{color:#fb7185}
+.ans-btns{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.ans-btns button{cursor:pointer;padding:9px 16px;border-radius:999px;border:1px solid rgba(168,85,247,.6);background:linear-gradient(90deg,#6366f1,#a855f7);color:#fff;font:800 13px Inter,system-ui,sans-serif}
+.ans-btns button.ghost{background:transparent;color:#9a9ab5;border-color:rgba(255,255,255,.15)}
+@media (max-height:500px){.ansmodal{padding-top:6px}.ans-card{padding:12px}.ans-h{font-size:14px;margin-bottom:8px}.ans-fb{margin-top:8px}.ans-btns{margin-top:10px}}
+
+/* interactive widgets (operators) */
+.wg{display:grid;grid-template-columns:.36fr 1fr;gap:22px;position:absolute;inset:0;align-items:center}
+.wg-in{padding:20px;border-radius:16px;border:1px solid var(--c);background:rgba(255,255,255,.03);display:flex;flex-direction:column;gap:16px}
+.wg-h{font-size:12px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:var(--c)}
+.st{display:flex;align-items:center;gap:10px}
+.stn{font:800 24px var(--mono);width:26px;color:var(--tp)}
+.st button{cursor:pointer;width:42px;height:42px;border-radius:12px;border:1px solid var(--border);background:rgba(255,255,255,.06);color:var(--tp);font:800 22px/1 Inter,system-ui,sans-serif;padding:0}
+.st button:hover{background:var(--c);color:#07070d}
+.stv{font:800 28px var(--mono);min-width:60px;text-align:center}
+.wg-note{font-size:12.5px;color:var(--ts);line-height:1.55}
+.wg-out{display:flex;flex-direction:column;gap:7px;min-width:0}
+.wr{display:grid;grid-template-columns:52px 1.2fr 1fr 1.15fr;align-items:center;gap:10px;padding:8px 14px;border-radius:12px;border:1px solid var(--border);background:rgba(255,255,255,.03);font-size:13px;min-width:0}
+.wr.l3{grid-template-columns:52px 1.25fr 1.5fr 1fr}
+.wr .op{font:800 15px var(--mono);color:var(--c)}
+.wr .wn{color:var(--ts);font-size:12.5px;line-height:1.35}
+.wr .we{font:600 13px var(--mono);color:var(--tp);white-space:nowrap}
+.wr .wres{font:800 14.5px var(--mono);text-align:right;white-space:nowrap}
+.wr .pp{font:600 12px var(--mono);color:var(--ts);margin-right:8px}
+.wr .ok{color:#34d399}.wr .bad{color:#fb7185}.wr .err{color:#fbbf24}
+.wr.flash{animation:wflash .55s}
+@keyframes wflash{from{background:rgba(255,255,255,.16)}to{background:rgba(255,255,255,.03)}}
+.walk.dense .stp{padding:7px 12px}
+.walk.dense .steps{gap:7px}
+.walk.dense .stp b{font-size:13.5px;margin-bottom:1px}
+.walk.dense .stp span{font-size:12.5px}
+
+#rotbtn{display:none;position:fixed;top:8px;right:8px;z-index:60;padding:7px 14px;border-radius:999px;border:1px solid rgba(168,85,247,.6);background:rgba(12,12,20,.85);color:#f0eeff;font:800 12px Inter,system-ui,sans-serif;cursor:pointer}
+.portrait #rotbtn{display:block}
+#boot{position:fixed;inset:0;display:grid;place-items:center;background:#07070d;color:#9a9ab5;font:700 14px system-ui,sans-serif;z-index:200}
+
+/* ── code windows: editor look, line numbers, hug the content ── */
+.codecard{background:#0b0b14;border:1px solid rgba(255,255,255,.11);border-radius:14px;padding:0;overflow:hidden;box-shadow:0 12px 34px rgba(0,0,0,.45)}
+.ed-bar{display:flex;align-items:center;gap:6px;padding:9px 14px;background:rgba(255,255,255,.05);border-bottom:1px solid var(--c)}
+.ed-bar i{width:9px;height:9px;border-radius:50%;display:block;flex:none}
+.cc .ed-lang{display:none}
+.cc .ed-body{min-height:118px}
+.ed-file{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ed-file{margin-left:10px;font:600 11.5px var(--mono);color:var(--ts)}
+.ed-lang{margin-left:auto;font:800 10px Inter,system-ui,sans-serif;letter-spacing:.9px;text-transform:uppercase;color:var(--c)}
+.ed-body{padding:14px 16px}
+.walk .codecard{padding:0;align-self:center;display:block}
+.cc .codecard{min-height:0;padding:0}
+.chal>.codecard{align-self:center}
+.sol-body{align-items:center}
+.sol-body .notes{align-self:center}
+pre.code{counter-reset:ln}
+pre.code .ln{counter-increment:ln;display:block;padding:0 10px;margin:0 -10px;border-radius:6px;opacity:1}
+pre.code .ln::before{content:counter(ln);display:inline-block;width:2ch;margin-right:16px;text-align:right;color:#4b4b66}
+.walk pre.code .ln{opacity:.5}
+.walk pre.code .ln.on{opacity:1;background:rgba(255,255,255,.08);box-shadow:inset 3px 0 0 var(--c)}
+.walk{grid-template-rows:minmax(0,1fr)}
+.walk .codecard{max-height:100%;overflow:hidden}
+</style>
+</head>
+<body>
+<a href="../../../index.html" style="position:fixed;top:12px;left:12px;z-index:99999;padding:8px 14px;border-radius:999px;background:rgba(10,14,30,.82);color:#e9edff;font:600 13px/1 system-ui,sans-serif;text-decoration:none;border:1px solid rgba(255,255,255,.2);backdrop-filter:blur(8px);transition:transform .2s,opacity .2s;opacity:.8" onmouseover="this.style.opacity=1;this.style.transform='scale(1.04)'" onmouseout="this.style.opacity=.8;this.style.transform='scale(1)'">← Back to sessions</a>
+<div id="boot">Loading…</div>
+<button id="rotbtn" type="button" tabindex="-1">⟳ Rotate view</button>
+<div id="fitbox"><div id="deck">
+  <div class="brand-bar">
+    <div class="brand-left">
+      <div class="logo">{ }</div>
+      <div>
+        <div class="brand-name">Multimedia</div>
+        <div class="brand-sub">Session ⇔ 01 · Introduction to Python · Sinai University</div>
+      </div>
+    </div>
+    <div class="brand-right">Instructor · Muhammad Ali Abdul Kareem</div>
+  </div>
+  <div class="vp part-intro" id="vp">
+    <canvas class="vp-bg" id="amb"></canvas>
+    <div class="vp-progress"><span id="prog"></span></div>
+    <div class="slide-counter" id="counter">1 / 1</div>
+    <button class="mnav mp" id="mprev" aria-label="Previous slide">‹</button>
+    <button class="mnav mn" id="mnext" aria-label="Next slide">›</button>
+  </div>
+  <div class="controls">
+    <button id="prev" tabindex="-1">‹ Prev</button>
+    <span><kbd>→</kbd> next &nbsp;·&nbsp; <kbd>←</kbd> back &nbsp;·&nbsp; <kbd>S</kbd> task solution &nbsp;·&nbsp; <kbd>F</kbd> fullscreen</span>
+    <button id="next" tabindex="-1">Next ›</button>
+  </div>
+</div></div>
+<div class="ansmodal" id="ansmodal" hidden>
+  <div class="ans-card">
+    <div class="ans-h">What is the final console output?</div>
+    <div class="ans-row"><span>&gt;</span><input id="ans" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="done" placeholder="type your answer"></div>
+    <div class="ans-fb" id="ansfb"></div>
+    <div class="ans-btns"><button id="anschk">Check</button><button id="ansrev" class="ghost">Show answer</button><button id="ansx" class="ghost">Close</button></div>
+  </div>
+</div>
+<script>
+/* boot: never let a slow font request or an error leave a blank page */
+'use strict';
+window.addEventListener('error',function(e){
+  var d=document.createElement('div');
+  d.style.cssText='position:fixed;left:8px;right:8px;bottom:8px;z-index:999;background:#3b0a14;color:#fecdd3;font:12px/1.4 monospace;padding:10px;border-radius:8px;white-space:pre-wrap';
+  d.textContent='Error: '+(e.message||'unknown')+(e.lineno?'  (line '+e.lineno+')':'');
+  (document.body||document.documentElement).appendChild(d);
+});
+(function(){
+  var url='https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&family=Lemonada:wght@400;600;700&display=swap';
+  function add(){var l=document.createElement('link');l.rel='stylesheet';l.href=url;document.head.appendChild(l)}
+  if(document.readyState==='complete')add();else window.addEventListener('load',add);
+})();
+'use strict';
+/* ═══════════════ Core helpers (canvas whiteboard toolkit) ═══════════════ */
+const CL={indigo:'#6366f1',violet:'#a855f7',pink:'#ec4899',cyan:'#67e8f9',green:'#34d399',amber:'#fbbf24',chalk:'#eef0ff',dim:'#8a8aa3',board:'#0a0a13'};
+const FONTS={ui:'Inter, system-ui, sans-serif',marker:'Lemonada, Inter, sans-serif',mono:'"JetBrains Mono", ui-monospace, Menlo, monospace'};
+let PC='#ec4899',PC2='#a855f7',SC=1;               // chapter colours + deck scale
+const at=(f,a,b)=>Math.min(1,Math.max(0,(f-a)/(b-a)));
+const ease=t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
+const lerp=(a,b,t)=>a+(b-a)*t;
+const rgba=(h,a)=>{const n=parseInt(h.slice(1),16);return `rgba(${n>>16},${(n>>8)&255},${n&255},${a})`};
+const typed=(s,p)=>s.slice(0,Math.ceil(s.length*p));
+
+/** DPR-aware canvas sizing bound to its parent */
+function fit(cv){
+  const ctx=cv.getContext('2d'),s={ctx,W:0,H:0,d:0},p=cv.parentElement;
+  s.rs=()=>{
+    const w=p.clientWidth,h=p.clientHeight,d=Math.min((devicePixelRatio||1)*SC,3);
+    if(!w||!h||(w===s.W&&h===s.H&&Math.abs(d-s.d)<.01))return;
+    s.W=w;s.H=h;s.d=d;cv.width=Math.round(w*d);cv.height=Math.round(h*d);ctx.setTransform(d,0,0,d,0,0);
+  };
+  s.rs();return s;
+}
+function rr(c,x,y,w,h,r){c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath()}
+
+/** ✍️ signature move: draws a polyline progressively, like a marker */
+function marker(c,pts,prog,col,lw=2.4){
+  if(prog<=0||pts.length<2)return;
+  let total=0;const seg=[];
+  for(let i=1;i<pts.length;i++){const d=Math.hypot(pts[i][0]-pts[i-1][0],pts[i][1]-pts[i-1][1]);seg.push(d);total+=d}
+  const target=total*prog;c.save();
+  c.strokeStyle=col;c.lineWidth=lw;c.lineJoin='round';c.lineCap='round';c.shadowColor=col;c.shadowBlur=6;
+  c.beginPath();c.moveTo(pts[0][0],pts[0][1]);let acc=0;
+  for(let i=1;i<pts.length;i++){const d=seg[i-1];
+    if(acc+d<=target){c.lineTo(pts[i][0],pts[i][1]);acc+=d}
+    else{const r=(target-acc)/d;c.lineTo(pts[i-1][0]+(pts[i][0]-pts[i-1][0])*r,pts[i-1][1]+(pts[i][1]-pts[i-1][1])*r);break}
+  }
+  c.stroke();c.restore();
+}
+function pathPos(pts,p){
+  let total=0;const seg=[];
+  for(let i=1;i<pts.length;i++){const d=Math.hypot(pts[i][0]-pts[i-1][0],pts[i][1]-pts[i-1][1]);seg.push(d);total+=d}
+  const t=total*p;let acc=0;
+  for(let i=0;i<seg.length;i++){
+    if(acc+seg[i]>=t||i===seg.length-1){const r=seg[i]?(t-acc)/seg[i]:0;return[pts[i][0]+(pts[i+1][0]-pts[i][0])*r,pts[i][1]+(pts[i+1][1]-pts[i][1])*r]}
+    acc+=seg[i];
+  }
+  return pts[0];
+}
+const mrect=(c,x,y,w,h,p,col,lw)=>marker(c,[[x,y],[x+w,y],[x+w,y+h],[x,y+h],[x,y-1]],p,col,lw);
+const mdia=(c,cx,cy,hw,hh,p,col,lw)=>marker(c,[[cx,cy-hh],[cx+hw,cy],[cx,cy+hh],[cx-hw,cy],[cx,cy-hh]],p,col,lw);
+function mbox(c,x,y,w,h,p,col,fa=.09){
+  if(p<=0)return;
+  c.save();rr(c,x,y,w,h,8);c.fillStyle=rgba(col,fa*p);c.fill();c.restore();
+  mrect(c,x,y,w,h,p,col,2.2);
+}
+function head(c,x1,y1,x2,y2,col,s=8){
+  const a=Math.atan2(y2-y1,x2-x1);c.save();c.fillStyle=col;c.beginPath();c.moveTo(x2,y2);
+  c.lineTo(x2-s*Math.cos(a-.42),y2-s*Math.sin(a-.42));c.lineTo(x2-s*Math.cos(a+.42),y2-s*Math.sin(a+.42));c.closePath();c.fill();c.restore();
+}
+function arrow(c,pts,p,col,lw=2.2){
+  marker(c,pts,p,col,lw);
+  if(p>=.98){const n=pts.length;head(c,pts[n-2][0],pts[n-2][1],pts[n-1][0],pts[n-1][1],col)}
+}
+function dash(c,pts,col,lw=1.6,a=1){
+  c.save();c.globalAlpha=a;c.strokeStyle=col;c.lineWidth=lw;c.setLineDash([6,5]);c.beginPath();
+  pts.forEach((p,i)=>i?c.lineTo(p[0],p[1]):c.moveTo(p[0],p[1]));c.stroke();c.restore();
+}
+function dot(c,x,y,r,col,label){
+  c.save();c.shadowColor=col;c.shadowBlur=12;c.fillStyle=col;c.beginPath();c.arc(x,y,r,0,7);c.fill();c.restore();
+  if(label)txt(c,label,x,y+.5,{size:Math.max(9,r*.95),col:'#07070d',weight:900,font:'mono'});
+}
+let CW=0;   // current canvas width, set every frame by the master loop
+function txt(c,s,x,y,o={}){
+  const{size=13,col=CL.chalk,weight=700,align='center',a=1,font='ui',base='middle'}=o;
+  if(!s||!(a>0))return;
+  c.save();c.globalAlpha=a;c.font=`${weight} ${size}px ${FONTS[font]}`;
+  if(font==='mono'&&'letterSpacing' in c)c.letterSpacing='.3px';   // switches off <= << ligatures
+  const w=c.measureText(s).width;
+  let ax=align==='center'?x-w/2:align==='right'?x-w:x;
+  if(CW)ax=Math.max(12,Math.min(ax,CW-12-w));      // keep every label inside the canvas
+  c.fillStyle=col;c.textAlign='left';c.textBaseline=base;c.fillText(s,ax,y);c.restore();
+}
+/** chalkboard surface: dark + dot grid + breathing brand-gradient frame */
+function board(c,W,H,o={}){
+  const p=6,x=p,y=p,w=W-p*2,h=H-p*2;
+  rr(c,x,y,w,h,16);c.fillStyle=CL.board;c.fill();
+  c.save();rr(c,x,y,w,h,16);c.clip();c.fillStyle='rgba(168,85,247,.055)';
+  for(let gx=x+22;gx<x+w;gx+=26)for(let gy=y+22;gy<y+h;gy+=26){c.beginPath();c.arc(gx,gy,1,0,7);c.fill()}
+  c.restore();
+  const g=c.createLinearGradient(x,y,x+w,y+h);
+  g.addColorStop(0,CL.indigo);g.addColorStop(.5,CL.violet);g.addColorStop(1,CL.pink);
+  c.save();c.strokeStyle=g;c.lineWidth=2;c.shadowColor=CL.violet;c.shadowBlur=10+5*Math.sin((o.frame||0)*.03);
+  rr(c,x,y,w,h,16);c.stroke();c.restore();
+  if(o.title)txt(c,o.title,x+22,y+28,{size:16,col:CL.chalk,align:'left',font:'marker',weight:600});
+  return{x,y,w,h};
+}
+
+/** trace table (chalk style). Rows appear one by one; changed cells flash. */
+function table(c,x,y,w,cols,rows,f,o={}){
+  const{rowH=44,hdrH=36,start=14,per=60,col=PC}=o;
+  const hp=at(f,start-10,start+24);
+  c.save();rr(c,x,y,w,hdrH,8);c.fillStyle=rgba(col,.16*ease(hp));c.fill();c.restore();
+  let cx=x;
+  cols.forEach(cd=>{const cw=cd.w*w;
+    txt(c,cd.h,cd.al==='left'?cx+12:cx+cw/2,y+hdrH/2,{size:11.5,col:col,weight:800,align:cd.al==='left'?'left':'center',a:ease(hp)});
+    cx+=cw});
+  marker(c,[[x,y+hdrH],[x+w,y+hdrH]],hp,col,1.6);
+  const first=start+30;
+  rows.forEach((row,r)=>{
+    const s0=first+r*per,p=at(f,s0,s0+24),ry=y+hdrH+8+r*rowH;
+    if(p<=0)return;
+    const active=f>=s0&&f<s0+per;
+    c.save();c.globalAlpha=ease(p);
+    if(active){rr(c,x,ry,w,rowH-4,8);c.fillStyle=rgba(col,.10);c.fill();c.strokeStyle=rgba(col,.55);c.lineWidth=1.4;c.stroke()}
+    let cx2=x;
+    row.forEach((cell,i)=>{
+      const cd=cols[i],cw=cd.w*w,o2=typeof cell==='string'?{t:cell}:cell;
+      if(o2.hl&&active){c.fillStyle=rgba(o2.col||col,.24);rr(c,cx2+3,ry+3,cw-6,rowH-10,6);c.fill()}
+      txt(c,o2.t,cd.al==='left'?cx2+12:cx2+cw/2,ry+(rowH-4)/2,{size:cd.size||13,col:o2.col||CL.chalk,weight:o2.hl?800:600,align:cd.al==='left'?'left':'center',font:cd.mono?'mono':'ui'});
+      cx2+=cw;
+    });
+    c.restore();
+  });
+  return Math.max(-1,Math.min(rows.length-1,Math.floor((f-first)/per)));
+}
+
+/** terminal that types out the expected console I/O */
+function terminal(c,x,y,w,h,f,lines,o={}){
+  const{start=26,speed=.5,pause=18,title='Expected output'}=o;
+  const p=ease(at(f,0,30));
+  c.save();c.globalAlpha=p;
+  rr(c,x,y,w,h,14);c.fillStyle='#0b0b14';c.fill();
+  c.save();rr(c,x,y,w,h,14);c.clip();c.fillStyle='rgba(255,255,255,.05)';c.fillRect(x,y,w,36);c.restore();
+  c.strokeStyle=rgba(PC,.6);c.lineWidth=1.6;rr(c,x,y,w,h,14);c.stroke();
+  ['#fb7185','#fbbf24','#34d399'].forEach((k,i)=>{c.fillStyle=k;c.beginPath();c.arc(x+22+i*18,y+18,5,0,7);c.fill()});
+  c.restore();
+  txt(c,title,x+w-18,y+18,{size:11.5,col:CL.dim,align:'right',a:p});
+  const lh=Math.min(32,(h-76)/lines.length);
+  let t=(f-start)*speed,ly=y+34+lh*.9+12,last=null,cur=null;
+  lines.forEach(seg=>{
+    const len=seg.reduce((n,s)=>n+s[0].length,0);
+    if(t>0){
+      let budget=Math.min(len,Math.floor(t)),cx=x+22;
+      seg.forEach(([tx,ck])=>{
+        const part=tx.slice(0,Math.max(0,budget));budget-=tx.length;
+        if(part){c.save();c.font=`500 15px ${FONTS.mono}`;if('letterSpacing' in c)c.letterSpacing='.3px';c.fillStyle=CL[ck]||CL.chalk;c.textAlign='left';c.textBaseline='middle';c.fillText(part,cx,ly);cx+=c.measureText(part).width;c.restore()}
+      });
+      last=[cx,ly];
+      if(t<len+pause*speed)cur=[cx,ly];
+    }
+    t-=len+pause*speed;ly+=lh;
+  });
+  const cp=cur||last;
+  if(cp&&Math.floor(f/24)%2===0){c.fillStyle=PC;c.fillRect(cp[0]+3,cp[1]-9,9,18)}
+}
+
+/* ═══════════════ Visual registry ═══════════════ */
+const VIZ={};
+
+/* hero — drifting C++ tokens */
+VIZ.tokens={cycle:100000,draw(c,W,H,f){
+  const T=['if','for','def','in','return','print()','%','while','input()','range()','len()','elif','==','and','or','not','int()','True'];
+  T.forEach((t,i)=>{
+    const sx=((i*137.5)%100)/100,sy=((i*61.8)%100)/100;
+    const x=W*sx+Math.sin(f*.01+i)*18,y=(((H*sy-f*(.12+(i%4)*.05))%H)+H)%H;
+    txt(c,t,x,y,{size:15+(i%3)*4,col:i%2?PC:PC2,a:.1+.08*Math.sin(f*.02+i),font:'mono',weight:700});
+  });
+}};
+
+
+/* ═══════════════ Python helpers ═══════════════ */
+const PYC={k:null,t:'#67e8f9',s:'#34d399',n:'#fbbf24',c:'#6b6b85',p:'#a855f7',f:'#a5b4fc','':'#eef0ff'};
+function pyTok(src){
+  const re=/(#[^\n]*)|("(?:[^"\\\n]|\\.)*"|'(?:[^'\\\n]|\\.)*')|\b(\d+(?:\.\d+)?j?)\b|\b(def|return|if|elif|else|for|while|in|and|or|not|break|continue|import|from|pass|lambda)\b|\b(True|False|None)\b|\b(int|str|float|bool|list|set|dict|tuple|complex|range|frozenset|bytes|bytearray|memoryview)\b(?!\()|\b([A-Za-z_]\w*)(?=\()/g;
+  const out=[];let last=0,m;
+  while((m=re.exec(src))){
+    if(m.index>last)out.push([src.slice(last,m.index),'']);
+    const cls=m[1]?'c':m[2]?'s':m[3]?'n':m[4]?'k':m[5]?'p':m[6]?'t':'f';
+    out.push([m[0],cls]);last=m.index+m[0].length;
+  }
+  if(last<src.length)out.push([src.slice(last),'']);
+  return out;
+}
+/** typed, syntax-coloured code lines on the canvas */
+function drawCode(c,x,y,lines,o={}){
+  const{size=13,lh=24,f=1e9,start=0,per=30,active=null,a=1}=o;
+  c.save();c.font=`500 ${size}px ${FONTS.mono}`;if('letterSpacing' in c)c.letterSpacing='.3px';
+  c.textAlign='left';c.textBaseline='middle';
+  lines.forEach((ln,i)=>{
+    const p=at(f,start+i*per,start+i*per+per*.9);if(p<=0||!ln)return;
+    let n=Math.ceil(ln.length*p),cx=x;
+    c.globalAlpha=a*((active&&!active.includes(i))?.4:1);
+    for(const[t,cl]of pyTok(ln)){
+      if(n<=0)break;const part=t.slice(0,n);n-=t.length;
+      c.fillStyle=cl==='k'?PC:PYC[cl];c.fillText(part,cx,y+i*lh);cx+=c.measureText(part).width;
+    }
+  });
+  c.restore();
+}
+function pill(c,x,y,w,h,label,col,p=1,o={}){
+  if(p<=0)return;c.save();c.globalAlpha=p;rr(c,x,y,w,h,h/2);c.fillStyle=rgba(col,o.fa??.16);c.fill();c.strokeStyle=col;c.lineWidth=1.6;c.stroke();c.restore();
+  txt(c,label,x+w/2,y+h/2,{size:o.size||12,font:o.font||'mono',col:o.tc||CL.chalk,a:p,weight:700});
+}
+/** editor / terminal window drawn on the canvas */
+function edPanel(c,x,y,w,h,name,p=1,o={}){
+  if(p<=0)return;const a=Math.min(1,p),acc=o.acc||CL.violet;
+  c.save();c.globalAlpha=a;
+  rr(c,x,y,w,h,12);c.fillStyle='#0b0b14';c.fill();
+  c.save();rr(c,x,y,w,h,12);c.clip();c.fillStyle='rgba(255,255,255,.05)';c.fillRect(x,y,w,30);c.fillStyle=rgba(acc,.6);c.fillRect(x,y+30,w,1.5);c.restore();
+  c.strokeStyle='rgba(255,255,255,.13)';c.lineWidth=1.2;rr(c,x,y,w,h,12);c.stroke();
+  ['#fb7185','#fbbf24','#34d399'].forEach((k,i)=>{c.fillStyle=k;c.beginPath();c.arc(x+16+i*14,y+15,4,0,7);c.fill()});
+  c.restore();
+  txt(c,name,x+w-16,y+15,{size:11,font:'mono',col:CL.dim,align:'right',a,weight:600});
+}
+/** code editor on the left (with line numbers), terminal on the right; rows typed one by one */
+function codeout(c,b,f,spec){
+  const{rows,note,per=46,start=16,size=13,lh=26,file='main.py'}=spec;
+  const lx=b.x+22,ly=b.y+50,lw=Math.round(b.w*.56),rx=lx+lw+14,rw=b.x+b.w-22-rx,ph=Math.min(b.h-(note?100:80),30+36+rows.length*lh);
+  edPanel(c,lx,ly,lw,ph,file,at(f,0,30),{acc:CL.violet});edPanel(c,rx,ly,rw,ph,'terminal',at(f,0,30),{acc:CL.green});
+  rows.forEach((r,i)=>{
+    const t0=start+i*per,y=ly+30+26+i*lh;
+    if(f>=t0&&f<t0+per&&(r.c||r.o)){c.save();rr(c,lx+6,y-lh/2+2,lw+rw+8,lh-2,6);c.fillStyle=rgba(PC,.10);c.fill();c.restore()}
+    txt(c,String(i+1),lx+32,y,{size:size-2,font:'mono',col:'#4b4b66',align:'right',a:ease(at(f,10,40))});
+    if(r.c)drawCode(c,lx+46,y,[r.c],{f,start:t0,per:per*.8,size});
+    if(r.o!=null){const op=at(f,t0+per*.75,t0+per*.75+24);
+      txt(c,typed(r.o,op),rx+18,y,{size,font:'mono',col:CL.green,align:'left',weight:600,a:op>0?1:0})}
+  });
+  if(note){const tn=start+rows.length*per;txt(c,note,b.x+b.w/2,b.y+b.h-24,{size:13.5,col:PC,font:'marker',a:ease(at(f,tn,tn+30))})}
+}
+
+/* ═══════════════ Python visualisations (part 1) ═══════════════ */
+
+/* 2 — roadmap */
+VIZ.pyroad={cycle:720,draw(c,W,H,f,frame){
+  const b=board(c,W,H,{title:'Course roadmap',frame});
+  const T=[['Output & Input',0],['Variables',0],['Data types',0],['Arithmetic',1],['Assignment',1],['Comparison',1],['Logical',1],['List',2],['Set',2],['if / elif / else',3],['for loop',3],['while loop',3],['range()',3],['Functions',4],['OOP · next session',5]];
+  const col=[CL.cyan,CL.violet,CL.amber,CL.green,CL.pink,CL.dim];
+  const gx=14,gy=20,cw=Math.min(180,(b.w-56-4*gx)/5),ch=56,x0=b.x+(b.w-(5*cw+4*gx))/2,y0=b.y+68;
+  T.forEach(([n,g],i)=>{
+    const r=Math.floor(i/5),k=i%5,x=x0+k*(cw+gx),y=y0+r*(ch+gy),p=at(f,10+i*14,40+i*14);
+    const on=f>=260&&(Math.floor((f-260)/26)%15===i);
+    mbox(c,x,y,cw,ch,p,col[g],on?.3:.08);
+    txt(c,String(i+1).padStart(2,'0'),x+14,y+ch/2,{size:11.5,font:'mono',col:col[g],a:ease(p),align:'left'});
+    txt(c,n,x+cw/2+12,y+ch/2,{size:11.5,font:'marker',a:ease(at(f,30+i*14,60+i*14)),col:g===5?CL.dim:CL.chalk});
+  });
+  txt(c,'From your first print() to writing your own functions',b.x+b.w/2,b.y+b.h-34,{size:14,col:PC,font:'marker',a:ease(at(f,240,280))});
+}};
+
+/* 3 — print() */
+VIZ.pyprint={cycle:640,draw(c,W,H,f,frame){
+  const b=board(c,W,H,{title:'print(): text to the screen',frame});
+  codeout(c,b,f,{file:'print_demo.py',size:15,lh:48,per:60,rows:[
+    {c:"print('This sentence is output to the screen')",o:'This sentence is output to the screen'},
+    {c:''},
+    {c:'a = 5'},
+    {c:"print('The value of a is', a)",o:'The value of a is 5'}],
+    note:'Arguments separated by commas are joined with a space'});
+}};
+
+/* 4 — input() returns a string */
+VIZ.pyinput={cycle:680,draw(c,W,H,f,frame){
+  const b=board(c,W,H,{title:'input() always returns a string',frame});
+  const nw=160,nh=46,x0=b.x+34,gap=(b.w-68-4*nw)/3,X=i=>x0+i*(nw+gap);
+  const row=(y,nodes,t0)=>{
+    nodes.forEach((n,i)=>{
+      const p=at(f,t0+i*30,t0+i*30+30);
+      mbox(c,X(i),y,nw,nh,p,n[1],.13);
+      txt(c,n[0],X(i)+nw/2,y+nh/2,{size:12,font:'mono',a:ease(at(f,t0+i*30+20,t0+i*30+45))});
+      if(i<nodes.length-1)arrow(c,[[X(i)+nw,y+nh/2],[X(i+1),y+nh/2]],at(f,t0+i*30+20,t0+i*30+45),CL.dim,1.8);
+    });
+  };
+  const y1=b.y+86,y2=b.y+214;
+  txt(c,'Without casting',x0,y1-24,{size:12.5,col:CL.dim,align:'left',font:'marker',a:ease(at(f,0,30))});
+  row(y1,[['you type  10',CL.cyan],['input(...)',CL.violet],["num = '10'  (str)",CL.pink],['print(..., num)',CL.green]],10);
+  const d1=at(f,140,200);if(d1>0&&d1<1){const[x,y]=pathPos([[X(0)+nw/2,y1+nh/2],[X(3)+nw/2,y1+nh/2]],ease(d1));dot(c,x,y,11,CL.amber,'10')}
+  txt(c,'the result is  10',X(3)+nw/2,y1+nh+22,{size:12.5,font:'mono',col:CL.green,a:ease(at(f,200,230))});
+  txt(c,'With int()',x0,y2-24,{size:12.5,col:CL.dim,align:'left',font:'marker',a:ease(at(f,240,270))});
+  row(y2,[["num = '10'  (str)",CL.pink],['int(num)',CL.amber],['10  (int)',CL.green],['+ 5   →   15',CL.indigo]],250);
+  const d2=at(f,380,450);if(d2>0&&d2<1){const[x,y]=pathPos([[X(0)+nw/2,y2+nh/2],[X(3)+nw/2,y2+nh/2]],ease(d2));dot(c,x,y,11,CL.amber,d2<.5?'10':'15')}
+  txt(c,'the result is  15',X(3)+nw/2,y2+nh+22,{size:12.5,font:'mono',col:CL.green,a:ease(at(f,450,480))});
+  const pc=at(f,500,570);
+  txt(c,typed('input() gives text: cast it with int() before doing arithmetic',pc),b.x+b.w/2,b.y+b.h-26,{size:13.5,col:PC,font:'marker',a:pc>0?1:0});
+}};
+
+/* 7 — variables */
+VIZ.pyvars={cycle:720,draw(c,W,H,f,frame){
+  const b=board(c,W,H,{title:'A variable is created when you assign it',frame});
+  const lx=b.x+24,ly=b.y+50,lw=b.w*.38,ph=b.h-100;
+  edPanel(c,lx,ly,lw,ph,'variables.py',at(f,0,30),{acc:CL.violet});
+  const L=[['x = 5',30],['y = "John"',110],['',0],['x = "Sally"  # x is now a str',250]];
+  L.forEach(([t,s],i)=>{txt(c,String(i+1),lx+34,ly+66+i*34,{size:12,font:'mono',col:'#4b4b66',align:'right',a:ease(at(f,10,40))});if(t)drawCode(c,lx+50,ly+66+i*34,[t],{f,start:s,per:40,size:15})});
+  const bx=b.x+b.w*.68,bw=170,bh=46,tx=b.x+b.w*.5,th=32;
+  const Ry=[ly+46,ly+118,ly+190];
+  txt(c,'MEMORY',bx,ly+16,{size:10.5,col:CL.dim,align:'left',a:ease(at(f,20,40)),weight:800});
+  const p1=at(f,40,80),p2=at(f,120,160),p3=at(f,260,300);
+  const fade1=f>=330?1-.7*at(f,330,370):1;
+  c.save();c.globalAlpha=fade1;
+  mbox(c,bx,Ry[0],bw,bh,p1,CL.amber,.14);txt(c,'5',bx+bw/2,Ry[0]+bh/2,{size:20,font:'marker',a:ease(p1)});
+  pill(c,bx+bw+10,Ry[0]+bh/2-11,44,22,'int',CL.amber,ease(p1),{size:11});c.restore();
+  mbox(c,bx,Ry[1],bw,bh,p2,CL.green,.14);txt(c,'"John"',bx+bw/2,Ry[1]+bh/2,{size:18,font:'marker',a:ease(p2)});
+  pill(c,bx+bw+10,Ry[1]+bh/2-11,44,22,'str',CL.green,ease(p2),{size:11});
+  mbox(c,bx,Ry[2],bw,bh,p3,CL.green,.14);txt(c,'"Sally"',bx+bw/2,Ry[2]+bh/2,{size:18,font:'marker',a:ease(p3)});
+  pill(c,bx+bw+10,Ry[2]+bh/2-11,44,22,'str',CL.green,ease(p3),{size:11});
+  // name tags
+  const xy=(f<270)?Ry[0]:lerp(Ry[0],Ry[2],ease(at(f,270,330)));
+  if(p1>0){pill(c,tx,xy+bh/2-16,56,32,'x',PC,ease(p1),{size:15});arrow(c,[[tx+56,xy+bh/2],[bx,xy+bh/2]],p1,PC,2)}
+  if(p2>0){pill(c,tx,Ry[1]+bh/2-16,56,32,'y',CL.cyan,ease(p2),{size:15});arrow(c,[[tx+56,Ry[1]+bh/2],[bx,Ry[1]+bh/2]],p2,CL.cyan,2)}
+  const pc=at(f,380,450);
+  txt(c,typed('No declaration needed · the type can change after assignment',pc),b.x+b.w/2,b.y+b.h-26,{size:13.5,col:PC,font:'marker',a:pc>0?1:0});
+}};
+
+/* 8 — casting and type() */
+VIZ.pycast={cycle:640,draw(c,W,H,f,frame){
+  const b=board(c,W,H,{title:'Casting and type()',frame});
+  codeout(c,b,f,{file:'casting.py',lh:27,per:46,rows:[
+    {c:"x = str(3)    # x will be '3'"},{c:'y = int(3)    # y will be 3'},{c:'z = float(3)  # z will be 3.0'},{c:''},
+    {c:'x = 5'},{c:'y = "John"'},
+    {c:'print(type(x))',o:"<class 'int'>"},{c:'print(type(y))',o:"<class 'str'>"}],
+    note:'type() tells you the data type of any value'});
+}};
+
+/* 9 — quotes and case */
+VIZ.pycase={cycle:640,draw(c,W,H,f,frame){
+  const b=board(c,W,H,{title:'Quotes and case-sensitivity',frame});
+  codeout(c,b,f,{file:'names.py',lh:25,per:42,rows:[
+    {c:'x = "John"'},{c:'print(x)',o:'John'},{c:"x = 'John'   # same as double quotes"},{c:'print(x)',o:'John'},{c:''},
+    {c:'a = 4'},{c:'A = "Sally"'},{c:'print(a)',o:'4'},{c:'print(A)',o:'Sally'}],
+    note:'Names are case-sensitive: a and A are two different variables'});
+}};
+
+/* 10 — data types map */
+VIZ.pytypes={cycle:720,draw(c,W,H,f,frame){
+  const b=board(c,W,H,{title:'Python built-in data types',frame});
+  const G=[
+    ['Text',CL.cyan,[['str','"Hello World"']]],
+    ['Numeric',CL.amber,[['int','20'],['float','20.5'],['complex','1j']]],
+    ['Sequence',CL.violet,[['list','["apple", "banana"]'],['tuple','("apple", "banana")'],['range','range(6)']]],
+    ['Mapping',CL.pink,[['dict','{"name": "John", "age": 36}']]],
+    ['Set',CL.green,[['set','{"apple", "banana"}'],['frozenset','frozenset({"apple"})']]],
+    ['Boolean',CL.indigo,[['bool','True']]],
+    ['Binary',CL.cyan,[['bytes','b"Hello"'],['bytearray','bytearray(5)'],['memoryview','memoryview(bytes(5))']]],
+    ['None',CL.dim,[['NoneType','None']]]];
+  const gp=14,gw=(b.w-48-3*gp)/4,gh=(b.h-72-gp)/2;
+  G.forEach(([name,col,items],i)=>{
+    const r=Math.floor(i/4),k=i%4,x=b.x+24+k*(gw+gp),y=b.y+54+r*(gh+gp),p=at(f,10+i*36,50+i*36);
+    mbox(c,x,y,gw,gh,p,col,.07);
+    txt(c,name.toUpperCase(),x+14,y+18,{size:11.5,col,align:'left',weight:800,a:ease(at(f,40+i*36,70+i*36))});
+    items.forEach(([t,ex],j)=>{
+      const a=ease(at(f,60+i*36+j*14,90+i*36+j*14)),yy=y+46+j*36;
+      txt(c,t,x+14,yy,{size:13.5,font:'mono',col:CL.chalk,align:'left',a,weight:700});
+      txt(c,ex,x+14,yy+16,{size:10.5,font:'mono',col:CL.dim,align:'left',a});
+    });
+  });
+}};
+
+/* 12 — assignment operators */
+VIZ.pyassign={cycle:720,draw(c,W,H,f,frame){
+  const b=board(c,W,H,{title:'Assignment operators',frame});
+  const lx=b.x+24,ly=b.y+50,lw=b.w*.38,ph=b.h-80;
+  edPanel(c,lx,ly,lw,ph,'assign.py',at(f,0,30),{acc:CL.violet});
+  [['x = 5',20],['x += 3',150],['x *= 3',290]].forEach(([t,s],i)=>{txt(c,String(i+1),lx+34,ly+70+i*44,{size:12,font:'mono',col:'#4b4b66',align:'right',a:ease(at(f,10,40))});drawCode(c,lx+50,ly+70+i*44,[t],{f,start:s,per:30,size:16})});
+  const v=f<60?'':(f<190?'5':(f<330?'8':'24'));
+  const vx=lx+lw*.62,vy=ly+52,fl=(f>=190&&f<240)||(f>=330&&f<380);
+  mbox(c,vx,vy,lw*.3,64,at(f,40,80),fl?CL.amber:CL.violet,.16);
+  txt(c,'x',vx+14,vy+14,{size:11,font:'mono',col:CL.dim,align:'left',a:ease(at(f,60,90))});
+  txt(c,v,vx+lw*.15,vy+36,{size:28,font:'marker',col:fl?CL.amber:CL.chalk,a:v?1:0,weight:700});
+  txt(c,'x = x + 3   →  8',lx+50,ly+70+3*44+4,{size:12.5,font:'mono',col:CL.amber,align:'left',a:ease(at(f,200,240))});
+  txt(c,'x = x * 3   →  24',lx+50,ly+70+3*44+30,{size:12.5,font:'mono',col:CL.amber,align:'left',a:ease(at(f,340,380))});
+  const ops=[['=','x = 5'],['+=','x = x + 3'],['-=','x = x - 3'],['*=','x = x * 3'],['/=','x = x / 3'],['%=','x = x % 3'],['//=','x = x // 3'],['**=','x = x ** 3'],['&=','x = x & 3'],['|=','x = x | 3'],['^=','x = x ^ 3'],['>>=','x = x >> 3'],['<<=','x = x << 3']];
+  const rx=lx+lw+22,cw=(b.x+b.w-24-rx)/2;
+  txt(c,'OPERATOR',rx+8,ly+16,{size:10.5,col:CL.dim,align:'left',a:ease(at(f,20,40)),weight:800});
+  txt(c,'SAME AS',rx+78,ly+16,{size:10.5,col:CL.dim,align:'left',a:ease(at(f,20,40)),weight:800});
+  txt(c,'OPERATOR',rx+cw+8,ly+16,{size:10.5,col:CL.dim,align:'left',a:ease(at(f,20,40)),weight:800});
+  txt(c,'SAME AS',rx+cw+78,ly+16,{size:10.5,col:CL.dim,align:'left',a:ease(at(f,20,40)),weight:800});
+  ops.forEach(([o,s],i)=>{
+    const col=i<7?0:1,row=i<7?i:i-7,x=rx+col*cw,y=ly+48+row*34,a=ease(at(f,40+i*22,70+i*22));
+    txt(c,o,x+8,y,{size:14,font:'mono',col:PC,align:'left',weight:800,a});
+    txt(c,s,x+78,y,{size:12,font:'mono',col:CL.chalk,align:'left',a});
+  });
+}};
+
+/* terminals for the task slides */
+VIZ.terminal={cycle:560,draw(c,W,H,f,frame,o){
+  const h=Math.min(H-8,Math.max(200,o.data.lines.length*34+90));
+  terminal(c,4,(H-h)/2,W-8,h,f,o.data.lines,{title:o.data.title||'Expected output'});
+}};
+/* ═══════════════ Python visualisations (part 2) ═══════════════ */
+
+/* 15 — list */
+VIZ.pylist={cycle:760,draw(c,W,H,f,frame){
+  const b=board(c,W,H,{title:'List: ordered, changeable, duplicates allowed',frame});
+  const x0=b.x+40,cw=118,ch=44,gp=10;
+  drawCode(c,x0,b.y+64,['thislist = ["apple", "banana", "cherry"]'],{f,start:10,per:50,size:14});
+  const y1=b.y+112;
+  ['apple','banana','cherry'].forEach((s,i)=>{
+    const x=x0+i*(cw+gp),p=at(f,60+i*18,90+i*18),on=f>=190&&f<300&&i===0;
+    mbox(c,x,y1,cw,ch,p,CL.violet,on?.32:.12);
+    txt(c,'"'+s+'"',x+cw/2,y1+ch/2,{size:13,font:'mono',a:ease(at(f,85+i*18,110+i*18))});
+    txt(c,'['+i+']',x+cw/2,y1-14,{size:12,font:'mono',col:CL.amber,a:ease(at(f,100+i*18,125+i*18))});
+  });
+  const ax=x0+3*(cw+gp)+30,pl=at(f,240,290);
+  txt(c,'thislist[0]   →   apple',ax,y1+ch/2-12,{size:13,font:'mono',align:'left',col:CL.chalk,a:ease(at(f,170,200))});
+  if(pl>0){const bx1=x0,bx2=x0+3*(cw+gp)-gp;marker(c,[[bx1,y1+ch+10],[bx1,y1+ch+18],[bx2,y1+ch+18],[bx2,y1+ch+10]],pl,CL.green,2)}
+  txt(c,'len(thislist)   →   3',ax,y1+ch/2+14,{size:13,font:'mono',align:'left',col:CL.green,a:ease(at(f,240,270))});
+  drawCode(c,x0,b.y+218,['list1 = ["abc", 34, True, 40, "male"]'],{f,start:330,per:50,size:14});
+  const y2=b.y+258,items=[['"abc"','str',CL.green],['34','int',CL.amber],['True','bool',CL.cyan],['40','int',CL.amber],['"male"','str',CL.green]],cw2=96;
+  items.forEach(([t,ty,col],i)=>{
+    const x=x0+i*(cw2+gp),p=at(f,380+i*16,410+i*16);
+    mbox(c,x,y2,cw2,40,p,col,.12);txt(c,t,x+cw2/2,y2+20,{size:12.5,font:'mono',a:ease(at(f,405+i*16,430+i*16))});
+    txt(c,ty,x+cw2/2,y2+56,{size:11,font:'mono',col,a:ease(at(f,430+i*16,455+i*16))});
+  });
+  txt(c,"type(list1)   →   <class 'list'>",x0+5*(cw2+gp)+22,y2+20,{size:12.5,font:'mono',align:'left',col:CL.chalk,a:ease(at(f,520,550))});
+  txt(c,'any data type, even mixed',x0+5*(cw2+gp)+22,y2+44,{size:11.5,col:CL.dim,align:'left',a:ease(at(f,540,570))});
+}};
+
+/* 17 — set */
+VIZ.pyset={cycle:760,draw(c,W,H,f,frame){
+  const b=board(c,W,H,{title:'Set: unordered, unindexed, no duplicates',frame});
+  drawCode(c,b.x+30,b.y+66,['thisset = {"apple", "banana", "cherry", "apple"}'],{f,start:10,per:60,size:14});
+  const bag={x:b.x+b.w*.30,y:b.y+112,w:340,h:170};
+  mbox(c,bag.x,bag.y,bag.w,bag.h,at(f,70,120),CL.green,.06);
+  txt(c,'set',bag.x+bag.w-18,bag.y+16,{size:11,font:'mono',col:CL.green,align:'right',a:ease(at(f,110,140))});
+  const IT=[['apple',.30,.34],['banana',.66,.56],['cherry',.34,.76]],pos=[];
+  IT.forEach(([n,u,v],i)=>{
+    const x=bag.x+u*bag.w+Math.sin(f*.03+i*2)*10,y=bag.y+v*bag.h+Math.cos(f*.025+i*1.7)*8;pos.push([x,y]);
+    pill(c,x-46,y-15,92,30,'"'+n+'"',CL.green,ease(at(f,130+i*20,160+i*20)),{size:12});
+  });
+  const pd=at(f,270,350);
+  if(pd>0&&pd<1){const x=lerp(b.x+70,pos[0][0],ease(pd)),y=lerp(bag.y+bag.h/2,pos[0][1],ease(pd));pill(c,x-46,y-15,92,30,'"apple"',CL.pink,1,{size:12})}
+  const pf=at(f,350,430);
+  if(pf>0&&pf<1){txt(c,'✕  duplicate ignored',pos[0][0],pos[0][1]-30,{size:12,col:CL.pink,font:'marker',a:1-pf})}
+  const rx=bag.x+bag.w+34;
+  txt(c,'print(thisset)',rx,b.y+150,{size:13,font:'mono',col:CL.dim,align:'left',a:ease(at(f,440,470))});
+  const po=at(f,470,530);
+  txt(c,typed("{'banana', 'cherry', 'apple'}",po),rx,b.y+178,{size:13,font:'mono',col:CL.green,align:'left',a:po>0?1:0,weight:600});
+  txt(c,'len(thisset)   →   3',rx,b.y+220,{size:13,font:'mono',col:CL.chalk,align:'left',a:ease(at(f,560,590))});
+  txt(c,'The order can change every time you run it',b.x+b.w/2,b.y+b.h-24,{size:13.5,col:PC,font:'marker',a:ease(at(f,600,640))});
+}};
+
+/* 18 — list vs set */
+VIZ.listset={cycle:640,draw(c,W,H,f,frame){
+  const b=board(c,W,H,{title:'List vs. Set',frame});
+  const cols=[{h:'PROPERTY',w:.30,al:'left',size:13},{h:'LIST',w:.30,mono:1},{h:'SET',w:.40,mono:1}];
+  const G=CL.green,R=CL.pink;
+  const rows=[
+    ['Brackets',{t:'[ ]',hl:1},{t:'{ }',hl:1}],
+    ['Ordered',{t:'Yes',col:G,hl:1},{t:'No  (unordered)',col:R,hl:1}],
+    ['Indexed  x[0]',{t:'Yes',col:G,hl:1},{t:'No',col:R,hl:1}],
+    ['Change items',{t:'Yes',col:G,hl:1},{t:'No  (only add / remove)',col:CL.amber,hl:1}],
+    ['Duplicates',{t:'Allowed',col:G,hl:1},{t:'Not allowed',col:R,hl:1}],
+    ['len()',{t:'works',hl:1},{t:'works',hl:1}]];
+  table(c,b.x+24,b.y+48,b.w-48,cols,rows,f,{rowH:44,hdrH:34,start:16,per:70});
+}};
+
+/* 19 — if / elif / else */
+VIZ.pyif={cycle:760,draw(c,W,H,f,frame){
+  const b=board(c,W,H,{title:'if / elif / else',frame});
+  const cy=b.y+112,hw=76,hh=42,xs=[b.x+310,b.x+560],ex=b.x+b.w-150,dropY=cy+100;
+  mbox(c,b.x+24,cy-32,130,64,at(f,0,40),CL.cyan);
+  txt(c,'a = 200',b.x+89,cy-9,{size:13,font:'mono',a:ease(at(f,30,60))});txt(c,'b = 33',b.x+89,cy+12,{size:13,font:'mono',a:ease(at(f,30,60))});
+  arrow(c,[[b.x+154,cy],[xs[0]-hw,cy]],at(f,30,60),CL.dim,1.8);
+  const cond=['b > a ?','a == b ?'],msg=['b is greater than a','a and b are equal'];
+  xs.forEach((x,i)=>{
+    const p=at(f,50+i*50,100+i*50);
+    mdia(c,x,cy,hw,hh,p,CL.amber,2.2);
+    txt(c,cond[i],x,cy,{size:12.5,font:'mono',a:ease(at(f,90+i*50,120+i*50))});
+    arrow(c,[[x,cy+hh],[x,dropY]],at(f,110+i*50,140+i*50),CL.green,2);
+    txt(c,'True',x+22,cy+hh+28,{size:11,col:CL.green,font:'marker',a:ease(at(f,130+i*50,160+i*50))});
+    mbox(c,x-78,dropY,156,40,at(f,130+i*50,170+i*50),CL.green,.1);
+    txt(c,msg[i],x,dropY+20,{size:11,font:'marker',a:ease(at(f,160+i*50,190+i*50))});
+    const nx=i<1?xs[1]-hw:ex-20;
+    arrow(c,[[x+hw,cy],[nx,cy]],at(f,110+i*50,140+i*50),CL.dim,1.8);
+    txt(c,'False',(x+hw+nx)/2,cy-14,{size:11,col:CL.pink,font:'marker',a:ease(at(f,130+i*50,160+i*50))});
+  });
+  const glow=f>=520;
+  mbox(c,ex-20,cy-24,110,48,at(f,200,240),CL.pink);
+  txt(c,'else',ex+35,cy,{size:14,font:'mono',a:ease(at(f,230,260))});
+  arrow(c,[[ex+35,cy+24],[ex+35,dropY]],at(f,240,270),CL.green,2);
+  mbox(c,ex-40,dropY,150,40,at(f,250,290),CL.green,glow?.45:.1);
+  txt(c,'a is greater than b',ex+35,dropY+20,{size:10.5,font:'marker',a:ease(at(f,280,310))});
+  const path=[[b.x+154,cy],[xs[0]-hw,cy],[xs[0]+hw,cy],[xs[1]-hw,cy],[xs[1]+hw,cy],[ex-20,cy],[ex+35,cy],[ex+35,dropY]];
+  const tp=ease(at(f,330,520));
+  if(tp>0&&tp<1){const[x,y]=pathPos(path,tp);dot(c,x,y,12,CL.amber,'')}
+  txt(c,'33 > 200  →  False',xs[0],cy-hh-16,{size:11.5,col:CL.pink,font:'marker',a:ease(at(f,380,410))});
+  txt(c,'200 == 33  →  False',xs[1],cy-hh-16,{size:11.5,col:CL.pink,font:'marker',a:ease(at(f,450,480))});
+  const p5=at(f,540,600),p6=at(f,620,690);
+  txt(c,typed('Output: a is greater than b',p5),b.x+b.w/2,b.y+b.h-52,{size:14,col:PC,font:'marker',a:p5>0?1:0});
+  txt(c,typed('Indentation (not { }) defines what belongs to each branch',p6),b.x+b.w/2,b.y+b.h-26,{size:13,col:CL.dim,font:'marker',a:p6>0?1:0});
+}};
+
+/* 22 — for loop */
+VIZ.pyfor={cycle:760,draw(c,W,H,f,frame){
+  const b=board(c,W,H,{title:'for x in ...',frame});
+  const x0=b.x+34,cw=118,ch=38,gp=10;
+  drawCode(c,x0,b.y+66,['fruits = ["apple", "banana", "cherry"]'],{f,start:0,per:40,size:13.5});
+  drawCode(c,x0,b.y+94,['for x in fruits:','    print(x)'],{f,start:20,per:30,size:13.5,lh:22});
+  const yA=b.y+150;
+  ['apple','banana','cherry'].forEach((s,i)=>{
+    const p=at(f,50+i*12,80+i*12),on=f>=110&&Math.min(2,Math.floor((f-110)/70))===i&&f<330;
+    mbox(c,x0+i*(cw+gp),yA,cw,ch,p,CL.violet,on?.34:.12);
+    txt(c,'"'+s+'"',x0+i*(cw+gp)+cw/2,yA+ch/2,{size:12.5,font:'mono',a:ease(p)});
+  });
+  const sa=Math.min(2,Math.floor((f-110)/70));
+  if(f>=110&&f<330){const px=x0+sa*(cw+gp)+cw/2;pill(c,px-16,yA-40,32,24,'x',PC,1,{size:13});arrow(c,[[px,yA-16],[px,yA-2]],1,PC,1.8)}
+  drawCode(c,x0,b.y+236,['for x in "banana":','    print(x)'],{f,start:340,per:30,size:13.5,lh:22});
+  const yB=b.y+288,cw2=56;
+  'banana'.split('').forEach((ch2,i)=>{
+    const p=at(f,380+i*8,410+i*8),on=f>=430&&Math.min(5,Math.floor((f-430)/48))===i&&f<740;
+    mbox(c,x0+i*(cw2+8),yB,cw2,36,p,CL.cyan,on?.34:.12);txt(c,ch2,x0+i*(cw2+8)+cw2/2,yB+18,{size:15,font:'mono',a:ease(p)});
+  });
+  const sb=Math.min(5,Math.floor((f-430)/48));
+  if(f>=430&&f<740){const px=x0+sb*(cw2+8)+cw2/2;pill(c,px-14,yB-32,28,22,'x',PC,1,{size:12})}
+  const rx=b.x+b.w*.64,rw=b.x+b.w-24-rx;
+  mbox(c,rx,b.y+52,rw,b.h-90,at(f,0,30),CL.green,.05);
+  txt(c,'OUTPUT',rx+14,b.y+68,{size:10.5,col:CL.dim,align:'left',weight:800,a:ease(at(f,20,40))});
+  ['apple','banana','cherry'].forEach((s,i)=>{const t0=125+i*70;txt(c,typed(s,at(f,t0,t0+25)),rx+18,b.y+106+i*28,{size:14,font:'mono',col:CL.green,align:'left',a:f>=t0?1:0})});
+  const nb=Math.min(6,Math.max(0,Math.floor((f-445)/48)+1));
+  if(f>=440)'banana'.slice(0,nb).split('').forEach((ch2,i)=>txt(c,ch2,rx+18+i*22,b.y+232,{size:14,font:'mono',col:CL.green,align:'left'}));
+  txt(c,'(one letter per line)',rx+18,b.y+256,{size:11,col:CL.dim,align:'left',a:ease(at(f,450,480))});
+}};
+
+/* 23 — break / continue */
+VIZ.pybreak={cycle:760,draw(c,W,H,f,frame){
+  const b=board(c,W,H,{title:'break and continue',frame});
+  const x0=b.x+34,cw=120,ch=40,gp=12,names=['apple','banana','cherry'];
+  const lanes=[
+    {n:'break',y:b.y+62,code:'if x == "banana": break',t0:30,st:['print','print','none'],out:'apple   banana',col:CL.pink},
+    {n:'continue',y:b.y+206,code:'if x == "banana": continue',t0:400,st:['print','skip','print'],out:'apple   cherry',col:CL.amber}];
+  lanes.forEach(L=>{
+    txt(c,L.n,x0,L.y+12,{size:20,font:'marker',col:L.col,align:'left',a:ease(at(f,L.t0-30,L.t0)),weight:700});
+    txt(c,L.code,x0+150,L.y+12,{size:13,font:'mono',col:CL.dim,align:'left',a:ease(at(f,L.t0-20,L.t0+10))});
+    names.forEach((s,i)=>{
+      const x=x0+i*(cw+gp),y=L.y+44,t=L.t0+i*70,on=f>=t&&f<t+70,done=f>=t+70;
+      const pp=at(f,L.t0-20+i*10,L.t0+10+i*10);
+      const dim=L.st[i]==='none'&&f>=L.t0+2*70?.35:1;
+      c.save();c.globalAlpha=dim;
+      mbox(c,x,y,cw,ch,pp,on?CL.chalk:CL.violet,on?.22:.1);txt(c,'"'+s+'"',x+cw/2,y+ch/2,{size:12.5,font:'mono',a:ease(pp)});c.restore();
+      if(done||on){const st=L.st[i],lab=st==='print'?'print':st==='skip'?'skipped':'not reached';const colr=st==='print'?CL.green:st==='skip'?CL.amber:CL.dim;
+        if(!(st==='none'&&!done))txt(c,lab,x+cw/2,y+ch+18,{size:11.5,font:'marker',col:colr,a:ease(at(f,t+20,t+45))})}
+    });
+    if(L.n==='break'){txt(c,'STOP',x0+2*(cw+gp)-gp/2,L.y+34,{size:11,font:'marker',col:CL.pink,a:ease(at(f,L.t0+95,L.t0+130))})}
+    const rx=b.x+b.w*.66,po=at(f,L.t0+150,L.t0+210);
+    txt(c,'OUTPUT',rx,L.y+12,{size:10.5,col:CL.dim,align:'left',weight:800,a:ease(at(f,L.t0+140,L.t0+160))});
+    txt(c,typed(L.out,po),rx,L.y+50,{size:14,font:'mono',col:CL.green,align:'left',a:po>0?1:0});
+  });
+  marker(c,[[b.x+30,b.y+180],[b.x+b.w-30,b.y+180]],at(f,0,60),'rgba(255,255,255,.14)',1.2);
+}};
+
+/* 24 — while trace */
+VIZ.pywhile={cycle:720,draw(c,W,H,f,frame){
+  const b=board(c,W,H,{title:'Trace: while i < 6',frame});
+  const cols=[{h:'CHECK',w:.12},{h:'i',w:.12,mono:1},{h:'i < 6 ?',w:.26},{h:'print(i)',w:.22,mono:1},{h:'i += 1   →   i',w:.28,mono:1}];
+  const T=v=>({t:'True   ('+v+' < 6)',col:CL.green});
+  const rows=[
+    ['1','1',T(1),{t:'1',hl:1},'2'],['2','2',T(2),{t:'2',hl:1},'3'],['3','3',T(3),{t:'3',hl:1},'4'],
+    ['4','4',T(4),{t:'4',hl:1},'5'],['5','5',T(5),{t:'5',hl:1},'6'],
+    ['6','6',{t:'False  (6 < 6)',col:CL.pink},'—',{t:'loop ends',col:CL.amber,hl:1}]];
+  table(c,b.x+24,b.y+46,b.w-48,cols,rows,f,{rowH:41,hdrH:34,start:16,per:78});
+  const p=at(f,16+30+6*78,16+30+6*78+30);
+  txt(c,'Prints 1 2 3 4 5 — then 6 < 6 fails and the loop ends',b.x+b.w/2,b.y+b.h-26,{size:14,col:PC,font:'marker',a:ease(p)});
+}};
+
+/* 26 — range() */
+VIZ.pyrange={cycle:800,draw(c,W,H,f,frame){
+  const b=board(c,W,H,{title:'range(): a sequence of numbers',frame});
+  const rows=[{code:'range(6)',s:0,e:6,st:1,max:7,t0:20},{code:'range(2, 6)',s:2,e:6,st:1,max:7,t0:230},{code:'range(2, 30, 3)',s:2,e:30,st:3,max:31,t0:440}];
+  const ax0=b.x+250,ax1=b.x+b.w-40,X=v=>ax0+(ax1-ax0)*v/rows[0].max;
+  rows.forEach((r,ri)=>{
+    const y=b.y+104+ri*84,XX=v=>ax0+(ax1-ax0)*v/r.max;
+    txt(c,'for x in '+r.code+':',b.x+30,y,{size:13,font:'mono',align:'left',a:ease(at(f,r.t0-10,r.t0+15))});
+    marker(c,[[ax0-10,y+8],[ax1,y+8]],at(f,r.t0,r.t0+30),CL.dim,1.6);
+    let k=0;
+    for(let v=r.s;v<r.e;v+=r.st){
+      const p=at(f,r.t0+30+k*14,r.t0+48+k*14);
+      if(p>0){c.save();c.globalAlpha=ease(p);c.fillStyle=PC;c.shadowColor=PC;c.shadowBlur=8;c.beginPath();c.arc(XX(v),y+8,7*ease(p),0,7);c.fill();c.restore();
+        txt(c,String(v),XX(v),y-14,{size:11.5,font:'mono',col:CL.chalk,a:ease(p)})}
+      k++;
+    }
+    const ps=at(f,r.t0+40+k*14,r.t0+70+k*14);
+    if(ps>0){c.save();c.globalAlpha=ease(ps);c.strokeStyle=CL.pink;c.lineWidth=2;c.beginPath();c.arc(XX(r.e),y+8,7,0,7);c.stroke();c.restore();
+      txt(c,'stop '+r.e+'  (excluded)',XX(r.e),y+34,{size:11,font:'marker',col:CL.pink,a:ease(ps)})}
+  });
+  txt(c,'start (default 0) · stop (never included) · step (default 1)',b.x+b.w/2,b.y+b.h-24,{size:13.5,col:PC,font:'marker',a:ease(at(f,660,700))});
+}};
+
+/* 28 — def and call */
+VIZ.pyfunc={cycle:760,draw(c,W,H,f,frame){
+  const b=board(c,W,H,{title:'Defining and calling a function',frame});
+  const lx=b.x+24,ly=b.y+50,lw=b.w*.56,ph=b.h-100,rx=lx+lw+14,rw=b.x+b.w-24-rx;
+  edPanel(c,lx,ly,lw,ph,'function.py',at(f,0,30),{acc:CL.violet});edPanel(c,rx,ly,rw,ph,'terminal',at(f,0,30),{acc:CL.green});
+  const lines=['def my_function():','    print("Hello from a function")','','my_function()'],lh=36,y0=ly+76;
+  const active=f<150?null:f<280?[0,1]:f<340?[3]:f<560?[0,1]:null;
+  lines.forEach((_,i)=>txt(c,String(i+1),lx+34,y0+i*lh,{size:12,font:'mono',col:'#4b4b66',align:'right',a:ease(at(f,10,40))}));
+  drawCode(c,lx+50,y0,lines,{f,start:20,per:32,size:15,lh,active});
+  const pd=ease(at(f,150,190));
+  if(pd>0&&f<280)txt(c,'def  →  stores the code, nothing runs yet',lx+50,y0+4*lh+12,{size:12.5,font:'marker',col:CL.amber,align:'left',a:pd});
+  if(f>=280){txt(c,'call  →  now the body runs',lx+50,y0+4*lh+12,{size:12.5,font:'marker',col:CL.green,align:'left',a:ease(at(f,280,310))})}
+  const ax=lx+lw-34,yc=y0+3*lh,yd=y0;
+  if(f>=285){const p=at(f,285,340);dash(c,[[ax,yc],[ax+18,yc],[ax+18,yd],[ax,yd]],CL.amber,1.6,ease(p));
+    if(p<1){const[x,y]=pathPos([[ax,yc],[ax+18,yc],[ax+18,yd],[ax,yd]],ease(p));dot(c,x,y,7,CL.amber,'')}}
+  const po=at(f,380,440);
+  txt(c,typed('Hello from a function',po),rx+16,y0+lh,{size:14,font:'mono',col:CL.green,align:'left',a:po>0?1:0,weight:600});
+}};
+
+/* 29 — arguments */
+VIZ.pyargs={cycle:760,draw(c,W,H,f,frame){
+  const b=board(c,W,H,{title:'Arguments: passing data in',frame});
+  const names=['Emil','Tobias','Linus'],cx0=b.x+26,cwid=252,fx=b.x+b.w*.43,fy=b.y+62,fw=250,fh=170,ox=b.x+b.w*.77,ow=b.x+b.w-24-ox;
+  const raw=f<50?-1:Math.floor((f-50)/140),idx=Math.min(2,raw),s=raw>2?999:(f-50)%140;
+  mbox(c,fx,fy,fw,fh,at(f,0,40),CL.violet,.08);
+  txt(c,'def my_function(fname):',fx+14,fy+22,{size:12.5,font:'mono',align:'left',a:ease(at(f,20,50)),weight:700});
+  txt(c,'print(fname + " Refsnes")',fx+30,fy+fh-24,{size:12,font:'mono',col:CL.dim,align:'left',a:ease(at(f,30,60))});
+  const val=(idx>=0&&f>=50&&s>=45)?'"'+names[idx]+'"':(idx>=0&&idx<3&&f>=50&&s<45&&idx>0?'"'+names[idx-1]+'"':'');
+  txt(c,'fname =',fx+14,fy+fh/2,{size:13,font:'mono',col:CL.dim,align:'left',a:ease(at(f,40,70))});
+  if(val)txt(c,val,fx+92,fy+fh/2,{size:16,font:'marker',col:CL.amber,align:'left'});
+  names.forEach((n,i)=>{
+    const y=fy+i*62,on=idx===i&&f>=50;
+    mbox(c,cx0,y+2,cwid,38,at(f,10+i*12,40+i*12),on?PC:CL.dim,on?.22:.06);
+    txt(c,'my_function("'+n+'")',cx0+cwid/2,y+21,{size:12.5,font:'mono',col:on?CL.chalk:CL.dim,a:ease(at(f,30+i*12,60+i*12))});
+    arrow(c,[[cx0+cwid,y+21],[fx,fy+fh/2]],at(f,40+i*12,70+i*12),'rgba(138,138,163,.6)',1.4);
+  });
+  if(idx>=0&&f>=50&&s<45){const p=ease(at(f,50+idx*140,50+idx*140+45)%1===0?s/45:s/45);const[x,y]=pathPos([[cx0+cwid,fy+idx*62+21],[fx+70,fy+fh/2]],p);pill(c,x-36,y-13,72,26,'"'+names[idx]+'"',CL.amber,1,{size:11})}
+  mbox(c,ox,fy,ow,fh,at(f,0,40),CL.green,.05);
+  txt(c,'OUTPUT',ox+14,fy+16,{size:10.5,col:CL.dim,align:'left',weight:800,a:ease(at(f,20,50))});
+  names.forEach((n,i)=>{const t0=50+i*140+75;txt(c,typed(n+' Refsnes',at(f,t0,t0+30)),ox+14,fy+52+i*32,{size:12.5,font:'mono',col:CL.green,align:'left',a:f>=t0?1:0,weight:600})});
+  txt(c,'Add as many arguments as you want — separate them with commas',b.x+b.w/2,b.y+b.h-30,{size:13.5,col:PC,font:'marker',a:ease(at(f,500,540))});
+}};
+
+/* 30 — return */
+VIZ.pyreturn={cycle:760,draw(c,W,H,f,frame){
+  const b=board(c,W,H,{title:'return: send a value back',frame});
+  const vals=[3,5,9],mx=b.x+b.w*.37,my=b.y+92,mw=b.w*.26,mh=150,cy=my+mh/2;
+  const raw=f<40?-1:Math.floor((f-40)/165),idx=Math.min(2,raw),s=raw>2?999:(f-40)%165;
+  const busy=idx>=0&&s>=50&&s<100;
+  mbox(c,mx,my,mw,mh,at(f,0,40),busy?CL.amber:CL.violet,busy?.24:.08);
+  txt(c,'def my_function(x):',mx+mw/2,my+42,{size:12.5,font:'mono',a:ease(at(f,20,50)),weight:700});
+  txt(c,'return 5 * x',mx+mw/2,my+mh/2+10,{size:16,font:'mono',col:CL.amber,a:ease(at(f,30,60)),weight:700});
+  txt(c,'print(my_function(x))',mx+mw/2,my+mh-22,{size:11.5,font:'mono',col:CL.dim,a:ease(at(f,40,70))});
+  const lx=b.x+34;
+  vals.forEach((v,i)=>{pill(c,lx,my+18+i*48,72,32,String(v),idx===i?PC:CL.dim,ease(at(f,10+i*12,40+i*12)),{size:15})});
+  arrow(c,[[lx+72,cy],[mx,cy]],at(f,40,70),'rgba(138,138,163,.6)',1.6);
+  arrow(c,[[mx+mw,cy],[b.x+b.w*.72,cy]],at(f,50,80),'rgba(138,138,163,.6)',1.6);
+  if(idx>=0&&s<50){const p=ease(s/50),y0=my+18+idx*48+16;const[x,y]=pathPos([[lx+72,y0],[lx+90,cy],[mx-6,cy]],p);dot(c,x,y,13,CL.amber,String(vals[idx]))}
+  if(idx>=0&&s>=100&&s<150){const p=ease((s-100)/50);const x=lerp(mx+mw+6,b.x+b.w*.72,p);dot(c,x,cy,13,CL.green,String(vals[idx]*5))}
+  const rx=b.x+b.w*.74;
+  txt(c,'RETURNED',rx,my+8,{size:10.5,col:CL.dim,align:'left',weight:800,a:ease(at(f,30,60))});
+  vals.forEach((v,i)=>{const t0=40+i*165+140;txt(c,'my_function('+v+')   →   '+(v*5),rx,my+44+i*34,{size:13,font:'mono',col:CL.green,align:'left',a:ease(at(f,t0,t0+25)),weight:600})});
+  txt(c,'A function can hand data back to whoever called it',b.x+b.w/2,b.y+b.h-30,{size:13.5,col:PC,font:'marker',a:ease(at(f,540,580))});
+}};
+
+/* 34 — recap */
+VIZ.pyclose={cycle:720,draw(c,W,H,f,frame){
+  const b=board(c,W,H,{title:'What you can build now',frame});
+  const L=[['Output & Input · Variables · Data types',CL.cyan,.92],['Operators: arithmetic · assignment · comparison · logical',CL.violet,.82],['Collections: list · set',CL.amber,.66],['Control flow: if / elif / else',CL.green,.54],['Loops: for · while · range()',CL.indigo,.44],['Functions: def · arguments · return',CL.pink,.34]];
+  const h=38,gap=8,base=b.y+b.h-24-h;
+  L.forEach(([t,col,wf],i)=>{
+    const w=(b.w-80)*wf,x=b.x+(b.w-w)/2,y=base-i*(h+gap),p=at(f,10+i*40,60+i*40);
+    mbox(c,x,y,w,h,p,col,.16);txt(c,t,x+w/2,y+h/2,{size:12.5,font:'marker',a:ease(at(f,50+i*40,80+i*40)),weight:700});
+  });
+  const yt=base-6*(h+gap),pt=at(f,270,340);
+  mbox(c,b.x+b.w/2-150,yt,300,h+6,pt,PC,.2+.1*Math.sin(f*.06));
+  txt(c,'Next session: OOP',b.x+b.w/2,yt+(h+6)/2,{size:17,font:'marker',a:ease(at(f,320,350)),weight:700});
+}};
+
+/* ═══════════════ Content ═══════════════ */
+const CODE={
+t1:`a = int(input("Enter first number: "))
+b = int(input("Enter second number: "))
+print("Sum:", a + b)`,
+t2:`n = int(input("Enter a number: "))
+
+if n > 0:
+    print("positive")
+elif n == 0:
+    print("zero")
+else:
+    print("negative")`,
+t3:`for x in range(2, 21, 2):
+    print(x)`,
+t4:`def square(x):
+    return x * x
+
+print(square(3))
+print(square(5))`,
+c1:`total = 0
+
+for i in range(1, 6):
+    if i == 3:
+        continue
+    total += i
+
+print("Total:", total)`,
+w_in:`num = input("enter your number :")
+print("the result is ", num)
+
+num = input("enter your number :")
+# int(num) casts the string to an int
+print("the result is ", int(num) + 5)`,
+w_list:`thislist = ["apple", "banana", "cherry"]
+print(thislist)  # ['apple', 'banana', 'cherry']
+print(thislist[0])  # apple
+print(len(thislist))  # 3
+
+list1 = ["abc", 34, True, 40, "male"]
+print(type(list1))  # <class 'list'>`,
+w_if:`a = 200
+b = 33
+c = 500
+
+if b > a:
+    print("b is greater than a")
+elif a == b:
+    print("a and b are equal")
+else:
+    print("a is greater than b")
+
+if a > b and c > a:
+    print("Both conditions are True")
+if a > b or a > c:
+    print("At least one is True")`,
+w_fn:`def my_function(fname):
+    print(fname + " Refsnes")
+
+my_function("Emil")
+my_function("Tobias")
+
+def times_five(x):
+    return 5 * x
+
+print(times_five(3))
+print(times_five(5))`,
+L_for:`for x in fruits:
+    print(x)`,
+L_break:`for x in fruits:
+    print(x)
+    if x == "banana":
+        break`,
+L_cont:`for x in fruits:
+    if x == "banana":
+        continue
+    print(x)`,
+L_while:`i = 1
+while i < 6:
+    print(i)
+    i += 1`
+};
+
+const TASKS={
+t1:{n:1,req:['Ask for two numbers with <code>input()</code>','Convert each one with <code>int()</code>','Print their sum with <code>print()</code>'],
+  lines:[[['Enter first number: ','dim'],['4','amber']],[['Enter second number: ','dim'],['7','amber']],[['Sum: 11','green']]],
+  notes:['<code>input()</code> returns a string, so cast before doing arithmetic.','<code>int(input(...))</code> reads and converts in one step.','A comma in <code>print()</code> adds a space between the pieces.']},
+t2:{n:2,req:['Read an integer with <code>int(input())</code>','More than 0: print <code>positive</code>','Exactly 0: print <code>zero</code>','Otherwise: print <code>negative</code>'],
+  title:'Three test cases',
+  lines:[[['Enter a number: ','dim'],['5','amber']],[['positive','green']],[['Enter a number: ','dim'],['0','amber']],[['zero','green']],[['Enter a number: ','dim'],['-3','amber']],[['negative','green']]],
+  notes:['Indentation defines each branch: Python has no braces.','<code>elif</code> is checked only when the <code>if</code> was False.','<code>==</code> compares, <code>=</code> assigns.']},
+t3:{n:3,req:['Print the <b>even numbers from 2 to 20</b>','Use a <code>for</code> loop with <code>range()</code>','One number per line','Hint: the third argument of <code>range()</code> is the step'],
+  lines:[[['2','green']],[['4','green']],[['6','green']],[['...','dim']],[['20','green']]],
+  notes:['<code>range(2, 21, 2)</code>: start 2, stop 21, step 2.','The stop value is never included, so use 21 to reach 20.','Another way: loop over <code>range(1, 11)</code> and print <code>x * 2</code>.']},
+t4:{n:4,req:['Define <code>def square(x):</code> that <b>returns</b> x times x','Call it with 3 and with 5','Print both results'],
+  lines:[[['9','green']],[['25','green']]],
+  notes:['<code>return</code> sends the value back to the caller.','<code>print(square(3))</code> prints the returned value.','Without <code>return</code> a function gives back <code>None</code>.']}
+};
+
+const WALK={
+in:{code:'w_in',file:'input_demo.py',steps:[
+ {lines:[1],h:'input() reads text',t:`The program pauses. You type 10 and <code>num</code> holds the string '10'.`},
+ {lines:[2],h:'print() joins the pieces',t:`Output: <code>the result is  10</code> (a comma adds a space).`},
+ {lines:[4],h:'Same input again',t:`<code>num</code> is the string '10' once more.`},
+ {lines:[5,6],h:'Cast, then calculate',t:`<code>int(num)</code> makes it a number, so <code>+ 5</code> gives 15. Without the cast Python raises a TypeError.`}]},
+list:{code:'w_list',file:'lists.py',steps:[
+ {lines:[1,2],h:'Create and print',t:`Square brackets make a list. Items keep their order.`},
+ {lines:[3],h:'Index from 0',t:`<code>thislist[0]</code> is the first item: apple.`},
+ {lines:[4],h:'Length',t:`<code>len()</code> counts the items: 3.`},
+ {lines:[6,7],h:'Any type, even mixed',t:`A list can mix str, int and bool. <code>type()</code> says it is a list.`}]},
+if:{code:'w_if',file:'conditions.py',dense:true,steps:[
+ {lines:[1,2,3],h:'Three variables',t:`a = 200, b = 33, c = 500.`},
+ {lines:[5,6],h:'if',t:`<code>b > a</code> is <b>False</b>: the block is skipped.`},
+ {lines:[7,8],h:'elif',t:`<code>a == b</code> is <b>False</b> too.`},
+ {lines:[9,10],h:'else',t:`Nothing matched, so else runs: a is greater than b.`},
+ {lines:[12,13],h:'and',t:`Both conditions are True, so it prints.`},
+ {lines:[14,15],h:'or',t:`One True condition is enough.`}]},
+fn:{code:'w_fn',file:'functions.py',steps:[
+ {lines:[1,2],h:'def stores the code',t:`Defining a function does not run it yet.`},
+ {lines:[4,5],h:'Call with arguments',t:`Each call passes a name into <code>fname</code>: prints Emil Refsnes, then Tobias Refsnes.`},
+ {lines:[7,8],h:'return sends a value back',t:`<code>return 5 * x</code> hands the result to the caller.`},
+ {lines:[10,11],h:'Use the returned value',t:`<code>print(times_five(3))</code> prints 15, then 25.`}]}
+};
+const CARDS={
+loops:{fs:13.5,items:[
+ {h:'for',code:'L_for',file:'for_loop.py',n:`Runs once for every item in the list.`},
+ {h:'for + break',code:'L_break',file:'break_demo.py',n:`Stops the loop early. Output: apple, banana.`},
+ {h:'for + continue',code:'L_cont',file:'continue_demo.py',n:`Skips banana, keeps going. Output: apple, cherry.`},
+ {h:'while',code:'L_while',file:'while_loop.py',n:`Repeats while <code>i &lt; 6</code> is True. Prints 1 to 5.`}]}
+};
+
+/* interactive operator widgets */
+const ERR='ZeroDivisionError';
+const pyf=v=>Number.isInteger(v)?v.toFixed(1):String(v);
+const pyb=v=>v?'True':'False';
+const WIDGETS={
+arith:{title:'Try it: change x and y',lo:-9,hi:9,vars:[{n:'x',v:7},{n:'y',v:2}],
+  note:'Python has seven arithmetic operators. Try y = 0 to see what happens.',
+  rows:[['+','Addition','x + y',(x,y)=>x+y],['-','Subtraction','x - y',(x,y)=>x-y],['*','Multiplication','x * y',(x,y)=>x*y],
+   ['/','Division','x / y',(x,y)=>y===0?ERR:pyf(x/y)],['%','Modulus','x % y',(x,y)=>y===0?ERR:((x%y)+y)%y],
+   ['**','Exponentiation','x ** y',(x,y)=>(x===0&&y<0)?ERR:(y>=0?Math.pow(x,y):pyf(Math.pow(x,y)))],
+   ['//','Floor division','x // y',(x,y)=>y===0?ERR:Math.floor(x/y)]]},
+comp:{title:'Try it: change x and y',lo:-9,hi:9,vars:[{n:'x',v:5},{n:'y',v:3}],bool:true,
+  note:'Comparison operators always give True or False.',
+  rows:[['==','Equal','x == y',(x,y)=>x===y],['!=','Not equal','x != y',(x,y)=>x!==y],['>','Greater than','x > y',(x,y)=>x>y],
+   ['<','Less than','x < y',(x,y)=>x<y],['>=','Greater than or equal to','x >= y',(x,y)=>x>=y],['<=','Less than or equal to','x <= y',(x,y)=>x<=y]]},
+logic:{title:'Try it: change x',lo:0,hi:12,vars:[{n:'x',v:3}],logic:true,
+  note:'and: both must be True. or: one is enough. not: flips the result.',
+  rows:[['and','Returns True if both statements are true','x < 5 and x < 10',x=>[[x<5,x<10],' and ',x<5&&x<10]],
+   ['or','Returns True if one of the statements is true','x < 5 or x < 4',x=>[[x<5,x<4],' or ',x<5||x<4]],
+   ['not','Reverse the result','not(x < 5 and x < 10)',x=>[[x<5&&x<10],'',!(x<5&&x<10)]]]}
+};
+function widgetHTML(k){
+  const W=WIDGETS[k];
+  const st=W.vars.map((v,i)=>`<div class="st"><div class="stn">${v.n}</div><button data-w="${i}" data-d="-1" tabindex="-1" aria-label="decrease ${v.n}">−</button><b class="stv" data-v="${i}">${v.v}</b><button data-w="${i}" data-d="1" tabindex="-1" aria-label="increase ${v.n}">+</button></div>`).join('');
+  return `<div class="wg" data-wk="${k}"><div class="wg-in"><div class="wg-h">${W.title}</div>${st}<div class="wg-note">${W.note}</div></div><div class="wg-out"></div></div>`;
+}
+function widgetRender(el,flash){
+  const k=el.dataset.wk,W=WIDGETS[k],vals=[...el.querySelectorAll('.stv')].map(e=>+e.textContent);
+  const pv=v=>v<0?`(${v})`:v;
+  const sub=s=>s.replace(/\bx\b/g,pv(vals[0])).replace(/\by\b/g,pv(vals[1]));
+  const out=el.querySelector('.wg-out');
+  out.innerHTML=W.rows.map(([op,nm,ex,fn])=>{
+    const r=fn(...vals);let res;
+    if(W.logic){const[parts,join,fin]=r;res=`<span class="pp">${parts.map(pyb).join(join)}</span><span class="${fin?'ok':'bad'}">${pyb(fin)}</span>`}
+    else if(W.bool)res=`<span class="${r?'ok':'bad'}">${pyb(r)}</span>`;
+    else res=`<span class="${r===ERR?'err':''}">${r}</span>`;
+    return `<div class="wr${W.logic?' l3':''}${flash?' flash':''}"><span class="op">${op}</span><span class="wn">${nm}</span><code class="we">${W.logic?sub(ex):sub(ex)}${W.logic?'':''}</code><b class="wres">${res}</b></div>`;
+  }).join('');
+}
+
+const HERO=`
+<div class="lbl">Sinai University · Faculty of Information Technology and Computer Science</div>
+<h1><em>Multimedia</em></h1>
+<div class="tag">Session ⇔ 01 · Introduction to Python: Python Fundamentals</div>
+<div class="inst"><div class="avatar">M</div><div><small>Instructor</small><b>Muhammad Ali Abdul Kareem</b></div></div>
+<div class="chips"><span>Output &amp; Input</span><span>Variables</span><span>Operators</span><span>Collections</span><span>Control flow</span><span>Functions</span></div>`;
+
+const SL=[
+{part:'part-intro',hero:true,next:'Where are we going?'},
+{part:'part-intro',lbl:'Course roadmap',h2:`Introduction to Python: <em>what we will cover</em>`,sub:`Fourteen building blocks that take you from your very first <code>print()</code> to writing your own functions.`,viz:'pyroad',next:'Start with output'},
+{part:'part-seq',lbl:'Output & Input · Part 1',h2:`<em>print()</em> sends text to the screen`,sub:`The first tool every Python programmer reaches for. Mix in variables by separating arguments with commas.`,viz:'pyprint',next:'Now let the user type something'},
+{part:'part-seq',lbl:'Output & Input · Part 2',h2:`<em>input()</em> always returns a string`,sub:`To use it in arithmetic, cast it with <code>int()</code> first.`,viz:'pyinput',next:'See it in code'},
+{part:'part-seq',walk:'in',lbl:'Output & Input · In code',h2:`Input and casting <em>in code</em>`,sub:`Follow the highlighted lines. Click any step to jump to it.`,next:'Your turn — Task 1'},
+{part:'part-seq',task:'t1',lbl:'Task 1 · Input',h2:`Sum of <em>two numbers</em>`,sub:`Try it yourself first, then reveal the reference solution.`,next:'Now, what is a variable?'},
+{part:'part-seq',lbl:'Variables · Part 1',h2:`How we <em>define a variable</em>`,sub:`Python has no command for declaring a variable. It is created the moment you first assign a value.`,viz:'pyvars',next:'Changing the type on purpose'},
+{part:'part-seq',lbl:'Variables · Part 2',h2:`Casting and <em>getting the type</em>`,sub:`Use casting to choose a type, and <code>type()</code> to find out what you have.`,viz:'pycast',next:'Two small details'},
+{part:'part-seq',lbl:'Variables · Part 3',h2:`Quotes and <em>case-sensitivity</em>`,sub:`Single or double quotes, same string. But <code>a</code> and <code>A</code> are different variables.`,viz:'pycase',next:'All the data types'},
+{part:'part-seq',lbl:'Data types',h2:`Python <em>data types</em>`,sub:`Every value has a type. These are the built-in ones.`,viz:'pytypes',next:'Now, operators'},
+{part:'part-sel',widget:'arith',lbl:'Operators · Arithmetic',h2:`Arithmetic <em>operators</em>`,sub:`Change x and y with the + and − buttons and watch every result update.`,next:'Assigning with shortcuts'},
+{part:'part-sel',lbl:'Operators · Assignment',h2:`Assignment <em>operators</em>`,sub:`Shortcuts that update a variable using its own value.`,viz:'pyassign',next:'Comparing values'},
+{part:'part-sel',widget:'comp',lbl:'Operators · Comparison',h2:`Comparison <em>operators</em>`,sub:`They compare two values and answer True or False.`,next:'Combining conditions'},
+{part:'part-sel',widget:'logic',lbl:'Operators · Logical',h2:`Logical <em>operators</em>`,sub:`Combine or reverse conditions with and, or, not.`,next:'Collections: list'},
+{part:'part-col',lbl:'Collections · List',h2:`<em>List</em>: ordered and changeable`,sub:`Lists store multiple items in one variable. They are created using square brackets.`,viz:'pylist',next:'See it in code'},
+{part:'part-col',walk:'list',lbl:'Collections · In code',h2:`Lists <em>in code</em>`,sub:`Create, index, measure and mix types.`,next:'Now, the set'},
+{part:'part-col',lbl:'Collections · Set',h2:`<em>Set</em>: no order, no duplicates`,sub:`Sets are written with curly brackets. Items can be added or removed, but not changed.`,viz:'pyset',next:'List or set?'},
+{part:'part-col',lbl:'Collections · Comparison',h2:`List <em>vs.</em> Set`,sub:`Two of the four built-in collection types, side by side.`,viz:'listset',next:'Making decisions'},
+{part:'part-rep',lbl:'Control flow · if',h2:`<em>if</em> · <em>elif</em> · <em>else</em>`,sub:`Python uses indentation, not curly brackets, to define scope.`,viz:'pyif',next:'See it in code'},
+{part:'part-rep',walk:'if',lbl:'Control flow · In code',h2:`Decisions <em>in code</em>`,sub:`Conditions are checked from top to bottom. Then and / or.`,next:'Your turn — Task 2'},
+{part:'part-rep',task:'t2',lbl:'Task 2 · if / elif / else',h2:`Positive, zero or <em>negative</em>`,sub:`Three test cases to check your solution against.`,next:'Repeating things: loops'},
+{part:'part-rep',lbl:'Loops · for',h2:`<em>for</em> loop: visit every item`,sub:`Works on lists, and also on the characters of a string.`,viz:'pyfor',next:'Leaving early, skipping ahead'},
+{part:'part-rep',lbl:'Loops · break and continue',h2:`<em>break</em> stops, <em>continue</em> skips`,sub:`Two ways to control a loop from the inside.`,viz:'pybreak',next:'The while loop'},
+{part:'part-rep',lbl:'Loops · while',h2:`<em>while</em> loop: repeat while true`,sub:`<code>i = 1</code>, then <code>while i &lt; 6:</code> print i and add 1.`,viz:'pywhile',next:'See all the loops in code'},
+{part:'part-rep',cards:'loops',lbl:'Loops · In code',h2:`Loops <em>in code</em>`,sub:`With <code>fruits = ["apple", "banana", "cherry"]</code>`,next:'Counting with range()'},
+{part:'part-rep',lbl:'Loops · range()',h2:`<em>range()</em>: loop a set number of times`,sub:`It returns a sequence of numbers: start at 0 by default, step by 1 by default, and end just before the stop.`,viz:'pyrange',next:'Your turn — Task 3'},
+{part:'part-rep',task:'t3',lbl:'Task 3 · Loops',h2:`Even numbers <em>from 2 to 20</em>`,sub:`Use range() with three arguments.`,next:'Packaging code: functions'},
+{part:'part-fn',lbl:'Functions · Part 1',h2:`<em>Functions</em>: code that runs when called`,sub:`Defined with <code>def</code>. Nothing happens until you call it.`,viz:'pyfunc',next:'Passing data in'},
+{part:'part-fn',lbl:'Functions · Part 2',h2:`Functions and <em>arguments</em>`,sub:`Information is passed into a function as arguments, inside the parentheses.`,viz:'pyargs',next:'Getting data back'},
+{part:'part-fn',lbl:'Functions · Part 3',h2:`Functions and <em>return values</em>`,sub:`Use the <code>return</code> statement to let a function give a value back.`,viz:'pyreturn',next:'See it in code'},
+{part:'part-fn',walk:'fn',lbl:'Functions · In code',h2:`Functions <em>in code</em>`,sub:`Define, call with arguments, return, and use the result.`,next:'Your turn — Task 4'},
+{part:'part-fn',task:'t4',lbl:'Task 4 · Functions',h2:`A <em>square()</em> function`,sub:`Your first function that returns a value.`,next:'Final challenge'},
+{part:'part-fn',lbl:'Tracing challenge',h2:`Read the code. <em>Predict the output.</em>`,sub:`A for loop, an if, a continue and a running total.`,chal:true,next:'That is the toolbox'},
+{part:'part-intro',lbl:'Recap',h2:`Python fundamentals — <em>your toolbox</em>`,sub:`Next session: object-oriented programming.`,viz:'pyclose',next:'Thank you'}
+];
+const N=SL.length;
+
+/* ═══════════════ Code highlighter (Python) ═══════════════ */
+function highlight(src){
+  const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  return pyTok(src).map(([t,c])=>c?`<span class="${c}">${esc(t)}</span>`:esc(t)).join('');
+}
+const LANG='Python';
+const walkStyle=k=>{const n=CODE[k].split('\n').length;let fs=n<=7?17:n<=10?16:n<=13?15:14.5,lh=Math.min(fs*1.75,300/n);if(lh<fs*1.45)fs=lh/1.45;return `font-size:${fs.toFixed(1)}px;line-height:${lh.toFixed(1)}px`};
+const lineCode=(k,st)=>`<pre class="code"${st?` style="${st}"`:''}>${highlight(CODE[k]).split('\n').map(l=>`<span class="ln">${l||'&nbsp;'}</span>`).join('')}</pre>`;
+const edWrap=(inner,file)=>`<div class="codecard"><div class="ed-bar"><i style="background:#fb7185"></i><i style="background:#fbbf24"></i><i style="background:#34d399"></i><span class="ed-file">${file}</span><span class="ed-lang">${LANG}</span></div><div class="ed-body">${inner}</div></div>`;
+
+/* ═══════════════ Build the deck ═══════════════ */
+const vp=document.getElementById('vp'),live=[];
+const dots=i=>Array.from({length:N},(_,k)=>`<i class="dot${k===i?' on':''}"></i>`).join('');
+const footer=(i,next)=>`<div class="sf"><span>Multimedia</span><div class="pd">${dots(i)}</div><span>${next}</span></div>`;
+
+SL.forEach((s,i)=>{
+  const el=document.createElement('section');
+  el.className='slide'+(s.hero?' hero-slide':'');
+  let h='';
+  if(s.hero){
+    h=HERO+footer(i,s.next)+'<canvas class="herobg" data-viz="tokens"></canvas>';
+  }else{
+    let stage='';
+    if(s.viz)stage=`<div class="viz"><canvas data-viz="${s.viz}"></canvas></div>`;
+    else if(s.widget)stage=widgetHTML(s.widget);
+    else if(s.task){
+      const T=TASKS[s.task];
+      stage=`<div class="task"><div class="tleft"><div class="chip">What to build</div><ul class="req">${T.req.map(r=>`<li>${r}</li>`).join('')}</ul></div><div class="tright"><div class="viz"><canvas data-viz="terminal" data-task="${s.task}"></canvas></div></div></div>`;
+    }else if(s.walk){
+      const W=WALK[s.walk];
+      stage=`<div class="walk${W.dense?' dense':''}">${edWrap(lineCode(W.code,walkStyle(W.code)),W.file)}<div class="steps">${W.steps.map((p,k)=>`<div class="stp" data-k="${k}"><i>${k+1}</i><div><b>${p.h}</b><span>${p.t}</span></div></div>`).join('')}</div></div>`;
+    }else if(s.cards){
+      const C=CARDS[s.cards];
+      stage=`<div class="cards" style="--fs:${C.fs}px;grid-template-columns:repeat(${C.items.length},1fr)">${C.items.map(it=>`<div class="cc"><div class="cc-h">${it.h}</div>${edWrap(lineCode(it.code),it.file)}<div class="cc-n">${it.n}</div></div>`).join('')}</div>`;
+    }else if(s.chal){
+      stage=`<div class="chal" style="grid-template-columns:1fr 1fr">${edWrap(lineCode('c1','font-size:16px;line-height:1.75'),'challenge.py')}<div class="col"><div class="q"><b>What is the final console output?</b><div class="term" data-ans>&gt; <span class="typed" id="lastans"></span><i></i></div><button class="ansbtn" data-ans>Type your answer<kbd>A</kbd></button></div><div class="note" style="flex:none">Tip: write the value of <code>i</code> and <code>total</code> on paper, line by line.</div></div></div>`;
+    }
+    h=`<div class="lbl">${s.lbl}</div><h2>${s.h2}</h2>${s.sub?`<p class="sub">${s.sub}</p>`:''}<div class="stage">${stage}</div>${footer(i,s.next)}`;
+    if(s.task){
+      const T=TASKS[s.task];
+      h+=`<button class="solbtn" data-sol>Show solution<kbd>S</kbd></button>
+      <div class="sol"><div class="sol-h"><div class="lbl">Reference solution · Task ${T.n}</div><button class="solbtn" style="position:static" data-sol>Hide<kbd>S</kbd></button></div>
+      <div class="sol-body">${edWrap(lineCode(s.task,'font-size:15px;line-height:1.7'),'task'+T.n+'.py')}<div class="notes"><div class="note-h">What to notice</div>${T.notes.map(n=>`<div class="note">${n}</div>`).join('')}</div></div></div>`;
+    }
+  }
+  el.innerHTML=h;vp.appendChild(el);s.el=el;
+  el.querySelectorAll('.wg').forEach(w=>widgetRender(w,false));
+  el.querySelectorAll('canvas[data-viz]').forEach(cv=>{
+    const def=VIZ[cv.dataset.viz];
+    live.push({cv,s:fit(cv),def,slide:i,data:cv.dataset.task?{lines:TASKS[cv.dataset.task].lines,title:TASKS[cv.dataset.task].title}:null});
+  });
+});
+
+/* ═══════════════ Answer box (tracing challenge) ═══════════════ */
+const modal=document.getElementById('ansmodal'),inp=document.getElementById('ans'),fb=document.getElementById('ansfb');
+let typing=false;
+function openAns(){modal.hidden=false;typing=true;inp.value='';fb.textContent='';fb.className='ans-fb';setTimeout(()=>inp.focus(),60)}
+function closeAns(){modal.hidden=true;typing=false;inp.blur();setTimeout(layout,300)}
+const WHY='i takes the values 1 to 5, and i = 3 is skipped by <code>continue</code>. So total = 1 + 2 + 4 + 5 = 12.';
+function showOk(){fb.className='ans-fb ok';fb.innerHTML='<b>Total: 12</b><br>'+WHY}
+function checkAns(){
+  const raw=inp.value.trim(),v=raw.toLowerCase().replace(/\s+/g,'').replace(/^>/,'');
+  if(!v){fb.className='ans-fb bad';fb.textContent='Type what the program prints, then press Check.';return}
+  const last=document.getElementById('lastans');if(last)last.textContent=raw;
+  if(v==='12'||v==='total:12'||v==='total12'){fb.className='ans-fb ok';fb.innerHTML='Correct! <b>Total: 12</b><br>'+WHY}
+  else{fb.className='ans-fb bad';fb.textContent='Not quite. Hint: range(1, 6) gives 1, 2, 3, 4, 5. Which value does continue skip?'}
+}
+document.getElementById('anschk').onclick=checkAns;
+document.getElementById('ansrev').onclick=showOk;
+document.getElementById('ansx').onclick=closeAns;
+modal.addEventListener('click',e=>{if(e.target===modal)closeAns()});
+inp.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();checkAns()}else if(e.key==='Escape')closeAns()});
+
+/* ═══════════════ Navigation ═══════════════ */
+let cur=-1,frame=0,t0=0;
+const counter=document.getElementById('counter'),prog=document.getElementById('prog');
+function closeSol(){document.querySelectorAll('.sol.open').forEach(e=>e.classList.remove('open'))}
+function toggleSol(){const el=SL[cur].el.querySelector('.sol');if(el)el.classList.toggle('open')}
+let walkTimer=null;
+function walkApply(el,W,k){
+  el.querySelectorAll('.stp').forEach((e,i)=>e.classList.toggle('on',i===k));
+  const on=new Set(W.steps[k].lines);
+  el.querySelectorAll('.ln').forEach((e,i)=>e.classList.toggle('on',on.has(i+1)));
+}
+function walkStart(i){
+  clearInterval(walkTimer);const s=SL[i];if(!s.walk)return;
+  const W=WALK[s.walk];let k=0;walkApply(s.el,W,k);
+  walkTimer=setInterval(()=>{k=(k+1)%W.steps.length;walkApply(s.el,W,k)},3200);
+}
+function go(i){
+  i=Math.max(0,Math.min(N-1,i));if(i===cur)return;
+  if(cur>=0){SL[cur].el.classList.remove('active');closeSol()}
+  cur=i;SL[i].el.classList.add('active');
+  vp.className='vp '+SL[i].part;
+  const cs=getComputedStyle(vp);PC=cs.getPropertyValue('--c').trim();PC2=cs.getPropertyValue('--c-2').trim();
+  walkStart(i);counter.textContent=(i+1)+' / '+N;prog.style.width=((i+1)/N*100)+'%';t0=frame;
+}
+/* shortcuts work with any keyboard layout (English or Arabic): match the physical key, or the letter in either language */
+const isKey=(e,latin,arabic)=>e.code==='Key'+latin||e.key===latin.toLowerCase()||e.key===latin||e.key===arabic;
+document.addEventListener('keydown',e=>{
+  if(!modal.hidden)return;
+  if(e.metaKey||e.ctrlKey||e.altKey)return;const k=e.key;
+  if(['ArrowRight','ArrowDown','PageDown',' ','Enter'].includes(k)){e.preventDefault();go(cur+1)}
+  else if(['ArrowLeft','ArrowUp','PageUp','Backspace'].includes(k)){e.preventDefault();go(cur-1)}
+  else if(k==='Home')go(0);else if(k==='End')go(N-1);
+  else if(isKey(e,'S','س'))toggleSol();
+  else if(isKey(e,'A','ش')&&SL[cur].chal)openAns();
+  else if(k==='Escape')closeSol();
+  else if(isKey(e,'F','ب')){try{document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen()}catch(_){}}
+});
+document.getElementById('next').onclick=e=>{go(cur+1);e.target.blur()};
+document.getElementById('prev').onclick=e=>{go(cur-1);e.target.blur()};
+document.addEventListener('click',e=>{
+  if(e.target.closest('[data-sol]')){toggleSol();e.target.blur()}
+  if(e.target.closest('[data-ans]'))openAns();
+  const st=e.target.closest('.stp');
+  if(st&&SL[cur].walk){clearInterval(walkTimer);walkApply(SL[cur].el,WALK[SL[cur].walk],+st.dataset.k)}
+  const sb=e.target.closest('.st button');
+  if(sb){
+    const w=sb.closest('.wg'),W=WIDGETS[w.dataset.wk],vEl=w.querySelector(`[data-v="${sb.dataset.w}"]`);
+    vEl.textContent=Math.max(W.lo,Math.min(W.hi,+vEl.textContent+ +sb.dataset.d));
+    widgetRender(w,true);sb.blur();
+  }
+});
+let tx=null,ty=null;
+document.addEventListener('touchstart',e=>{tx=e.touches[0].clientX;ty=e.touches[0].clientY},{passive:true});
+document.addEventListener('touchend',e=>{
+  if(tx==null||!modal.hidden){tx=null;return}
+  const dx=e.changedTouches[0].clientX-tx,dy=e.changedTouches[0].clientY-ty;tx=null;
+  if(e.target.closest&&e.target.closest('.st'))return;
+  if(document.body.classList.contains('rot90')){if(Math.abs(dy)>60&&Math.abs(dy)>Math.abs(dx))go(cur+(dy<0?1:-1))}
+  else if(Math.abs(dx)>60&&Math.abs(dx)>Math.abs(dy))go(cur+(dx<0?1:-1));
+},{passive:true});
+document.getElementById('mnext').onclick=e=>{go(cur+1);e.target.blur()};
+document.getElementById('mprev').onclick=e=>{go(cur-1);e.target.blur()};
+
+/* ═══════════════ Fit the deck to the window (phones fill the screen) ═══════════════ */
+const fitbox=document.getElementById('fitbox'),deck=document.getElementById('deck');
+let rotPref=false;try{rotPref=localStorage.getItem('rotpref')==='1'}catch(_){}
+function layout(){
+  if(typing)return;
+  const cs=getComputedStyle(document.body),vv=window.visualViewport;
+  const W=Math.floor(vv?vv.width:innerWidth)-parseFloat(cs.paddingLeft)-parseFloat(cs.paddingRight);
+  const H=Math.floor(vv?vv.height:innerHeight)-parseFloat(cs.paddingTop)-parseFloat(cs.paddingBottom);
+  const small=Math.min(W,H)<640,portrait=small&&H>W,rot=portrait&&rotPref;
+  document.body.classList.toggle('portrait',portrait);
+  document.getElementById('rotbtn').textContent=rot?'⟲ Normal view':'⟳ Rotate view';
+  document.body.classList.toggle('small',small);document.body.classList.toggle('rot90',rot);
+  let s;
+  if(small){
+    const aw=rot?H:W,ah=rot?W:H,dh=619,s0=ah/dh,dw=Math.min(1500,Math.max(1100,aw/s0));
+    s=Math.min(s0,aw/dw);
+    vp.style.width=dw+'px';deck.style.width=dw+'px';deck.style.height=dh+'px';
+    fitbox.style.width=(rot?dh*s:dw*s)+'px';fitbox.style.height=(rot?dw*s:dh*s)+'px';
+    deck.style.transform=rot?`translate(${dh*s}px,0) rotate(90deg) scale(${s})`:`scale(${s})`;
+  }else{
+    s=Math.min((W-12)/1100,(H-12)/707);
+    vp.style.width='1100px';deck.style.width='1100px';deck.style.height='707px';
+    fitbox.style.width=1100*s+'px';fitbox.style.height=707*s+'px';deck.style.transform=`scale(${s})`;
+  }
+  SC=Math.max(.2,s);
+}
+document.getElementById('rotbtn').onclick=e=>{rotPref=!rotPref;try{localStorage.setItem('rotpref',rotPref?'1':'0')}catch(_){}layout();e.target.blur()};
+addEventListener('resize',layout);addEventListener('orientationchange',()=>setTimeout(layout,120));
+if(window.visualViewport)visualViewport.addEventListener('resize',layout);layout();
+
+/* ═══════════════ Ambient aurora + master loop ═══════════════ */
+const amb=fit(document.getElementById('amb'));
+const blobs=[[.2,.3,'#6366f1'],[.75,.25,'#a855f7'],[.55,.75,'#ec4899'],[.15,.8,'#6366f1']];
+const specks=Array.from({length:46},(_,i)=>[(i*.6180339)%1,(i*.3819661+.17)%1,i*1.7]);
+function aurora(f){
+  amb.rs();const{ctx,W,H}=amb;if(!W)return;
+  ctx.fillStyle='#07070d';ctx.fillRect(0,0,W,H);ctx.globalCompositeOperation='lighter';
+  blobs.forEach(([bx,by,col],i)=>{
+    const x=W*bx+Math.sin(f*.004+i)*70,y=H*by+Math.cos(f*.003+i*1.7)*50,r=Math.min(W,H)*(.42+.05*Math.sin(f*.006+i));
+    const g=ctx.createRadialGradient(x,y,0,x,y,r);g.addColorStop(0,col+'22');g.addColorStop(1,col+'00');
+    ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y,r,0,7);ctx.fill();
+  });
+  ctx.globalCompositeOperation='source-over';
+  specks.forEach(([dx,dy,ph])=>{ctx.fillStyle=`rgba(200,190,255,${.18+.18*Math.sin(f*.02+ph)})`;ctx.beginPath();ctx.arc(dx*W,dy*H,1.1,0,7);ctx.fill()});
+  const v=ctx.createRadialGradient(W/2,H/2,Math.min(W,H)*.3,W/2,H/2,Math.max(W,H)*.75);
+  v.addColorStop(0,'rgba(5,5,9,0)');v.addColorStop(1,'rgba(5,5,9,.7)');ctx.fillStyle=v;ctx.fillRect(0,0,W,H);
+}
+function tick(){
+  frame++;aurora(frame);
+  for(const o of live){
+    if(o.slide!==cur)continue;
+    o.s.rs();const{ctx,W,H}=o.s;if(!W)continue;
+    ctx.clearRect(0,0,W,H);CW=W;
+    o.def.draw(ctx,W,H,(frame-t0)%o.def.cycle,frame,o);
+  }
+  requestAnimationFrame(tick);
+}
+go(0);tick();
+const bt=document.getElementById('boot');if(bt)bt.remove();
+window.__go=go;
+</script>
+</body>
+</html>

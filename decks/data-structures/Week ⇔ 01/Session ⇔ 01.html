@@ -1,0 +1,1342 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Data Structures — From Structured Programming to Functions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&family=Lemonada:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  color-scheme:dark;
+  /* chapter colour — changes with every chapter */
+  --c:#ec4899; --c-2:#a855f7;
+  --c-grad:linear-gradient(90deg,var(--c),var(--c-2));
+  /* identity constants */
+  --bg:#07070d; --card:rgba(18,18,28,.82); --border:rgba(255,255,255,.07);
+  --tp:#f0eeff; --ts:#9a9ab5; --tm:#6b6b85; --warn:#fb7185;
+  --syntax-grad:linear-gradient(135deg,#6366f1,#a855f7,#ec4899);
+  --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;height:100dvh;background:var(--bg);color:var(--tp);font-family:Inter,system-ui,"Segoe UI",Roboto,Arial,sans-serif;overflow:hidden}
+body{padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px);display:flex;align-items:center;justify-content:center}
+#fitbox{position:relative;flex:none}
+#deck{width:1100px;height:707px;position:absolute;left:0;top:0;transform-origin:top left}
+
+/* brand bar */
+.brand-bar{height:44px;display:flex;justify-content:space-between;align-items:center}
+.brand-left{display:flex;align-items:center;gap:11px}
+.logo{width:30px;height:30px;border-radius:9px;background:var(--syntax-grad);display:grid;place-items:center;font:800 13px var(--mono);color:#fff;letter-spacing:-1px}
+.brand-name{font-size:15px;font-weight:900;background:var(--syntax-grad);-webkit-background-clip:text;background-clip:text;color:transparent;line-height:1.2}
+.brand-sub{font-size:11px;color:var(--tm);font-weight:600}
+.brand-right{font-size:11.5px;color:var(--ts);font-weight:700}
+
+/* 16:9 stage */
+.vp{width:1100px;height:619px;position:relative;border-radius:20px;overflow:hidden;border:1px solid var(--border);background:var(--bg);box-shadow:0 0 0 1px rgba(168,85,247,.08),0 32px 70px rgba(0,0,0,.8)}
+.vp.part-intro{--c:#ec4899;--c-2:#a855f7}
+.vp.part-seq{--c:#6366f1;--c-2:#8b5cf6}
+.vp.part-sel{--c:#f59e0b;--c-2:#fbbf24}
+.vp.part-rep{--c:#22d3ee;--c-2:#06b6d4}
+.vp.part-fn{--c:#10b981;--c-2:#34d399}
+.vp-bg{position:absolute;inset:0;width:100%;height:100%;display:block;z-index:0}
+.vp-progress{position:absolute;top:0;left:0;right:0;height:3px;background:rgba(255,255,255,.05);z-index:6}
+.vp-progress span{display:block;height:100%;width:0;background:var(--syntax-grad);box-shadow:0 0 12px #a855f7;border-radius:0 3px 3px 0;transition:width .45s ease}
+.slide-counter{position:absolute;top:14px;left:50%;transform:translateX(-50%);z-index:6;padding:5px 14px;border-radius:999px;background:rgba(12,12,20,.75);border:1px solid var(--border);font-size:12px;font-weight:800;color:var(--ts)}
+
+/* slide */
+.slide{position:absolute;inset:0;display:none;flex-direction:column;padding:46px 52px 40px;z-index:2}
+.slide.active{display:flex}
+.slide>*{animation:revealUp .6s ease both}
+.slide>*:nth-child(2){animation-delay:.08s}
+.slide>*:nth-child(3){animation-delay:.16s}
+.slide>*:nth-child(4){animation-delay:.24s}
+.slide>*:nth-child(5){animation-delay:.32s}
+@keyframes revealUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.lbl{font-size:12.5px;font-weight:800;color:var(--c);margin-bottom:6px;letter-spacing:.4px;text-transform:uppercase}
+h2{margin:0 0 6px;font-size:27px;font-weight:900;line-height:1.3;letter-spacing:-.3px}
+h2 em{font-style:normal;background:var(--c-grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.sub{margin:0;font-size:14.5px;color:var(--ts);line-height:1.6;max-width:820px}
+.sub strong{color:var(--tp)}
+code,pre.code{font-variant-ligatures:none;font-feature-settings:"liga" 0,"calt" 0}
+code{font-family:var(--mono);font-size:.92em;color:#c7b3ff;background:rgba(255,255,255,.06);padding:1px 6px;border-radius:6px}
+.stage{flex:1;position:relative;min-height:0;margin-top:10px}
+.viz{position:absolute;inset:0}
+.viz canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+
+/* footer */
+.sf{display:flex;align-items:center;justify-content:space-between;font-size:11px;color:var(--tm);font-weight:600;margin-top:10px;height:16px}
+.pd{display:flex;gap:4px;align-items:center}
+.dot{width:5px;height:5px;border-radius:99px;background:rgba(255,255,255,.14);transition:.3s}
+.dot.on{width:18px;background:var(--c-grad)}
+
+/* hero */
+.hero-slide{justify-content:center}
+.hero-slide .lbl{margin-top:auto}
+.hero-slide h1{margin:6px 0 10px;font-size:72px;line-height:1.02;font-weight:900;letter-spacing:-2px}
+.hero-slide h1 em{font-style:normal;background:var(--syntax-grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero-slide .tag{font-size:21px;color:var(--ts);font-weight:600;max-width:760px;line-height:1.45}
+.inst{display:flex;align-items:center;gap:14px;margin-top:30px}
+.avatar{width:56px;height:56px;border-radius:50%;background:var(--syntax-grad);display:grid;place-items:center;font-weight:900;font-size:23px;box-shadow:0 0 24px rgba(168,85,247,.45)}
+.inst small{display:block;font-size:11px;letter-spacing:1.6px;text-transform:uppercase;color:var(--tm);font-weight:800;margin-bottom:2px}
+.inst b{font-size:21px;font-weight:800}
+.chips{display:flex;gap:10px;margin-top:26px;flex-wrap:wrap}
+.chips span{padding:6px 14px;border-radius:999px;border:1px solid var(--border);background:rgba(255,255,255,.04);font-size:13px;font-weight:700;color:var(--ts)}
+.hero-slide .sf{margin-top:auto}
+.herobg{position:absolute;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none}
+
+/* task slides */
+.task{display:grid;grid-template-columns:.92fr 1.08fr;gap:24px;position:absolute;inset:0}
+.tleft{display:flex;flex-direction:column;gap:14px;justify-content:center;min-width:0}
+.chip{align-self:flex-start;padding:5px 13px;border-radius:999px;background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--c);font-weight:800;font-size:11.5px;letter-spacing:.4px;text-transform:uppercase}
+.req{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+.req li{position:relative;padding-left:26px;font-size:15px;line-height:1.5;color:var(--tp)}
+.req li::before{content:'';position:absolute;left:0;top:.42em;width:11px;height:11px;border-radius:3px;background:var(--c-grad)}
+.trap{padding:12px 14px;border-radius:12px;border:1px solid rgba(251,113,133,.4);background:rgba(251,113,133,.08);font-size:13.5px;line-height:1.55;color:var(--tp)}
+.trap b{color:var(--warn)}
+.tright{position:relative;min-height:0}
+.solbtn{position:absolute;top:30px;right:52px;z-index:7;cursor:pointer;padding:8px 16px;border-radius:999px;border:1px solid var(--c);background:rgba(12,12,20,.85);color:var(--tp);font:800 12.5px Inter,system-ui,sans-serif;letter-spacing:.3px}
+.solbtn:hover{background:var(--c);color:#07070d}
+.solbtn kbd{margin-left:6px;padding:1px 6px;border-radius:5px;background:rgba(255,255,255,.1);font:700 11px var(--mono)}
+.sol{display:none;position:absolute;inset:0;background:rgba(7,7,13,.97);padding:34px 52px 40px;z-index:8;flex-direction:column;gap:14px}
+.sol.open{display:flex}
+.slide>.sol{animation-delay:0s}
+.sol-h{display:flex;justify-content:space-between;align-items:center}
+.sol-h .lbl{margin:0;font-size:13px}
+.sol-body{display:grid;grid-template-columns:1.5fr 1fr;gap:20px;flex:1;min-height:0}
+.codecard{background:rgba(12,12,20,.92);border:1px solid var(--border);border-radius:14px;padding:14px 18px;overflow:hidden;min-height:0}
+.notes{display:flex;flex-direction:column;gap:12px;justify-content:center}
+.note-h{font-size:12px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:var(--tm)}
+.note{padding:12px 15px;border-radius:12px;border:1px solid var(--border);border-left:3px solid var(--c);background:rgba(255,255,255,.03);font-size:14px;line-height:1.55}
+
+/* code */
+pre.code{margin:0;font:500 13px/1.5 var(--mono);color:#e8e6ff;white-space:pre;tab-size:4}
+pre.code .k{color:var(--c);font-weight:700}
+pre.code .t{color:#67e8f9}
+pre.code .s{color:#34d399}
+pre.code .n{color:#fbbf24}
+pre.code .c{color:#6b6b85;font-style:italic}
+pre.code .p{color:#a855f7}
+pre.code .f{color:#a5b4fc}
+pre.code .o{color:#f9a8d4}
+
+/* challenge slide */
+.chal{display:grid;grid-template-columns:1.1fr 1fr;gap:20px;position:absolute;inset:0}
+.chal .col{display:flex;flex-direction:column;gap:14px;min-height:0}
+.chal .codecard{flex:none}
+.chal pre.code{font-size:14px}
+.q{padding:16px 18px;border-radius:14px;border:1px solid var(--c);background:rgba(255,255,255,.03);flex:1;display:flex;flex-direction:column;justify-content:center;gap:10px}
+.q b{font-size:18px}
+.q .term{font:600 16px var(--mono);color:var(--ts)}
+.q .term i{display:inline-block;width:9px;height:18px;background:var(--c);vertical-align:-3px;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+
+/* controls */
+.controls{height:44px;display:flex;align-items:center;justify-content:space-between;color:var(--tm);font-size:12px;font-weight:600}
+.controls button{cursor:pointer;padding:7px 16px;border-radius:999px;border:1px solid var(--border);background:rgba(255,255,255,.04);color:var(--ts);font:700 12px Inter,system-ui,sans-serif}
+.controls button:hover{color:var(--tp);border-color:rgba(255,255,255,.25)}
+.controls kbd{padding:1px 6px;border-radius:5px;background:rgba(255,255,255,.08);font:700 11px var(--mono);color:var(--ts)}
+
+/* code walkthrough slides */
+.walk{display:grid;grid-template-columns:1.12fr 1fr;gap:22px;position:absolute;inset:0}
+.walk .codecard{padding:16px 20px;align-self:stretch;display:flex;align-items:center}
+.walk pre.code{font-size:14.5px;line-height:1.75;width:100%}
+pre.code .ln{display:block;padding:0 12px;margin:0 -12px;border-radius:6px;opacity:.5;transition:opacity .25s,background .25s}
+pre.code .ln.on{opacity:1;background:rgba(255,255,255,.08);box-shadow:inset 3px 0 0 var(--c)}
+.steps{display:flex;flex-direction:column;gap:10px;justify-content:center;min-width:0}
+.stp{display:flex;gap:12px;align-items:flex-start;padding:11px 14px;border-radius:12px;border:1px solid var(--border);background:rgba(255,255,255,.02);cursor:pointer;opacity:.5;transition:opacity .25s,border-color .25s,background .25s}
+.stp.on{opacity:1;border-color:var(--c);background:rgba(255,255,255,.06)}
+.stp i{flex:none;width:24px;height:24px;border-radius:50%;background:var(--c-grad);color:#07070d;font:900 12px Inter,system-ui,sans-serif;font-style:normal;display:grid;place-items:center;margin-top:1px}
+.stp b{display:block;font-size:14.5px;margin-bottom:3px}
+.stp span b{display:inline;font-size:inherit;margin:0;color:var(--tp)}
+.stp span{font-size:13px;color:var(--ts);line-height:1.5;display:block}
+/* side-by-side code cards */
+.cards{display:grid;gap:18px;position:absolute;inset:0;align-content:center}
+.cc{display:flex;flex-direction:column;gap:10px;min-width:0}
+.cc-h{font-size:12.5px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:var(--c)}
+.cc .codecard{flex:none;padding:16px 16px;min-height:230px}
+.cc pre.code{font-size:var(--fs,13px);line-height:1.7}
+.cc-n{font-size:13px;line-height:1.55;color:var(--ts);min-height:60px}
+.cc-n b{color:var(--tp)}
+/* no font ligatures in code: students must see the real characters  <=  <<  >> */
+pre.code,pre.code *,code{font-variant-ligatures:none!important;font-feature-settings:"liga" 0,"calt" 0!important}
+
+/* phones: hide chrome, fill the whole screen (landscape) or rotate to fill it (portrait) */
+.mnav{display:none;position:absolute;top:50%;z-index:9;width:38px;height:38px;margin-top:-19px;border-radius:50%;border:1px solid var(--border);background:rgba(12,12,20,.55);color:var(--tp);font:800 20px/1 Inter,system-ui,sans-serif;cursor:pointer;place-items:center;padding:0;opacity:.6}
+.mnav.mp{left:6px}.mnav.mn{right:6px}
+.small .mnav{display:grid}
+.small .brand-bar,.small .controls{display:none}
+.small .vp{border-radius:12px}
+
+/* answer box for the tracing challenge (lives outside the rotated deck, so the phone keyboard works) */
+.ansbtn{align-self:flex-start;cursor:pointer;padding:9px 18px;border-radius:999px;border:1px solid var(--c);background:rgba(255,255,255,.05);color:var(--tp);font:800 13.5px Inter,system-ui,sans-serif}
+.ansbtn:hover{background:var(--c);color:#07070d}
+.ansbtn kbd{margin-left:8px;padding:1px 6px;border-radius:5px;background:rgba(255,255,255,.12);font:700 11px var(--mono)}
+.q .term{cursor:pointer;min-height:24px}
+.q .term .typed{color:var(--tp)}
+.ansmodal{position:fixed;inset:0;z-index:100;display:flex;justify-content:center;align-items:flex-start;padding:8vh 12px 12px;background:rgba(5,5,10,.78)}
+.ansmodal[hidden]{display:none}
+.ans-card{width:min(94vw,460px);background:#0b0b14;border:1px solid rgba(168,85,247,.65);border-radius:16px;padding:18px;box-shadow:0 20px 60px rgba(0,0,0,.7);font-family:Inter,system-ui,sans-serif;color:#f0eeff}
+.ans-h{font-weight:800;font-size:16px;margin-bottom:12px}
+.ans-row{display:flex;align-items:center;gap:8px;background:#05050a;border:1px solid var(--border);border-radius:10px;padding:8px 12px}
+.ans-row span{font:700 16px "JetBrains Mono",ui-monospace,monospace;color:#9a9ab5}
+.ans-row input{flex:1;min-width:0;background:transparent;border:0;outline:0;color:#34d399;font:600 16px "JetBrains Mono",ui-monospace,monospace}
+.ans-fb{font-size:13.5px;line-height:1.55;margin-top:12px;min-height:0}
+.ans-fb.ok{color:#34d399}.ans-fb.bad{color:#fb7185}
+.ans-btns{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.ans-btns button{cursor:pointer;padding:9px 16px;border-radius:999px;border:1px solid rgba(168,85,247,.6);background:linear-gradient(90deg,#6366f1,#a855f7);color:#fff;font:800 13px Inter,system-ui,sans-serif}
+.ans-btns button.ghost{background:transparent;color:#9a9ab5;border-color:rgba(255,255,255,.15)}
+@media (max-height:500px){.ansmodal{padding-top:6px}.ans-card{padding:12px}.ans-h{font-size:14px;margin-bottom:8px}.ans-fb{margin-top:8px}.ans-btns{margin-top:10px}}
+</style>
+</head>
+<body>
+<a href="../../../index.html" style="position:fixed;top:12px;left:12px;z-index:99999;padding:8px 14px;border-radius:999px;background:rgba(10,14,30,.82);color:#e9edff;font:600 13px/1 system-ui,sans-serif;text-decoration:none;border:1px solid rgba(255,255,255,.2);backdrop-filter:blur(8px);transition:transform .2s,opacity .2s;opacity:.8" onmouseover="this.style.opacity=1;this.style.transform='scale(1.04)'" onmouseout="this.style.opacity=.8;this.style.transform='scale(1)'">← Back to sessions</a>
+<div id="fitbox"><div id="deck">
+  <div class="brand-bar">
+    <div class="brand-left">
+      <div class="logo">{ }</div>
+      <div>
+        <div class="brand-name">Data Structures</div>
+        <div class="brand-sub">C++ Revision · From Structured Programming to Functions</div>
+      </div>
+    </div>
+    <div class="brand-right">Instructor · Muhammad Ali Abdul Kareem</div>
+  </div>
+  <div class="vp part-intro" id="vp">
+    <canvas class="vp-bg" id="amb"></canvas>
+    <div class="vp-progress"><span id="prog"></span></div>
+    <div class="slide-counter" id="counter">1 / 1</div>
+    <button class="mnav mp" id="mprev" aria-label="Previous slide">‹</button>
+    <button class="mnav mn" id="mnext" aria-label="Next slide">›</button>
+  </div>
+  <div class="controls">
+    <button id="prev" tabindex="-1">‹ Prev</button>
+    <span><kbd>→</kbd> next &nbsp;·&nbsp; <kbd>←</kbd> back &nbsp;·&nbsp; <kbd>S</kbd> task solution &nbsp;·&nbsp; <kbd>F</kbd> fullscreen</span>
+    <button id="next" tabindex="-1">Next ›</button>
+  </div>
+</div></div>
+<div class="ansmodal" id="ansmodal" hidden>
+  <div class="ans-card">
+    <div class="ans-h">What is the final console output?</div>
+    <div class="ans-row"><span>&gt;</span><input id="ans" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="done" placeholder="type your answer"></div>
+    <div class="ans-fb" id="ansfb"></div>
+    <div class="ans-btns"><button id="anschk">Check</button><button id="ansrev" class="ghost">Show answer</button><button id="ansx" class="ghost">Close</button></div>
+  </div>
+</div>
+<script>
+'use strict';
+/* ═══════════════ Core helpers (canvas whiteboard toolkit) ═══════════════ */
+const CL={indigo:'#6366f1',violet:'#a855f7',pink:'#ec4899',cyan:'#67e8f9',green:'#34d399',amber:'#fbbf24',chalk:'#eef0ff',dim:'#8a8aa3',board:'#0a0a13'};
+const FONTS={ui:'Inter, system-ui, sans-serif',marker:'Lemonada, Inter, sans-serif',mono:'"JetBrains Mono", ui-monospace, Menlo, monospace'};
+let PC='#ec4899',PC2='#a855f7',SC=1;               // chapter colours + deck scale
+const at=(f,a,b)=>Math.min(1,Math.max(0,(f-a)/(b-a)));
+const ease=t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
+const lerp=(a,b,t)=>a+(b-a)*t;
+const rgba=(h,a)=>{const n=parseInt(h.slice(1),16);return `rgba(${n>>16},${(n>>8)&255},${n&255},${a})`};
+const typed=(s,p)=>s.slice(0,Math.ceil(s.length*p));
+
+/** DPR-aware canvas sizing bound to its parent */
+function fit(cv){
+  const ctx=cv.getContext('2d'),s={ctx,W:0,H:0,d:0},p=cv.parentElement;
+  s.rs=()=>{
+    const w=p.clientWidth,h=p.clientHeight,d=Math.min((devicePixelRatio||1)*SC,3);
+    if(!w||!h||(w===s.W&&h===s.H&&Math.abs(d-s.d)<.01))return;
+    s.W=w;s.H=h;s.d=d;cv.width=Math.round(w*d);cv.height=Math.round(h*d);ctx.setTransform(d,0,0,d,0,0);
+  };
+  s.rs();return s;
+}
+function rr(c,x,y,w,h,r){c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath()}
+
+/** ✍️ signature move: draws a polyline progressively, like a marker */
+function marker(c,pts,prog,col,lw=2.4){
+  if(prog<=0||pts.length<2)return;
+  let total=0;const seg=[];
+  for(let i=1;i<pts.length;i++){const d=Math.hypot(pts[i][0]-pts[i-1][0],pts[i][1]-pts[i-1][1]);seg.push(d);total+=d}
+  const target=total*prog;c.save();
+  c.strokeStyle=col;c.lineWidth=lw;c.lineJoin='round';c.lineCap='round';c.shadowColor=col;c.shadowBlur=6;
+  c.beginPath();c.moveTo(pts[0][0],pts[0][1]);let acc=0;
+  for(let i=1;i<pts.length;i++){const d=seg[i-1];
+    if(acc+d<=target){c.lineTo(pts[i][0],pts[i][1]);acc+=d}
+    else{const r=(target-acc)/d;c.lineTo(pts[i-1][0]+(pts[i][0]-pts[i-1][0])*r,pts[i-1][1]+(pts[i][1]-pts[i-1][1])*r);break}
+  }
+  c.stroke();c.restore();
+}
+function pathPos(pts,p){
+  let total=0;const seg=[];
+  for(let i=1;i<pts.length;i++){const d=Math.hypot(pts[i][0]-pts[i-1][0],pts[i][1]-pts[i-1][1]);seg.push(d);total+=d}
+  const t=total*p;let acc=0;
+  for(let i=0;i<seg.length;i++){
+    if(acc+seg[i]>=t||i===seg.length-1){const r=seg[i]?(t-acc)/seg[i]:0;return[pts[i][0]+(pts[i+1][0]-pts[i][0])*r,pts[i][1]+(pts[i+1][1]-pts[i][1])*r]}
+    acc+=seg[i];
+  }
+  return pts[0];
+}
+const mrect=(c,x,y,w,h,p,col,lw)=>marker(c,[[x,y],[x+w,y],[x+w,y+h],[x,y+h],[x,y-1]],p,col,lw);
+const mdia=(c,cx,cy,hw,hh,p,col,lw)=>marker(c,[[cx,cy-hh],[cx+hw,cy],[cx,cy+hh],[cx-hw,cy],[cx,cy-hh]],p,col,lw);
+function mbox(c,x,y,w,h,p,col,fa=.09){
+  if(p<=0)return;
+  c.save();rr(c,x,y,w,h,8);c.fillStyle=rgba(col,fa*p);c.fill();c.restore();
+  mrect(c,x,y,w,h,p,col,2.2);
+}
+function head(c,x1,y1,x2,y2,col,s=8){
+  const a=Math.atan2(y2-y1,x2-x1);c.save();c.fillStyle=col;c.beginPath();c.moveTo(x2,y2);
+  c.lineTo(x2-s*Math.cos(a-.42),y2-s*Math.sin(a-.42));c.lineTo(x2-s*Math.cos(a+.42),y2-s*Math.sin(a+.42));c.closePath();c.fill();c.restore();
+}
+function arrow(c,pts,p,col,lw=2.2){
+  marker(c,pts,p,col,lw);
+  if(p>=.98){const n=pts.length;head(c,pts[n-2][0],pts[n-2][1],pts[n-1][0],pts[n-1][1],col)}
+}
+function dash(c,pts,col,lw=1.6,a=1){
+  c.save();c.globalAlpha=a;c.strokeStyle=col;c.lineWidth=lw;c.setLineDash([6,5]);c.beginPath();
+  pts.forEach((p,i)=>i?c.lineTo(p[0],p[1]):c.moveTo(p[0],p[1]));c.stroke();c.restore();
+}
+function dot(c,x,y,r,col,label){
+  c.save();c.shadowColor=col;c.shadowBlur=12;c.fillStyle=col;c.beginPath();c.arc(x,y,r,0,7);c.fill();c.restore();
+  if(label)txt(c,label,x,y+.5,{size:Math.max(9,r*.95),col:'#07070d',weight:900,font:'mono'});
+}
+let CW=0;   // current canvas width, set every frame by the master loop
+function txt(c,s,x,y,o={}){
+  const{size=13,col=CL.chalk,weight=700,align='center',a=1,font='ui',base='middle'}=o;
+  if(!s||!(a>0))return;
+  c.save();c.globalAlpha=a;c.font=`${weight} ${size}px ${FONTS[font]}`;
+  if(font==='mono'&&'letterSpacing' in c)c.letterSpacing='.3px';   // switches off <= << ligatures
+  const w=c.measureText(s).width;
+  let ax=align==='center'?x-w/2:align==='right'?x-w:x;
+  if(CW)ax=Math.max(12,Math.min(ax,CW-12-w));      // keep every label inside the canvas
+  c.fillStyle=col;c.textAlign='left';c.textBaseline=base;c.fillText(s,ax,y);c.restore();
+}
+/** chalkboard surface: dark + dot grid + breathing brand-gradient frame */
+function board(c,W,H,o={}){
+  const p=6,x=p,y=p,w=W-p*2,h=H-p*2;
+  rr(c,x,y,w,h,16);c.fillStyle=CL.board;c.fill();
+  c.save();rr(c,x,y,w,h,16);c.clip();c.fillStyle='rgba(168,85,247,.055)';
+  for(let gx=x+22;gx<x+w;gx+=26)for(let gy=y+22;gy<y+h;gy+=26){c.beginPath();c.arc(gx,gy,1,0,7);c.fill()}
+  c.restore();
+  const g=c.createLinearGradient(x,y,x+w,y+h);
+  g.addColorStop(0,CL.indigo);g.addColorStop(.5,CL.violet);g.addColorStop(1,CL.pink);
+  c.save();c.strokeStyle=g;c.lineWidth=2;c.shadowColor=CL.violet;c.shadowBlur=10+5*Math.sin((o.frame||0)*.03);
+  rr(c,x,y,w,h,16);c.stroke();c.restore();
+  if(o.title)txt(c,o.title,x+22,y+28,{size:16,col:CL.chalk,align:'left',font:'marker',weight:600});
+  return{x,y,w,h};
+}
+
+/** trace table (chalk style). Rows appear one by one; changed cells flash. */
+function table(c,x,y,w,cols,rows,f,o={}){
+  const{rowH=44,hdrH=36,start=14,per=60,col=PC}=o;
+  const hp=at(f,start-10,start+24);
+  c.save();rr(c,x,y,w,hdrH,8);c.fillStyle=rgba(col,.16*ease(hp));c.fill();c.restore();
+  let cx=x;
+  cols.forEach(cd=>{const cw=cd.w*w;
+    txt(c,cd.h,cd.al==='left'?cx+12:cx+cw/2,y+hdrH/2,{size:11.5,col:col,weight:800,align:cd.al==='left'?'left':'center',a:ease(hp)});
+    cx+=cw});
+  marker(c,[[x,y+hdrH],[x+w,y+hdrH]],hp,col,1.6);
+  const first=start+30;
+  rows.forEach((row,r)=>{
+    const s0=first+r*per,p=at(f,s0,s0+24),ry=y+hdrH+8+r*rowH;
+    if(p<=0)return;
+    const active=f>=s0&&f<s0+per;
+    c.save();c.globalAlpha=ease(p);
+    if(active){rr(c,x,ry,w,rowH-4,8);c.fillStyle=rgba(col,.10);c.fill();c.strokeStyle=rgba(col,.55);c.lineWidth=1.4;c.stroke()}
+    let cx2=x;
+    row.forEach((cell,i)=>{
+      const cd=cols[i],cw=cd.w*w,o2=typeof cell==='string'?{t:cell}:cell;
+      if(o2.hl&&active){c.fillStyle=rgba(o2.col||col,.24);rr(c,cx2+3,ry+3,cw-6,rowH-10,6);c.fill()}
+      txt(c,o2.t,cd.al==='left'?cx2+12:cx2+cw/2,ry+(rowH-4)/2,{size:cd.size||13,col:o2.col||CL.chalk,weight:o2.hl?800:600,align:cd.al==='left'?'left':'center',font:cd.mono?'mono':'ui'});
+      cx2+=cw;
+    });
+    c.restore();
+  });
+  return Math.max(-1,Math.min(rows.length-1,Math.floor((f-first)/per)));
+}
+
+/** terminal that types out the expected console I/O */
+function terminal(c,x,y,w,h,f,lines,o={}){
+  const{start=26,speed=.5,pause=18,title='Expected output'}=o;
+  const p=ease(at(f,0,30));
+  c.save();c.globalAlpha=p;
+  rr(c,x,y,w,h,14);c.fillStyle='#0b0b14';c.fill();
+  c.save();rr(c,x,y,w,h,14);c.clip();c.fillStyle='rgba(255,255,255,.05)';c.fillRect(x,y,w,36);c.restore();
+  c.strokeStyle=rgba(PC,.6);c.lineWidth=1.6;rr(c,x,y,w,h,14);c.stroke();
+  ['#fb7185','#fbbf24','#34d399'].forEach((k,i)=>{c.fillStyle=k;c.beginPath();c.arc(x+22+i*18,y+18,5,0,7);c.fill()});
+  c.restore();
+  txt(c,title,x+w-18,y+18,{size:11.5,col:CL.dim,align:'right',a:p});
+  const lh=Math.min(32,(h-76)/lines.length);
+  let t=(f-start)*speed,ly=y+34+lh*.9+12,last=null,cur=null;
+  lines.forEach(seg=>{
+    const len=seg.reduce((n,s)=>n+s[0].length,0);
+    if(t>0){
+      let budget=Math.min(len,Math.floor(t)),cx=x+22;
+      seg.forEach(([tx,ck])=>{
+        const part=tx.slice(0,Math.max(0,budget));budget-=tx.length;
+        if(part){c.save();c.font=`500 15px ${FONTS.mono}`;if('letterSpacing' in c)c.letterSpacing='.3px';c.fillStyle=CL[ck]||CL.chalk;c.textAlign='left';c.textBaseline='middle';c.fillText(part,cx,ly);cx+=c.measureText(part).width;c.restore()}
+      });
+      last=[cx,ly];
+      if(t<len+pause*speed)cur=[cx,ly];
+    }
+    t-=len+pause*speed;ly+=lh;
+  });
+  const cp=cur||last;
+  if(cp&&Math.floor(f/24)%2===0){c.fillStyle=PC;c.fillRect(cp[0]+3,cp[1]-9,9,18)}
+}
+
+/* ═══════════════ Visual registry ═══════════════ */
+const VIZ={};
+
+/* hero — drifting C++ tokens */
+VIZ.tokens={cycle:100000,draw(c,W,H,f){
+  const T=['if','for','int','&','return','{ }','%','while','cin','cout','void','++','==','<<','>>','main()','double','bool'];
+  T.forEach((t,i)=>{
+    const sx=((i*137.5)%100)/100,sy=((i*61.8)%100)/100;
+    const x=W*sx+Math.sin(f*.01+i)*18,y=(((H*sy-f*(.12+(i%4)*.05))%H)+H)%H;
+    txt(c,t,x,y,{size:15+(i%3)*4,col:i%2?PC:PC2,a:.1+.08*Math.sin(f*.02+i),font:'mono',weight:700});
+  });
+}};
+
+/* 2 — messy vs structured */
+VIZ.pain={cycle:640,draw(c,W,H,f,frame){
+  const b=board(c,W,H,{title:'Messy vs. structured',frame});
+  const mid=b.x+b.w/2;
+  marker(c,[[mid,b.y+56],[mid,b.y+b.h-60]],at(f,0,40),'rgba(255,255,255,.18)',1.4);
+  const L={x:b.x+50,y:b.y+70,w:b.w/2-100,h:b.h-170};
+  const N=[[.08,.1],[.5,0],[.94,.2],[.12,.55],[.62,.5],[.94,.8],[.32,.98]].map(([u,v])=>[L.x+u*L.w,L.y+v*L.h]);
+  const links=[[0,4],[4,1],[1,3],[3,5],[5,0],[2,3],[6,1],[6,4],[2,6],[0,2]];
+  links.forEach(([a,bn],i)=>{
+    const p=at(f,20+i*12,64+i*12),A=N[a],B=N[bn];
+    const mx=(A[0]+B[0])/2+((i%2)?42:-42),my=(A[1]+B[1])/2+((i%3)-1)*34,pts=[];
+    for(let k=0;k<=14;k++){const t=k/14;pts.push([(1-t)*(1-t)*A[0]+2*(1-t)*t*mx+t*t*B[0],(1-t)*(1-t)*A[1]+2*(1-t)*t*my+t*t*B[1]])}
+    marker(c,pts,p,CL.pink,1.8);
+  });
+  N.forEach(([x,y],i)=>{const a=ease(at(f,8+i*4,30+i*4));c.save();c.globalAlpha=a;c.fillStyle=CL.board;c.strokeStyle=CL.pink;c.lineWidth=2;c.beginPath();c.arc(x,y,9,0,7);c.fill();c.stroke();c.restore()});
+  const pc=b.x+b.w*.75,names=['Sequence','Selection','Repetition'];
+  names.forEach((n,i)=>{
+    const y=b.y+76+i*66,p=at(f,210+i*40,255+i*40);
+    mbox(c,pc-95,y,190,42,p,CL.green,.12);
+    txt(c,n,pc,y+21,{size:15,font:'marker',a:ease(at(f,245+i*40,275+i*40))});
+    if(i<2)arrow(c,[[pc,y+42],[pc,y+66]],at(f,250+i*40,275+i*40),CL.green,2);
+  });
+  const cy=b.y+b.h-66;
+  const a1=ease(at(f,190,230)),a2=ease(at(f,380,420));
+  txt(c,'Jump anywhere = spaghetti code',b.x+b.w*.25,cy,{size:14,col:CL.pink,font:'marker',a:a1});
+  txt(c,'hard to read · hard to debug',b.x+b.w*.25,cy+22,{size:12,col:CL.dim,a:a1});
+  txt(c,'Three blocks, top to bottom',pc,cy,{size:14,col:CL.green,font:'marker',a:a2});
+  txt(c,'easy to read · debug · reuse',pc,cy+22,{size:12,col:CL.dim,a:a2});
+  const p3=at(f,450,520);
+  txt(c,typed('Any logic  =  Sequence + Selection + Repetition',p3),mid,b.y+b.h-20,{size:14,col:PC,font:'marker',a:p3>0?1:0});
+}};
+
+/* 3 — three pillars whiteboard */
+VIZ.pillars={cycle:680,draw(c,W,H,f,frame){
+  const b=board(c,W,H,{title:'Three pillars = any program',frame});
+  const cw=b.w/3,y0=b.y+66;
+  const nm=['Sequence','Selection','Repetition'],tg=['step by step','if / else conditions','for / while loops'],cols=[CL.indigo,CL.violet,CL.pink];
+  { // sequence
+    const cx=b.x+cw*.5,col=cols[0];
+    for(let i=0;i<3;i++){
+      const y=y0+i*54,p=at(f,10+i*30,50+i*30);
+      mbox(c,cx-52,y,104,32,p,col);
+      txt(c,'Step '+(i+1),cx,y+16,{size:12,font:'marker',a:ease(at(f,50+i*30,80+i*30))});
+      if(i<2)arrow(c,[[cx,y+32],[cx,y+54]],at(f,40+i*30,62+i*30),col,2);
+    }
+  }
+  { // selection
+    const cx=b.x+cw*1.5,col=cols[1],cy=y0+44;
+    mdia(c,cx,cy,62,40,at(f,110,170),col,2.2);
+    txt(c,'cond?',cx,cy,{size:12.5,font:'marker',a:ease(at(f,160,190))});
+    const pa=at(f,170,215);
+    arrow(c,[[cx-62,cy],[cx-96,cy],[cx-96,cy+50]],pa,col,2);
+    arrow(c,[[cx+62,cy],[cx+96,cy],[cx+96,cy+50]],pa,col,2);
+    mbox(c,cx-122,cy+50,52,28,at(f,205,240),col);mbox(c,cx+70,cy+50,52,28,at(f,205,240),col);
+    const al=ease(at(f,220,250));
+    txt(c,'A',cx-96,cy+64,{size:12,font:'marker',a:al});txt(c,'B',cx+96,cy+64,{size:12,font:'marker',a:al});
+    txt(c,'Yes',cx-84,cy-12,{size:11,col:CL.green,a:al,font:'marker'});txt(c,'No',cx+84,cy-12,{size:11,col:CL.pink,a:al,font:'marker'});
+  }
+  { // repetition
+    const cx=b.x+cw*2.5,col=cols[2];
+    mbox(c,cx-48,y0+34,96,38,at(f,250,290),col);
+    txt(c,'body',cx,y0+53,{size:13,font:'marker',a:ease(at(f,285,315))});
+    arrow(c,[[cx+48,y0+53],[cx+84,y0+53],[cx+84,y0+8],[cx,y0+8],[cx,y0+34]],at(f,290,350),col,2);
+    txt(c,'repeat?',cx+52,y0-4,{size:11,col:CL.amber,a:ease(at(f,340,370)),font:'marker'});
+    arrow(c,[[cx,y0+72],[cx,y0+112]],at(f,340,370),col,2);
+  }
+  for(let i=0;i<3;i++){
+    const cx=b.x+cw*(i+.5),a=ease(at(f,380+i*30,420+i*30));
+    txt(c,nm[i],cx,y0+152,{size:19,font:'marker',col:cols[i],a,weight:700});
+    txt(c,tg[i],cx,y0+180,{size:12.5,col:CL.dim,a});
+  }
+  const pb=at(f,500,560),by=b.y+b.h-64;
+  marker(c,[[b.x+50,by-10],[b.x+50,by],[b.x+b.w-50,by],[b.x+b.w-50,by-10]],pb,CL.amber,2);
+  txt(c,'+ Functions: package the blocks into named, reusable units',b.x+b.w/2,by+26,{size:14.5,col:CL.amber,font:'marker',a:ease(at(f,540,590))});
+}};
+
+/* 4 — sequence data-flow */
+VIZ.flow={cycle:640,draw(c,W,H,f,frame){
+  const b=board(c,W,H,{title:'Sequence: one step after another',frame});
+  const S=[70,190,310,430];let cur=-1;S.forEach((s,i)=>{if(f>=s)cur=i});
+  const labels=['Declare a variable','Read input  (cin)','Compute','Print output  (cout)'];
+  const sx=b.x+28,sy=b.y+62,sw=236,sh=46,gap=18;
+  labels.forEach((t,i)=>{
+    const y=sy+i*(sh+gap),p=at(f,6+i*10,40+i*10),on=i===cur,ta=ease(at(f,30+i*10,50+i*10));
+    mbox(c,sx,y,sw,sh,p,on?PC:CL.dim,on?.24:.06);
+    txt(c,String(i+1),sx+24,y+sh/2,{size:19,col:on?PC:CL.dim,weight:700,font:'marker',a:ta});
+    txt(c,t,sx+48,y+sh/2,{size:13,col:on?CL.chalk:CL.dim,align:'left',font:'marker',a:ta});
+    if(i<3)arrow(c,[[sx+sw/2,y+sh],[sx+sw/2,y+sh+gap]],at(f,40+i*10,60+i*10),CL.dim,1.8);
+  });
+  const L=b.x+310,R=b.x+b.w-28,cy=b.y+b.h*.48,cellW=190,cellX=L+100+92;
+  const kb={x:L,y:cy-42,w:100,h:84},scr={x:cellX+cellW+96,y:cy-58,w:R-(cellX+cellW+96),h:116};
+  const c1={x:cellX,y:cy-70,w:cellW,h:58},c2={x:cellX,y:cy+12,w:cellW,h:58};
+  mbox(c,kb.x,kb.y,kb.w,kb.h,at(f,20,60),CL.cyan);
+  txt(c,'Keyboard',kb.x+kb.w/2,kb.y+kb.h/2,{size:13.5,font:'marker',a:ease(at(f,50,80))});
+  mbox(c,scr.x,scr.y,scr.w,scr.h,at(f,60,100),CL.green);
+  txt(c,'Screen',scr.x+scr.w/2,scr.y+16,{size:12,font:'marker',col:CL.green,a:ease(at(f,90,120))});
+  // memory cells
+  const cell=(r,name,val,p,col,fl)=>{
+    mbox(c,r.x,r.y,r.w,r.h,p,col,.12);
+    const a=ease(at(p,.7,1));
+    txt(c,name,r.x+14,r.y+16,{size:11,font:'mono',col:CL.dim,align:'left',a});
+    txt(c,val,r.x+r.w-22,r.y+r.h/2+5,{size:26,font:'marker',col:fl?CL.amber:CL.chalk,align:'right',a,weight:700});
+  };
+  const v1=f<240?'0':'13',v2=f<360?'?':'2';
+  cell(c1,'int firstNumber',v1,at(f,70,110),CL.violet,f>=240&&f<300);
+  cell(c2,'int quotient',v2,at(f,310,350),CL.violet,f>=360&&f<420);
+  // pipes
+  const y1=c1.y+c1.h/2,y2=c2.y+c2.h/2;
+  const pin=[[kb.x+kb.w,y1],[c1.x,y1]],pout=[[c2.x+c2.w,y2],[scr.x,y2]];
+  arrow(c,pin,at(f,110,140),CL.dim,1.8);arrow(c,pout,at(f,120,150),CL.dim,1.8);
+  txt(c,'cin >>',(pin[0][0]+pin[1][0])/2,y1-14,{size:12,font:'mono',col:CL.cyan,a:ease(at(f,130,150))});
+  txt(c,'cout <<',(pout[0][0]+pout[1][0])/2,y2-14,{size:12,font:'mono',col:CL.green,a:ease(at(f,140,160))});
+  const d1=at(f,190,240),d2=at(f,430,480);
+  if(d1>0&&d1<1){const[x,y]=pathPos(pin,ease(d1));dot(c,x,y,11,CL.amber,'13')}
+  if(d2>0&&d2<1){const[x,y]=pathPos(pout,ease(d2));dot(c,x,y,10,CL.amber,'2')}
+  const pc=at(f,320,360);
+  if(pc>0)txt(c,'13 / 5 = 2',cellX+cellW/2,cy-2,{size:12.5,font:'marker',col:CL.amber,a:ease(pc)*(f<430?1:.4)});
+  const po=at(f,480,540);
+  txt(c,typed('Quotient: 2',po),scr.x+scr.w/2,scr.y+scr.h/2+8,{size:14,font:'mono',col:CL.green,a:po>0?1:0});
+}};
+
+/* 5 — / vs % */
+VIZ.divmod={cycle:660,draw(c,W,H,f,frame){
+  const b=board(c,W,H,{title:'13 items, groups of 5',frame});
+  const step=38,gap=58,groups=[5,5,3],total=13*step+gap*2,sx=b.x+(b.w-total)/2,cy=b.y+116;
+  let k=0,gx=sx;const gpos=[];
+  groups.forEach((n,g)=>{
+    gpos.push([gx,n*step]);
+    for(let j=0;j<n;j++){
+      const p=ease(at(f,10+k*6,30+k*6)),x=gx+j*step+step/2;
+      c.save();c.globalAlpha=p;c.fillStyle=g<2?PC:CL.amber;c.shadowColor=g<2?PC:CL.amber;c.shadowBlur=8;
+      c.beginPath();c.arc(x,cy,11*p,0,7);c.fill();c.restore();k++;
+    }
+    gx+=n*step+gap;
+  });
+  gpos.forEach(([x,w],g)=>{
+    const p=at(f,120+g*36,170+g*36),col=g<2?PC:CL.amber;
+    mbox(c,x-4,cy-30,w+8,60,p,col,.1);
+    const nmz=['group 1','group 2','left over'][g];
+    txt(c,nmz,x+w/2,cy-48,{size:12.5,font:'marker',col,a:ease(at(f,180+g*36,215+g*36))});
+  });
+  const ey=cy+104,a1=ease(at(f,270,320)),a2=ease(at(f,340,390));
+  txt(c,'13 / 5 = 2',b.x+b.w*.28,ey,{size:30,font:'marker',col:CL.chalk,a:a1,weight:700});
+  txt(c,'complete groups (quotient)',b.x+b.w*.28,ey+36,{size:13,col:PC,a:a1});
+  txt(c,'13 % 5 = 3',b.x+b.w*.72,ey,{size:30,font:'marker',col:CL.chalk,a:a2,weight:700});
+  txt(c,'what is left (remainder)',b.x+b.w*.72,ey+36,{size:13,col:CL.amber,a:a2});
+  const p3=at(f,430,500);
+  txt(c,typed('Both operands are int, so the decimal part is dropped: 2.6 becomes 2',p3),b.x+b.w/2,b.y+b.h-24,{size:12.5,col:CL.dim,font:'marker',a:p3>0?1:0});
+}};
+
+/* 6 — trace: sequence */
+VIZ.trace1={cycle:640,draw(c,W,H,f,frame){
+  const b=board(c,W,H,{title:'Trace table: sequential execution',frame});
+  const cols=[{h:'LINE',w:.06},{h:'INSTRUCTION',w:.40,al:'left',mono:1,size:12.5},{h:'firstNumber',w:.135,mono:1},{h:'secondNumber',w:.135,mono:1},{h:'quotient',w:.135,mono:1},{h:'remainder',w:.135,mono:1}];
+  const rows=[
+    ['1','int firstNumber = 0;',{t:'0',hl:1},'?','?','?'],
+    ['2','int secondNumber = 0;','0',{t:'0',hl:1},'?','?'],
+    ['3','cin >> firstNumber;',{t:'13',hl:1},'0','?','?'],
+    ['4','cin >> secondNumber;','13',{t:'5',hl:1},'?','?'],
+    ['5','int quotient = firstNumber / secondNumber;','13','5',{t:'2',hl:1},'?'],
+    ['6','int remainder = firstNumber % secondNumber;','13','5','2',{t:'3',hl:1}]];
+  const cap=['firstNumber is created and starts at 0.','secondNumber is created and starts at 0.','User types 13 → stored in firstNumber.','User types 5 → stored in secondNumber.','Integer division: 13 / 5 = 2.6 → 2','Remainder: 13 − (5 × 2) = 3'];
+  const act=table(c,b.x+24,b.y+46,b.w-48,cols,rows,f,{rowH:38,hdrH:34,start:20,per:74});
+  if(act>=0)txt(c,cap[act],b.x+b.w/2,b.y+b.h-28,{size:14,font:'marker',col:PC,a:ease(at(f,20+30+act*74,20+30+act*74+24))});
+}};
+
+/* terminals for the task slides */
+VIZ.terminal={cycle:560,draw(c,W,H,f,frame,o){
+  const h=Math.min(H-8,Math.max(200,o.data.lines.length*34+90));
+  terminal(c,4,(H-h)/2,W-8,h,f,o.data.lines,{title:o.data.title||'Expected output'});
+}};
+
+/* 8 — selection ladder */
+VIZ.ladder={cycle:700,draw(c,W,H,f,frame){
+  const b=board(c,W,H,{title:'Selection: the first true branch wins',frame});
+  const cy=b.y+124,hw=66,hh=42,xs=[b.x+300,b.x+520,b.x+740];
+  const gr=['A','B','C'],cd=['score ≥ 90 ?','score ≥ 80 ?','score ≥ 70 ?'],dropY=cy+112;
+  mbox(c,b.x+26,cy-24,128,48,at(f,0,40),CL.cyan);
+  txt(c,'score = 85',b.x+90,cy,{size:13,font:'marker',a:ease(at(f,30,60))});
+  arrow(c,[[b.x+154,cy],[xs[0]-hw,cy]],at(f,30,60),CL.dim,1.8);
+  xs.forEach((x,i)=>{
+    const p=at(f,50+i*50,100+i*50);
+    mdia(c,x,cy,hw,hh,p,CL.amber,2.2);
+    txt(c,cd[i],x,cy,{size:12,font:'marker',a:ease(at(f,90+i*50,120+i*50))});
+    arrow(c,[[x,cy+hh],[x,dropY]],at(f,100+i*50,130+i*50),CL.green,2);
+    txt(c,'Yes',x+20,cy+hh+30,{size:11,col:CL.green,font:'marker',a:ease(at(f,120+i*50,150+i*50))});
+    const glow=(i===1&&f>=470);
+    mbox(c,x-30,dropY,60,40,at(f,120+i*50,160+i*50),CL.green,glow?.45:.1);
+    txt(c,gr[i],x,dropY+20,{size:18,font:'marker',a:ease(at(f,150+i*50,180+i*50)),col:glow?CL.chalk:CL.green,weight:700});
+    const nx=i<2?xs[i+1]-hw:b.x+b.w-140;
+    arrow(c,[[x+hw,cy],[nx,cy]],at(f,100+i*50,130+i*50),CL.dim,1.8);
+    txt(c,'No',(x+hw+nx)/2,cy-14,{size:11,col:CL.pink,font:'marker',a:ease(at(f,120+i*50,150+i*50))});
+  });
+  mbox(c,b.x+b.w-140,cy-24,110,48,at(f,190,230),CL.pink);
+  txt(c,'else → F',b.x+b.w-85,cy,{size:13,font:'marker',a:ease(at(f,220,250))});
+  const path=[[b.x+154,cy],[xs[0]-hw,cy],[xs[0]+hw,cy],[xs[1]-hw,cy],[xs[1],cy],[xs[1],dropY]];
+  const tp=ease(at(f,270,470));
+  if(tp>0&&tp<1){const[x,y]=pathPos(path,tp);dot(c,x,y,13,CL.amber,'85')}
+  txt(c,'85 ≥ 90 → false',xs[0],cy-hh-16,{size:11.5,col:CL.pink,font:'marker',a:ease(at(f,320,350))});
+  txt(c,'85 ≥ 80 → true',xs[1],cy-hh-16,{size:11.5,col:CL.green,font:'marker',a:ease(at(f,410,440))});
+  const p5=at(f,520,590);
+  txt(c,typed('Grade: B — the remaining branches are skipped',p5),b.x+b.w/2,b.y+b.h-26,{size:14,col:PC,font:'marker',a:p5>0?1:0});
+}};
+
+/* 9 — trace: selection */
+VIZ.trace2={cycle:560,draw(c,W,H,f,frame){
+  const b=board(c,W,H,{title:'Trace: score = 85',frame});
+  const cols=[{h:'STEP',w:.08},{h:'EXPRESSION',w:.27,al:'left',mono:1,size:12.5},{h:'RESULT',w:.14},{h:'ACTION',w:.31,al:'left'},{h:'letterGrade',w:.2,mono:1}];
+  const rows=[
+    ['1','85 >= 90',{t:'false',col:CL.pink},'Skip the if body','?'],
+    ['2','85 >= 80',{t:'true',col:CL.green,hl:1},"letterGrade = 'B'",{t:"'B'",col:CL.amber,hl:1}],
+    ['3','remaining conditions',{t:'N/A',col:CL.dim},'Skip all other branches',"'B'"]];
+  table(c,b.x+24,b.y+52,b.w-48,cols,rows,f,{rowH:58,start:20,per:90});
+  const p=at(f,330,380);
+  txt(c,'Grade: B',b.x+b.w/2,b.y+b.h-56,{size:28,font:'marker',col:CL.amber,a:ease(p),weight:700});
+  txt(c,'Only the first true branch executed',b.x+b.w/2,b.y+b.h-24,{size:13,col:CL.dim,a:ease(at(f,360,400))});
+}};
+
+/* 11 — loop shapes */
+VIZ.loops={cycle:720,draw(c,W,H,f,frame){
+  const b=board(c,W,H,{title:'Three loop shapes',frame});
+  const cw=b.w/3,bw=140,bh=34,gap=24,y0=b.y+96;
+  txt(c,'true = go around again   ·   false = leave the loop',b.x+b.w-22,b.y+28,{size:11.5,col:CL.dim,align:'right',a:ease(at(f,200,240))});
+  const defs=[
+    {name:'for',cap:'known number of runs',boxes:['init  i = 1','cond  i <= 5 ?','body','update  i += 2'],cond:1,back:[3,1],seq:[0,1,2,3,1,2,3,1]},
+    {name:'while',cap:'checks first — may run 0 times',boxes:['cond ?','body'],cond:0,back:[1,0],seq:[0,1,0,1]},
+    {name:'do-while',cap:'runs first — at least once',boxes:['body','cond ?'],cond:1,back:[1,0],seq:[0,1,0,1]}];
+  defs.forEach((d,k)=>{
+    const cx=b.x+b.w*[.225,.5,.775][k],yc=i=>y0+i*(bh+gap)+bh/2;
+    txt(c,d.name,cx,b.y+62,{size:21,font:'marker',col:PC,a:ease(at(f,k*15,k*15+30)),weight:700});
+    d.boxes.forEach((t,i)=>{
+      const p=at(f,20+k*20+i*22,60+k*20+i*22),col=i===d.cond?CL.amber:PC;
+      mbox(c,cx-bw/2,y0+i*(bh+gap),bw,bh,p,col);
+      txt(c,t,cx,yc(i),{size:12,font:'mono',a:ease(at(f,50+k*20+i*22,80+k*20+i*22))});
+      if(i<d.boxes.length-1)arrow(c,[[cx,y0+i*(bh+gap)+bh],[cx,y0+(i+1)*(bh+gap)]],at(f,60+k*20+i*22,85+k*20+i*22),CL.dim,1.8);
+    });
+    const bx=cx+bw/2,pb=at(f,190+k*20,240+k*20);
+    arrow(c,[[bx,yc(d.back[0])],[bx+28,yc(d.back[0])],[bx+28,yc(d.back[1])],[bx,yc(d.back[1])]],pb,CL.amber,2);
+    txt(c,'true',bx+42,(yc(d.back[0])+yc(d.back[1]))/2,{size:10.5,col:CL.green,font:'marker',a:ease(at(f,230+k*20,260+k*20)),align:'left'});
+    arrow(c,[[cx-bw/2,yc(d.cond)],[cx-bw/2-30,yc(d.cond)]],pb,CL.pink,2);
+    txt(c,'false',cx-bw/2-36,yc(d.cond)-13,{size:10.5,col:CL.pink,font:'marker',a:ease(at(f,230+k*20,260+k*20)),align:'right'});
+    txt(c,d.cap,cx,b.y+b.h-40,{size:12.5,col:CL.dim,font:'marker',a:ease(at(f,280+k*20,320+k*20))});
+    if(f>=340){
+      const idx=d.seq[Math.floor((f-340)/34)%d.seq.length],by=y0+idx*(bh+gap);
+      c.save();rr(c,cx-bw/2,by,bw,bh,8);c.fillStyle='rgba(238,240,255,.16)';c.fill();c.strokeStyle=CL.chalk;c.lineWidth=2;c.stroke();c.restore();
+    }
+  });
+}};
+
+/* 12 — trace: loop */
+VIZ.trace3={cycle:640,draw(c,W,H,f,frame){
+  const b=board(c,W,H,{title:'Trace: for (int i = 1; i <= 5; i += 2)',frame});
+  const cols=[{h:'ITERATION',w:.12},{h:'STEP',w:.19},{h:'i',w:.09,mono:1},{h:'CONDITION  i <= 5',w:.22},{h:'sum (before)',w:.16,mono:1},{h:'sum (after)',w:.22,mono:1}];
+  const rows=[
+    ['Initial','Declare sum','-','-','-',{t:'0',hl:1}],
+    ['1','Loop starts',{t:'1',hl:1},{t:'True  (1 <= 5)',col:CL.green},'0',{t:'0 + 1 = 1',hl:1}],
+    ['2','i += 2',{t:'3',hl:1},{t:'True  (3 <= 5)',col:CL.green},'1',{t:'1 + 3 = 4',hl:1}],
+    ['3','i += 2',{t:'5',hl:1},{t:'True  (5 <= 5)',col:CL.green},'4',{t:'4 + 5 = 9',hl:1}],
+    ['4','i += 2',{t:'7',hl:1},{t:'False (7 <= 5)',col:CL.pink},'9',{t:'Loop ends',col:CL.amber,hl:1}]];
+  table(c,b.x+24,b.y+46,b.w-48,cols,rows,f,{rowH:44,start:16,per:78});
+  const p=at(f,16+30+5*78,16+30+5*78+30);
+  txt(c,'Sum of odds: 9',b.x+b.w/2,b.y+b.h-28,{size:20,font:'marker',col:CL.amber,a:ease(p),weight:700});
+}};
+
+/* 14 — why functions */
+VIZ.why={cycle:700,draw(c,W,H,f,frame){
+  const b=board(c,W,H,{title:'Why functions?',frame});
+  const cw=b.w/3,y0=b.y+96,cols=[CL.indigo,CL.amber,CL.green];
+  { // reuse
+    const cx=b.x+cw*.5,col=cols[0];
+    ['main','report','test'].forEach((n,i)=>{
+      const x=cx-70+i*70,p=at(f,10+i*14,40+i*14);
+      mbox(c,x-30,y0,60,26,p,CL.dim,.05);txt(c,n,x,y0+13,{size:10.5,font:'mono',a:ease(p)});
+      arrow(c,[[x,y0+26],[cx-28+i*28,y0+78]],at(f,50+i*14,80+i*14),col,1.8);
+    });
+    mbox(c,cx-56,y0+78,112,40,at(f,70,110),col);
+    txt(c,'multiply()',cx,y0+98,{size:12.5,font:'mono',a:ease(at(f,100,130))});
+  }
+  { // readability
+    const cx=b.x+cw*1.5,col=cols[1];
+    mbox(c,cx-128,y0+6,74,116,at(f,150,190),CL.pink);
+    [[.2,.7],[.35,.9],[.5,.6],[.65,.85],[.8,.5]].forEach(([v,u],i)=>marker(c,[[cx-118,y0+6+v*116],[cx-118+u*54,y0+6+v*116]],at(f,180+i*8,210+i*8),CL.pink,1.6));
+    arrow(c,[[cx-50,y0+64],[cx-10,y0+64]],at(f,230,255),col,2);
+    ['read()','calc()','print()'].forEach((n,i)=>{
+      const y=y0+4+i*42;mbox(c,cx,y,100,32,at(f,250+i*20,285+i*20),col);
+      txt(c,n,cx+50,y+16,{size:12,font:'mono',a:ease(at(f,280+i*20,305+i*20))});
+    });
+  }
+  { // testing
+    const cx=b.x+cw*2.5,col=cols[2];
+    mbox(c,cx-62,y0+20,124,46,at(f,330,370),col);
+    txt(c,'isEven()',cx,y0+43,{size:13,font:'mono',a:ease(at(f,360,390))});
+    marker(c,[[cx-26,y0+96],[cx-8,y0+114],[cx+28,y0+80]],at(f,400,450),col,4);
+    txt(c,'1 input → 1 result',cx,y0+134,{size:11,col:CL.dim,a:ease(at(f,440,470))});
+  }
+  const nm=['Reusability','Readability','Testing'],tg=['write once, call anywhere','big problem → named steps','debug one piece at a time'];
+  for(let i=0;i<3;i++){
+    const cx=b.x+cw*(i+.5),a=ease(at(f,480+i*30,520+i*30));
+    txt(c,nm[i],cx,y0+172,{size:19,font:'marker',col:cols[i],a,weight:700});
+    txt(c,tg[i],cx,y0+200,{size:12.5,col:CL.dim,a});
+  }
+}};
+
+/* 15 — anatomy of a function */
+VIZ.anatomy={cycle:720,draw(c,W,H,f,frame){
+  const b=board(c,W,H,{title:'Anatomy of a function',frame});
+  const lines=[
+    ['int multiply(int x, int y);',0],['',-1],['int main() {',-1],['    int a = 6;',-1],['    int b = 4;',-1],
+    ['    int result = multiply(a, b);',1],['    cout << "Result: " << result << endl;',-1],['}',-1],
+    ['int multiply(int x, int y) {',2],['    return x * y;',2],['}',2]];
+  const col=[CL.violet,CL.amber,CL.cyan],x0=b.x+34,y0=b.y+62,lh=24,tag=[0,5,8];
+  const reg=[[0,0],[5,5],[8,10]];
+  reg.forEach(([a,z],g)=>{
+    const p=at(f,20+g*70,60+g*70);
+    if(p>0){c.save();c.globalAlpha=p;rr(c,x0-8,y0+a*lh-3,404,(z-a+1)*lh+3,6);c.fillStyle=rgba(col[g],.12);c.fill();c.strokeStyle=rgba(col[g],.6);c.lineWidth=1.4;c.stroke();c.restore()}
+  });
+  lines.forEach(([t,g],i)=>{
+    const p=at(f,10+i*8,40+i*8);
+    if(t)txt(c,typed(t,p),x0,y0+i*lh+lh/2-1,{size:13,font:'mono',col:g>=0?CL.chalk:CL.dim,align:'left',weight:500,a:p>0?1:0});
+  });
+  const info=[
+    ['1  Declaration (prototype)','Names the function, its return type and parameters.',0],
+    ['2  Call','Passes arguments: a = 6 and b = 4 go in.',5],
+    ['3  Definition','The real implementation. Returns 24 to the caller.',8]];
+  const ix=b.x+b.w*.6;
+  info.forEach(([h,d,row],g)=>{
+    const p=ease(at(f,60+g*70,100+g*70)),y=y0+row*lh+lh/2;
+    txt(c,h,ix,y-(g===2?4:8),{size:14.5,font:'marker',col:col[g],align:'left',a:p,weight:700});
+    txt(c,d,ix,y+(g===2?16:12),{size:12,col:CL.dim,align:'left',a:p});
+    marker(c,[[x0+396,y],[ix-14,y]],at(f,90+g*70,120+g*70),col[g],1.6);
+  });
+  const cy1=y0+5*lh+lh/2,cy2=y0+8*lh+lh/2,ax=x0+424;
+  const pa=at(f,320,370);
+  if(pa>0){
+    dash(c,[[ax,cy1+6],[ax+16,cy1+6],[ax+16,cy2],[ax,cy2]],CL.amber,1.6,pa);
+    txt(c,'call',ax+22,(cy1+cy2)/2,{size:11,col:CL.amber,font:'marker',align:'left',a:pa});
+  }
+  const t1=at(f,380,450),t2=at(f,470,540);
+  if(t1>0&&t1<1){const y=lerp(cy1+6,cy2,ease(t1));dot(c,ax+16,y,13,CL.amber,'6,4')}
+  if(t2>0&&t2<1){const y=lerp(cy2,cy1+6,ease(t2));dot(c,ax+16,y,13,CL.green,'24')}
+  txt(c,typed('Result: 24',at(f,540,590)),b.x+b.w/2,b.y+b.h-24,{size:16,font:'marker',col:CL.green,a:f>=540?1:0});
+}};
+
+/* 17 — value vs reference */
+VIZ.refs={cycle:720,draw(c,W,H,f,frame){
+  const b=board(c,W,H,{title:'Copy vs. alias',frame});
+  const half=b.w/2,mid=b.x+half;
+  marker(c,[[mid,b.y+52],[mid,b.y+b.h-54]],at(f,0,40),'rgba(255,255,255,.18)',1.4);
+  const lx=b.x+half*.5,rx=b.x+half*1.5,cyy=b.y+150,ch=88;
+  const ta=ease(at(f,90,130));
+  txt(c,'Pass by value',lx,b.y+60,{size:19,font:'marker',col:PC,a:ta,weight:700});
+  txt(c,'void modifyValue(int x)',lx,b.y+86,{size:12,font:'mono',col:CL.dim,a:ta});
+  txt(c,'Pass by reference',rx,b.y+60,{size:19,font:'marker',col:PC,a:ta,weight:700});
+  txt(c,'void modifyReference(int& y)',rx,b.y+86,{size:12,font:'mono',col:CL.dim,a:ta});
+  const cell=(x,y,w,name,addr,val,p,col,flash)=>{
+    mbox(c,x,y,w,ch,p,col,.13);const a=ease(at(p,.7,1));
+    txt(c,name,x+14,y+16,{size:12,font:'mono',col:CL.chalk,align:'left',a,weight:700});
+    txt(c,addr,x+14,y+ch-14,{size:11,font:'mono',col:CL.dim,align:'left',a});
+    txt(c,val,x+w-20,y+ch/2+2,{size:30,font:'marker',col:flash?CL.amber:CL.chalk,align:'right',a,weight:700});
+  };
+  const A={x:lx-206,y:cyy,w:150},B={x:lx+56,y:cyy,w:150},C={x:rx-96,y:cyy+10,w:192};
+  txt(c,'main()',A.x+A.w/2,cyy-14,{size:11,col:CL.dim,a:ta});txt(c,'inside the function',B.x+B.w/2,cyy-14,{size:11,col:CL.dim,a:ta});
+  cell(A.x,A.y,A.w,'num1','0x4000','10',at(f,20,70),CL.violet,false);
+  const bv=f<240?'':(f<320?'10':'110');
+  cell(B.x,B.y,B.w,'x','0x999F',bv,at(f,60,110),CL.cyan,f>=320&&f<400);
+  const cv=f<320?'10':'110';
+  cell(C.x,C.y,C.w,'num2','0x5000',cv,at(f,40,90),CL.violet,f>=320&&f<400);
+  // copy arrow (value)
+  const pcopy=at(f,170,240);
+  dash(c,[[A.x+A.w,cyy+ch/2],[B.x,cyy+ch/2]],CL.amber,1.8,ease(at(f,150,180)));
+  txt(c,'copy',(A.x+A.w+B.x)/2,cyy+ch/2-14,{size:11.5,col:CL.amber,font:'marker',a:ease(at(f,160,190))});
+  if(pcopy>0&&pcopy<1){const x=lerp(A.x+A.w,B.x,ease(pcopy));dot(c,x,cyy+ch/2,10,CL.amber,'10')}
+  // alias pill (reference)
+  const pa=ease(at(f,180,240));
+  if(pa>0){
+    dash(c,[[rx+50,cyy-26],[rx+50,C.y]],CL.green,1.6,pa);
+    c.save();c.globalAlpha=pa;rr(c,rx+20,cyy-52,60,26,13);c.fillStyle=rgba(CL.green,.18);c.fill();c.strokeStyle=CL.green;c.lineWidth=1.6;c.stroke();c.restore();
+    txt(c,'y',rx+50,cyy-39,{size:13,font:'mono',col:CL.green,a:pa,weight:700});
+    txt(c,'alias',rx+92,cyy-39,{size:11,col:CL.green,align:'left',font:'marker',a:pa});
+  }
+  const po=ease(at(f,270,310));
+  txt(c,'x = x + 100',B.x+B.w/2,cyy+ch+22,{size:12.5,font:'mono',col:CL.amber,a:po});
+  txt(c,'y = y + 100',C.x+C.w/2,C.y+ch+22,{size:12.5,font:'mono',col:CL.amber,a:po});
+  const r1=ease(at(f,400,440)),r2=ease(at(f,420,460));
+  txt(c,'num1 is still 10  ✓',lx,b.y+b.h-64,{size:16,font:'marker',col:CL.green,a:r1,weight:700});
+  txt(c,'num2 is now 110',rx,b.y+b.h-64,{size:16,font:'marker',col:CL.amber,a:r2,weight:700});
+  const p3=at(f,500,570);
+  txt(c,typed('Copy → the original is safe.   Alias → the original changes.',p3),b.x+b.w/2,b.y+b.h-24,{size:13,col:CL.dim,font:'marker',a:p3>0?1:0});
+}};
+
+/* 18 — memory map */
+VIZ.mem={cycle:760,draw(c,W,H,f,frame){
+  const b=board(c,W,H,{title:'Memory map',frame});
+  const cw=200,gp=(b.w-3*cw)/4,y=b.y+74,ch=72;
+  const X=i=>b.x+gp*(i+1)+cw*i;
+  const cell=(i,name,addr,val,p,col,al=1,flash)=>{
+    if(p<=0||al<=0)return;c.save();c.globalAlpha=al;
+    mbox(c,X(i),y,cw,ch,p,col,.13);const a=ease(at(p,.7,1))*al;
+    txt(c,name,X(i)+14,y+16,{size:12,font:'mono',col:CL.chalk,align:'left',a,weight:700});
+    txt(c,addr,X(i)+14,y+ch-14,{size:11,font:'mono',col:CL.dim,align:'left',a});
+    txt(c,val,X(i)+cw-18,y+ch/2+2,{size:28,font:'marker',col:flash?CL.amber:CL.chalk,align:'right',a,weight:700});
+    c.restore();
+  };
+  cell(0,'num1','0x4000','10',at(f,10,50),CL.violet);
+  cell(1,'num2','0x5000',f<330?'10':'110',at(f,20,60),CL.violet,1,f>=330&&f<400);
+  const xa=f<270?1:1-at(f,270,300);
+  cell(2,'x  (temp copy)','0x999F',f<200?'10':'110',at(f,130,170),CL.cyan,xa,f>=200&&f<260);
+  if(f>=300){const p=ease(at(f,300,340));
+    dash(c,[[X(1)+cw-52,y-8],[X(1)+cw-52,y]],CL.green,1.6,p);
+    c.save();c.globalAlpha=p;rr(c,X(1)+cw-100,y-34,96,26,13);c.fillStyle=rgba(CL.green,.18);c.fill();c.strokeStyle=CL.green;c.lineWidth=1.6;c.stroke();c.restore();
+    txt(c,'y = alias',X(1)+cw-52,y-21,{size:11.5,font:'mono',col:CL.green,a:p,weight:700});
+  }
+  if(f>=280&&f<340)txt(c,'function returns → x is destroyed',X(2)+cw/2,y+ch+18,{size:11,col:CL.dim,font:'marker',a:ease(at(f,280,300))*(1-at(f,320,340))});
+  const cols=[{h:'FUNCTION CALL',w:.22,al:'left',mono:1,size:12},{h:'PARAM',w:.07,mono:1},{h:'PHYSICAL ADDRESS',w:.23,al:'left',size:12.5},{h:'OPERATION',w:.22,al:'left',mono:1,size:12},{h:'IMPACT ON main',w:.26,al:'left',size:12.5}];
+  const rows=[
+    ['modifyValue(num1)','x','0x999F  (temporary copy)','x = 10 + 100 = 110',{t:'num1 unchanged → 10',col:CL.green,hl:1}],
+    ['modifyReference(num2)','y','0x5000  (same as num2)','y = 10 + 100 = 110',{t:'num2 becomes 110',col:CL.amber,hl:1}]];
+  table(c,b.x+24,b.y+184,b.w-48,cols,rows,f,{rowH:58,start:100,per:170});
+}};
+
+/* 21 — challenge solution */
+VIZ.challenge={cycle:660,draw(c,W,H,f,frame){
+  const b=board(c,W,H,{title:'processNumbers(4, totalSum)',frame});
+  const cell={x:b.x+30,y:b.y+100,w:236,h:100};
+  mbox(c,cell.x,cell.y,cell.w,cell.h,at(f,0,50),CL.violet,.13);
+  const ca=ease(at(f,40,70));
+  const sum=f<212?0:(f<392?2:6);
+  const flash=(f>=212&&f<262)||(f>=392&&f<442);
+  txt(c,'int totalSum',cell.x+16,cell.y+18,{size:12,font:'mono',col:CL.chalk,align:'left',a:ca,weight:700});
+  txt(c,'0x7A00',cell.x+16,cell.y+cell.h-16,{size:11,font:'mono',col:CL.dim,align:'left',a:ca});
+  txt(c,String(sum),cell.x+cell.w-24,cell.y+cell.h/2+4,{size:44,font:'marker',col:flash?CL.amber:CL.chalk,align:'right',a:ca,weight:700});
+  const pa=ease(at(f,60,110));
+  if(pa>0){
+    dash(c,[[cell.x+cell.w-50,cell.y-6],[cell.x+cell.w-50,cell.y]],CL.green,1.6,pa);
+    c.save();c.globalAlpha=pa;rr(c,cell.x+cell.w-130,cell.y-34,158,26,13);c.fillStyle=rgba(CL.green,.18);c.fill();c.strokeStyle=CL.green;c.lineWidth=1.6;c.stroke();c.restore();
+    txt(c,'runningSum (alias)',cell.x+cell.w-51,cell.y-21,{size:11,font:'mono',col:CL.green,a:pa,weight:700});
+  }
+  txt(c,'limit = 4  (a copy)',cell.x+cell.w/2,cell.y+cell.h+24,{size:12,font:'mono',col:CL.dim,a:ease(at(f,70,110))});
+  const tw=128,tg=18,tx=b.x+310,ty=b.y+100,th=110;
+  for(let i=0;i<4;i++){
+    const s0=110+i*90,x=tx+i*(tw+tg),on=f>=s0&&f<s0+90,even=(i+1)%2===0;
+    mbox(c,x,ty,tw,th,at(f,20+i*14,60+i*14),on?PC:CL.dim,on?.22:.06);
+    const ta=ease(at(f,50+i*14,80+i*14));
+    txt(c,'i = '+(i+1),x+tw/2,ty+24,{size:18,font:'marker',col:on?CL.chalk:CL.dim,a:ta,weight:700});
+    txt(c,'isEven('+(i+1)+')',x+tw/2,ty+52,{size:12,font:'mono',col:CL.dim,a:ta});
+    const pr=ease(at(f,s0+22,s0+42));
+    if(pr>0){
+      txt(c,even?'true':'false',x+tw/2,ty+80,{size:16,font:'marker',col:even?CL.green:CL.pink,a:pr,weight:700});
+      if(even)txt(c,'+= '+(i+1),x+tw/2,ty+th+22,{size:14,font:'mono',col:CL.amber,a:ease(at(f,s0+45,s0+65)),weight:700});
+    }
+    if(i<3)arrow(c,[[x+tw,ty+th/2],[x+tw+tg,ty+th/2]],at(f,40+i*14,70+i*14),CL.dim,1.6);
+  }
+  const ex=ease(at(f,450,470));
+  txt(c,'loop ends: 5 <= 4 is false',tx+ (4*tw+3*tg)/2,ty+th+56,{size:12.5,col:CL.dim,font:'marker',a:ex});
+  const cy=b.y+b.h-64,pT=at(f,470,540);
+  c.save();c.globalAlpha=ease(at(f,455,485));rr(c,b.x+30,cy,b.w-60,44,10);c.fillStyle='#0b0b14';c.fill();c.strokeStyle=rgba(PC,.6);c.lineWidth=1.4;c.stroke();c.restore();
+  txt(c,'>',b.x+50,cy+22,{size:15,font:'mono',col:CL.dim,a:ease(at(f,455,485))});
+  txt(c,typed('Final Total Sum: 6',pT),b.x+72,cy+22,{size:16,font:'mono',col:CL.green,align:'left',a:pT>0?1:0,weight:700});
+}};
+
+/* 22 — closing */
+VIZ.closing={cycle:660,draw(c,W,H,f,frame){
+  const b=board(c,W,H,{title:'Blocks on blocks',frame});
+  const bx=b.x+110,bw=b.w-220,bh=52,y1=b.y+b.h-84,y2=y1-66,y3=y2-84,g=16,w=(bw-2*g)/3;
+  [['Sequence',CL.indigo],['Selection',CL.amber],['Repetition',CL.cyan]].forEach(([n,col],i)=>{
+    const x=bx+i*(w+g);mbox(c,x,y1,w,bh,at(f,10+i*30,60+i*30),col,.16);
+    txt(c,n,x+w/2,y1+bh/2,{size:17,font:'marker',a:ease(at(f,50+i*30,80+i*30)),weight:700});
+  });
+  mbox(c,bx,y2,bw,bh,at(f,120,190),CL.green,.16);
+  txt(c,'Functions — named, reusable blocks',bx+bw/2,y2+bh/2,{size:17,font:'marker',a:ease(at(f,180,215)),weight:700});
+  const p3=at(f,230,310),glow=.2+.1*Math.sin(f*.06);
+  mbox(c,bx+bw*.14,y3,bw*.72,bh+8,p3,PC,glow);
+  txt(c,'Data Structures',bx+bw/2,y3+(bh+8)/2,{size:23,font:'marker',col:CL.chalk,a:ease(at(f,300,335)),weight:700});
+  const pt=at(f,340,420);
+  txt(c,typed('Every data structure is built from these blocks',pt),b.x+b.w/2,b.y+66,{size:15,col:PC,font:'marker',a:pt>0?1:0});
+}};
+
+/* ═══════════════ Content ═══════════════ */
+const CODE={
+t1:`#include <iostream>
+using namespace std;
+
+int main() {
+    double length = 0.0;
+    double width = 0.0;
+
+    // Prompt user for dimensions
+    cout << "Enter length of the rectangle: ";
+    cin >> length;
+
+    cout << "Enter width of the rectangle: ";
+    cin >> width;
+
+    // Perform geometric calculations
+    double area = length * width;
+    double perimeter = 2 * (length + width);
+
+    // Display outputs
+    cout << "Area: " << area << endl;
+    cout << "Perimeter: " << perimeter << endl;
+
+    return 0;
+}`,
+t2:`#include <iostream>
+using namespace std;
+
+int main() {
+    int score = 0;
+    cout << "Enter exam score: ";
+    cin >> score;
+
+    // Multi-way bounds checking and classification
+    if (score < 0 || score > 100) {
+        cout << "Invalid Score" << endl;
+    } else if (score >= 50) {
+        cout << "Passed" << endl;
+    } else {
+        cout << "Failed" << endl;
+    }
+
+    return 0;
+}`,
+t3:`#include <iostream>
+using namespace std;
+
+int main() {
+    int n = 0;
+    cout << "Enter a non-negative integer: ";
+    cin >> n;
+
+    long long factorial = 1; // long long prevents overflow for larger inputs
+
+    // Calculate factorial iteratively
+    for (int i = 1; i <= n; ++i) {
+        factorial *= i; // same as: factorial = factorial * i
+    }
+
+    cout << "Factorial of " << n << " is " << factorial << endl;
+    return 0;
+}`,
+t4:`#include <iostream>
+using namespace std;
+
+// Function prototype
+double fahrenheitToCelsius(double fahrenheit);
+
+int main() {
+    double fahrenheitTemp = 0.0;
+    cout << "Enter temperature in Fahrenheit: ";
+    cin >> fahrenheitTemp;
+
+    // Call the conversion function
+    double celsiusResult = fahrenheitToCelsius(fahrenheitTemp);
+
+    cout << "Temperature in Celsius: " << celsiusResult << endl;
+    return 0;
+}
+
+// Function definition
+double fahrenheitToCelsius(double fahrenheit) {
+    // 5.0 / 9.0 instead of 5 / 9 avoids integer division (which gives 0)
+    double celsius = (fahrenheit - 32.0) * (5.0 / 9.0);
+    return celsius;
+}`,
+t5:`#include <iostream>
+using namespace std;
+
+// Function prototype (references are critical here!)
+void swapNumbers(int& x, int& y);
+
+int main() {
+    int a = 12;
+    int b = 45;
+
+    cout << "Before Swap: a = " << a << ", b = " << b << endl;
+
+    // Call the swap function
+    swapNumbers(a, b);
+
+    cout << "After Swap: a = " << a << ", b = " << b << endl;
+    return 0;
+}
+
+// Function definition
+void swapNumbers(int& x, int& y) {
+    int temp = x; // store x before it is overwritten
+    x = y;        // copy y into x
+    y = temp;     // put the saved value into y
+}`,
+c1:`#include <iostream>
+using namespace std;
+
+bool isEven(int n);
+void processNumbers(int limit, int& runningSum);
+
+int main() {
+    int totalSum = 0;
+    processNumbers(4, totalSum);
+    cout << "Final Total Sum: " << totalSum << endl;
+    return 0;
+}
+
+bool isEven(int n) {
+    return (n % 2 == 0);
+}`,
+c2:`// Loops from 1 up to limit,
+// adding even numbers to runningSum
+void processNumbers(int limit, int& runningSum) {
+    for (int i = 1; i <= limit; ++i) {
+        if (isEven(i)) {
+            runningSum += i;
+        }
+    }
+}`,
+w_seq:`int firstNumber = 0;
+int secondNumber = 0;
+
+cin >> firstNumber;
+cin >> secondNumber;
+
+int quotient = firstNumber / secondNumber;
+int remainder = firstNumber % secondNumber;
+
+cout << "Quotient: " << quotient << endl;
+cout << "Remainder: " << remainder << endl;`,
+w_sel:`int score = 85;
+char letterGrade;
+
+if (score >= 90) {
+    letterGrade = 'A';
+} else if (score >= 80) {
+    letterGrade = 'B';
+} else if (score >= 70) {
+    letterGrade = 'C';
+} else {
+    letterGrade = 'F';
+}`,
+w_for:`int sum = 0;
+for (int i = 1; i <= 5; i += 2) {
+    sum += i;
+}
+// sum = 9`,
+w_while:`int sum = 0;
+int i = 1;
+while (i <= 5) {
+    sum += i;
+    i += 2;
+}
+// sum = 9`,
+w_do:`int sum = 0;
+int i = 1;
+do {
+    sum += i;
+    i += 2;
+} while (i <= 5);
+// sum = 9`,
+v_val:`void modifyValue(int x) {
+    x = x + 100;
+}`,
+v_ref:`void modifyReference(int& y) {
+    y = y + 100;
+}`,
+v_main:`int num1 = 10;
+int num2 = 10;
+
+modifyValue(num1);
+modifyReference(num2);
+
+cout << num1;  // 10
+cout << num2;  // 110`
+};
+
+const WALK={
+seq:{code:'w_seq',steps:[
+ {lines:[1,2],h:'Declare and initialize',t:`Memory is reserved for two ints and both start at 0.`},
+ {lines:[4,5],h:'Read the input',t:`<code>cin >></code> waits for the user: 13 goes into firstNumber, then 5 into secondNumber.`},
+ {lines:[7,8],h:'Compute',t:`<code>/</code> gives the quotient (2), <code>%</code> the remainder (3). Integer division drops the decimals.`},
+ {lines:[10,11],h:'Print the results',t:`<code>cout &lt;&lt;</code> sends text and values to the screen. <code>endl</code> ends the line.`}]},
+sel:{code:'w_sel',steps:[
+ {lines:[1,2],h:'Set up',t:`<code>score</code> holds 85. <code>letterGrade</code> will receive the result.`},
+ {lines:[4,5],h:'if: checked first',t:`<code>85 >= 90</code> is <b>false</b>, so this block is skipped.`},
+ {lines:[6,7],h:'else if: checked next',t:`<code>85 >= 80</code> is <b>true</b>, so letterGrade becomes 'B'.`},
+ {lines:[8,9,10,11,12],h:'The rest is skipped',t:`Once a branch runs, the remaining conditions are never evaluated. <code>else</code> is only the fallback.`}]}
+};
+const CARDS={
+loops:{fs:14,items:[
+ {h:'for',code:'w_for',n:`Init, condition and update live in one line. Best when you know the count.`},
+ {h:'while',code:'w_while',n:`You manage init and update yourself. The condition is checked <b>before</b> every run.`},
+ {h:'do-while',code:'w_do',n:`The body runs <b>first</b>, then the condition is checked: at least one run. Note the final <code>;</code>`}]},
+refs:{fs:13.5,items:[
+ {h:'By value',code:'v_val',n:`<code>x</code> is a <b>copy</b> of num1. Changing it does not touch the original.`},
+ {h:'By reference',code:'v_ref',n:`<code>y</code> is an <b>alias</b> of num2 (see the <code>&amp;</code>). Changing y changes num2.`},
+ {h:'In main()',code:'v_main',n:`The call looks the same for both. The difference lives only in the function signature.`}]}
+};
+
+
+const TASKS={
+t1:{n:1,chip:'Student task 1 · Sequence',
+  req:['Read the <b>length</b> and <b>width</b> as <code>double</code>','<b>Area</b> = length × width','<b>Perimeter</b> = 2 × (length + width)','Print both results'],
+  lines:[[['Enter length of the rectangle: ','dim'],['5.5','amber']],[['Enter width of the rectangle: ','dim'],['4.0','amber']],[['Area: 22','green']],[['Perimeter: 19','green']]],
+  notes:['<code>double</code> keeps the decimals (5.5 and 4.0 are not integers).','Read first, calculate, then print — pure Sequence.','<code>cout</code> prints 22, not 22.0: trailing zeros are dropped.']},
+t2:{n:2,chip:'Student task 2 · Selection',
+  req:['Read an integer exam <b>score</b>','Outside <b>0 – 100</b> → print <code>Invalid Score</code>','<b>50 or higher</b> → print <code>Passed</code>','Below 50 but valid → print <code>Failed</code>'],
+  lines:[[['Enter exam score: ','dim'],['105','amber']],[['Invalid Score','pink']],[['Enter exam score: ','dim'],['72','amber']],[['Passed','green']],[['Enter exam score: ','dim'],['35','amber']],[['Failed','pink']]],
+  title:'Three test cases',
+  notes:['Check <b>validity first</b> — the order of the conditions matters.','<code>||</code> joins the two invalid cases: below 0 <b>or</b> above 100.','An else-if ladder runs exactly one branch.']},
+t3:{n:3,chip:'Student task 3 · Repetition',
+  req:['Read a non-negative integer <b>N</b>','Compute <b>N!</b> using a loop','Remember: <code>0! = 1</code>','Assume the input is valid'],
+  lines:[[['Enter a non-negative integer: ','dim'],['5','amber']],[['Factorial of 5 is 120','green']]],
+  notes:['<code>long long</code> avoids overflow for bigger N.','<code>factorial *= i</code> means factorial = factorial × i.','For N = 0 the loop never runs, so 1 is printed.']},
+t4:{n:4,chip:'Student task 4 · Functions',
+  req:['Write <code>double fahrenheitToCelsius(double fahrenheit);</code>','Formula: <b>C = (F − 32) × 5/9</b>','<code>main()</code> reads F, calls the function, prints C'],
+  trap:'<b>Trap:</b> in C++ <code>5 / 9</code> is integer division = <b>0</b>. Write <code>5.0 / 9.0</code>.',
+  lines:[[['Enter temperature in Fahrenheit: ','dim'],['98.6','amber']],[['Temperature in Celsius: 37','green']]],
+  notes:['The prototype sits above <code>main()</code>.','<code>5.0 / 9.0</code> keeps the decimals — <code>5 / 9</code> would give 0.','<code>main()</code> calls; the function computes and returns.']},
+t5:{n:5,chip:'Student task 5 · Parameter passing',
+  req:['Write <code>void swapNumbers(int& x, int& y);</code>','Both parameters are passed <b>by reference</b>','In <code>main()</code>: print, swap, print again'],
+  lines:[[['Before Swap: a = 12, b = 45','chalk']],[['After Swap: a = 45, b = 12','green']]],
+  notes:['<code>int&</code> makes x and y aliases of a and b.','<code>temp</code> saves x before it gets overwritten.','Try removing the <code>&</code> — nothing swaps!']}
+};
+
+const HERO=`
+<div class="lbl">Course</div>
+<h1><em>Data Structures</em></h1>
+<div class="tag">C++ Revision — From Structured Programming to Functions</div>
+<div class="inst"><div class="avatar">M</div><div><small>Instructor</small><b>Muhammad Ali Abdul Kareem</b></div></div>
+<div class="chips"><span>Sequence</span><span>Selection</span><span>Repetition</span><span>Functions</span><span>5 hands-on tasks</span></div>`;
+
+const SL=[
+{part:'part-intro',hero:true,next:'Let\'s start with why structure matters'},
+{part:'part-intro',lbl:'Why structure?',h2:'Messy code vs. <em>structured code</em>',sub:'Jumping around makes programs unreadable. <strong>Three building blocks</strong> are enough to express any logic.',viz:'pain',next:'So what are the three blocks?'},
+{part:'part-intro',lbl:'The big idea',h2:'Three pillars — <em>any program you will write</em>',sub:'Sequence, Selection and Repetition. Master them, then wrap them into functions.',viz:'pillars',next:'Start with the simplest: Sequence'},
+{part:'part-seq',lbl:'Pillar 1 · Sequence',h2:'Instructions run <em>top to bottom, in order</em>',sub:'Variables hold data · <code>cin</code> reads input · <code>cout</code> prints output.',viz:'flow',next:'One trap is hiding in the arithmetic…'},
+{part:'part-seq',lbl:'Pillar 1 · Sequence',h2:'Integer division: <em>/ gives the quotient, % the rest</em>',sub:'When both operands are integers, C++ drops the decimals: <code>5 / 2 = 2</code> and <code>5 % 2 = 1</code>.',viz:'divmod',next:'See it in code'},
+{part:'part-seq',walk:'seq',lbl:'Pillar 1 · In code',h2:`Sequence in code: <em>each line runs once, in order</em>`,sub:`Follow the highlighted lines. Click any step to jump to it.`,next:'Now trace it by hand'},
+{part:'part-seq',lbl:'Pillar 1 · Sequence',h2:'Trace table: <em>watch the memory change</em>',sub:'Tracing = executing the code by hand, one line at a time.',viz:'trace1',next:'Your turn — Task 1'},
+{part:'part-seq',task:'t1',lbl:'Task 1 · Sequence',h2:'Rectangle: <em>area and perimeter</em>',sub:'Try it yourself first — then reveal the reference solution.',next:'Sequence done — now the program decides'},
+{part:'part-sel',lbl:'Pillar 2 · Selection',h2:'Selection: <em>choose a path</em> with if / else',sub:'<code>if</code> · <code>if-else</code> · <code>else if</code> ladder — the first true condition wins.',viz:'ladder',next:'See it in code'},
+{part:'part-sel',walk:'sel',lbl:'Pillar 2 · In code',h2:`Selection in code: <em>if / else if / else</em>`,sub:`Conditions are checked top to bottom and the first true one wins. Here <code>score = 85</code> lands in the 'B' branch.`,next:'Now trace score = 85 by hand'},
+{part:'part-sel',lbl:'Pillar 2 · Selection',h2:'Trace: <em>85 walks down the ladder</em>',sub:'Conditions are evaluated in order. After the first true one, the rest are skipped.',viz:'trace2',next:'Your turn — Task 2'},
+{part:'part-sel',task:'t2',lbl:'Task 2 · Selection',h2:'Score validator: <em>Invalid, Passed or Failed</em>',sub:'Three test cases to check your solution against.',next:'Now let the code repeat itself'},
+{part:'part-rep',lbl:'Pillar 3 · Repetition',h2:'Loops: <em>repeat while the condition is true</em>',sub:'<code>for</code> when you know the count · <code>while</code> checks first · <code>do-while</code> runs first.',viz:'loops',next:'See the three loops in code'},
+{part:'part-rep',cards:'loops',lbl:'Pillar 3 · In code',h2:`Loops in code: <em>same result, three shapes</em>`,sub:`All three add the odd numbers 1 + 3 + 5, so <code>sum = 9</code>.`,next:'Follow one loop, iteration by iteration'},
+{part:'part-rep',lbl:'Pillar 3 · Repetition',h2:'Trace: <em>sum of odd numbers</em>',sub:'<code>for (int i = 1; i &lt;= 5; i += 2) sum += i;</code>',viz:'trace3',next:'Your turn — Task 3'},
+{part:'part-rep',task:'t3',lbl:'Task 3 · Repetition',h2:'Factorial: <em>N! with a loop</em>',sub:'Build the result step by step inside the loop.',next:'Three pillars done — now package them'},
+{part:'part-fn',lbl:'Functions',h2:'Why functions? <em>Write once, use anywhere</em>',sub:'A big <code>main()</code> becomes unmanageable. Functions make code reusable, readable and testable.',viz:'why',next:'How is a function built?'},
+{part:'part-fn',lbl:'Functions',h2:'A function has <em>three parts</em>',sub:'Declaration (prototype) · Call · Definition.',viz:'anatomy',next:'Your turn — Task 4'},
+{part:'part-fn',task:'t4',lbl:'Task 4 · Functions',h2:'Temperature: <em>Fahrenheit → Celsius</em>',sub:'Your first function with a return value.',next:'What happens to the arguments?'},
+{part:'part-fn',lbl:'Parameter passing',h2:'Value vs. reference: <em>a copy or the real thing?</em>',sub:'By value the function gets a copy. With <code>&amp;</code> the parameter is an alias of the caller\'s variable.',viz:'refs',next:'See it in code'},
+{part:'part-fn',cards:'refs',lbl:'Parameter passing · In code',h2:`By value vs. by reference <em>in code</em>`,sub:`The whole difference is one character: <code>&amp;</code>`,next:'Now look inside memory'},
+{part:'part-fn',lbl:'Parameter passing',h2:'Memory view: <em>which address changes?</em>',sub:'Assume <code>num1</code> lives at 0x4000 and <code>num2</code> at 0x5000.',viz:'mem',next:'Your turn — Task 5'},
+{part:'part-fn',task:'t5',lbl:'Task 5 · Parameter passing',h2:'Swap two numbers <em>by reference</em>',sub:'The classic use case for <code>&amp;</code>.',next:'Final boss: everything together'},
+{part:'part-fn',lbl:'Tracing challenge',h2:'Read the code. <em>Predict the output.</em>',sub:'All three pillars, two functions, a loop and a reference parameter.',chal:true,next:'Check your answer'},
+{part:'part-fn',lbl:'Tracing challenge',h2:'Solution: <em>trace it step by step</em>',sub:'<code>runningSum</code> is an alias of <code>totalSum</code>, so every update lands in main().',viz:'challenge',next:'That is the toolbox — what comes next?'},
+{part:'part-intro',lbl:'Recap',h2:'Four blocks — <em>the base of every data structure</em>',sub:'Sequence · Selection · Repetition · Functions. Next, we build on top of them.',viz:'closing',next:'Next: data structures'}
+];
+const N=SL.length;
+
+/* ═══════════════ Code highlighter ═══════════════ */
+function highlight(src){
+  const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const re=/(\/\/[^\n]*)|(#include\s*<[^>\n]+>)|("(?:[^"\\\n]|\\.)*")|('(?:[^'\\\n]|\\.)')|\b(\d+(?:\.\d+)?)\b|\b(long long|int|double|char|bool|void|float)\b|\b(return|if|else|for|while|do|using|namespace|true|false)\b|\b(cout|cin|endl)\b|\b([A-Za-z_]\w*)(?=\()/g;
+  let out='',last=0,m;
+  while((m=re.exec(src))){
+    out+=esc(src.slice(last,m.index));const t=m[0];
+    const cls=m[1]?'c':m[2]?'p':(m[3]||m[4])?'s':m[5]?'n':m[6]?'t':m[7]?'k':m[8]?'o':'f';
+    out+=`<span class="${cls}">${esc(t)}</span>`;last=m.index+t.length;
+  }
+  return out+esc(src.slice(last));
+}
+const codeBlock=k=>`<pre class="code">${highlight(CODE[k])}</pre>`;
+const lineCode=k=>`<pre class="code">${highlight(CODE[k]).split('\n').map(l=>`<span class="ln">${l||'&nbsp;'}</span>`).join('')}</pre>`;
+
+/* ═══════════════ Build the deck ═══════════════ */
+const vp=document.getElementById('vp'),live=[];
+const dots=i=>Array.from({length:N},(_,k)=>`<i class="dot${k===i?' on':''}"></i>`).join('');
+const footer=(i,next)=>`<div class="sf"><span>Data Structures</span><div class="pd">${dots(i)}</div><span>${next}</span></div>`;
+
+SL.forEach((s,i)=>{
+  const el=document.createElement('section');
+  el.className='slide'+(s.hero?' hero-slide':'');
+  let h='';
+  if(s.hero){
+    h=HERO+footer(i,s.next)+'<canvas class="herobg" data-viz="tokens"></canvas>';
+  }else{
+    let stage='';
+    if(s.viz)stage=`<div class="viz"><canvas data-viz="${s.viz}"></canvas></div>`;
+    else if(s.task){
+      const T=TASKS[s.task];
+      stage=`<div class="task"><div class="tleft"><div class="chip">What to build</div><ul class="req">${T.req.map(r=>`<li>${r}</li>`).join('')}</ul>${T.trap?`<div class="trap">${T.trap}</div>`:''}</div><div class="tright"><div class="viz"><canvas data-viz="terminal" data-task="${s.task}"></canvas></div></div></div>`;
+    }else if(s.walk){
+      const W=WALK[s.walk];
+      stage=`<div class="walk"><div class="codecard">${lineCode(W.code)}</div><div class="steps">${W.steps.map((p,k)=>`<div class="stp" data-k="${k}"><i>${k+1}</i><div><b>${p.h}</b><span>${p.t}</span></div></div>`).join('')}</div></div>`;
+    }else if(s.cards){
+      const C=CARDS[s.cards];
+      stage=`<div class="cards" style="--fs:${C.fs}px;grid-template-columns:repeat(${C.items.length},1fr)">${C.items.map(it=>`<div class="cc"><div class="cc-h">${it.h}</div><div class="codecard">${codeBlock(it.code)}</div><div class="cc-n">${it.n}</div></div>`).join('')}</div>`;
+    }else if(s.chal){
+      stage=`<div class="chal"><div class="codecard">${codeBlock('c1')}</div><div class="col"><div class="codecard">${codeBlock('c2')}</div><div class="q"><b>What is the final console output?</b><div class="term" data-ans>&gt; <span class="typed" id="lastans"></span><i></i></div><button class="ansbtn" data-ans>Type your answer<kbd>A</kbd></button></div></div></div>`;
+    }
+    h=`<div class="lbl">${s.lbl}</div><h2>${s.h2}</h2>${s.sub?`<p class="sub">${s.sub}</p>`:''}<div class="stage">${stage}</div>${footer(i,s.next)}`;
+    if(s.task){
+      const T=TASKS[s.task];
+      h+=`<button class="solbtn" data-sol>Show solution<kbd>S</kbd></button>
+      <div class="sol"><div class="sol-h"><div class="lbl">Reference solution · Task ${T.n}</div><button class="solbtn" style="position:static" data-sol>Hide<kbd>S</kbd></button></div>
+      <div class="sol-body"><div class="codecard">${codeBlock(s.task)}</div><div class="notes"><div class="note-h">What to notice</div>${T.notes.map(n=>`<div class="note">${n}</div>`).join('')}</div></div></div>`;
+    }
+  }
+  el.innerHTML=h;vp.appendChild(el);s.el=el;
+  el.querySelectorAll('canvas[data-viz]').forEach(cv=>{
+    const def=VIZ[cv.dataset.viz];
+    live.push({cv,s:fit(cv),def,slide:i,data:cv.dataset.task?{lines:TASKS[cv.dataset.task].lines,title:TASKS[cv.dataset.task].title}:null});
+  });
+});
+
+/* ═══════════════ Answer box (tracing challenge) ═══════════════ */
+const modal=document.getElementById('ansmodal'),inp=document.getElementById('ans'),fb=document.getElementById('ansfb');
+let typing=false;
+function openAns(){modal.hidden=false;typing=true;inp.value='';fb.textContent='';fb.className='ans-fb';setTimeout(()=>inp.focus(),60)}
+function closeAns(){modal.hidden=true;typing=false;inp.blur();setTimeout(layout,300)}
+const WHY='Even numbers from 1 to 4 are 2 and 4, so 2 + 4 = 6. <code>runningSum</code> is an alias of <code>totalSum</code>, so main() sees the update.';
+function showOk(){fb.className='ans-fb ok';fb.innerHTML='<b>Final Total Sum: 6</b><br>'+WHY}
+function checkAns(){
+  const raw=inp.value.trim(),v=raw.toLowerCase().replace(/\s+/g,'').replace(/^>/,'');
+  if(!v){fb.className='ans-fb bad';fb.textContent='Type what the program prints, then press Check.';return}
+  const last=document.getElementById('lastans');if(last)last.textContent=raw;
+  if(v==='6'||v==='finaltotalsum:6'||v==='finaltotalsum6'){fb.className='ans-fb ok';fb.innerHTML='Correct! <b>Final Total Sum: 6</b><br>'+WHY}
+  else{fb.className='ans-fb bad';fb.textContent='Not quite. Hint: which values of i does isEven accept while i runs from 1 to 4? And runningSum is a reference to totalSum.'}
+}
+document.getElementById('anschk').onclick=checkAns;
+document.getElementById('ansrev').onclick=showOk;
+document.getElementById('ansx').onclick=closeAns;
+modal.addEventListener('click',e=>{if(e.target===modal)closeAns()});
+inp.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();checkAns()}else if(e.key==='Escape')closeAns()});
+
+/* ═══════════════ Navigation ═══════════════ */
+let cur=-1,frame=0,t0=0;
+const counter=document.getElementById('counter'),prog=document.getElementById('prog');
+function closeSol(){document.querySelectorAll('.sol.open').forEach(e=>e.classList.remove('open'))}
+function toggleSol(){const el=SL[cur].el.querySelector('.sol');if(el)el.classList.toggle('open')}
+let walkTimer=null;
+function walkApply(el,W,k){
+  el.querySelectorAll('.stp').forEach((e,i)=>e.classList.toggle('on',i===k));
+  const on=new Set(W.steps[k].lines);
+  el.querySelectorAll('.ln').forEach((e,i)=>e.classList.toggle('on',on.has(i+1)));
+}
+function walkStart(i){
+  clearInterval(walkTimer);const s=SL[i];if(!s.walk)return;
+  const W=WALK[s.walk];let k=0;walkApply(s.el,W,k);
+  walkTimer=setInterval(()=>{k=(k+1)%W.steps.length;walkApply(s.el,W,k)},3200);
+}
+function go(i){
+  i=Math.max(0,Math.min(N-1,i));if(i===cur)return;
+  if(cur>=0){SL[cur].el.classList.remove('active');closeSol()}
+  cur=i;SL[i].el.classList.add('active');
+  vp.className='vp '+SL[i].part;
+  const cs=getComputedStyle(vp);PC=cs.getPropertyValue('--c').trim();PC2=cs.getPropertyValue('--c-2').trim();
+  walkStart(i);counter.textContent=(i+1)+' / '+N;prog.style.width=((i+1)/N*100)+'%';t0=frame;
+}
+document.addEventListener('keydown',e=>{
+  if(!modal.hidden)return;
+  if(e.metaKey||e.ctrlKey||e.altKey)return;const k=e.key;
+  if(['ArrowRight','ArrowDown','PageDown',' ','Enter'].includes(k)){e.preventDefault();go(cur+1)}
+  else if(['ArrowLeft','ArrowUp','PageUp','Backspace'].includes(k)){e.preventDefault();go(cur-1)}
+  else if(k==='Home')go(0);else if(k==='End')go(N-1);
+  else if(k==='s'||k==='S')toggleSol();
+  else if((k==='a'||k==='A')&&SL[cur].chal)openAns();
+  else if(k==='Escape')closeSol();
+  else if(k==='f'||k==='F'){try{document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen()}catch(_){}}
+});
+document.getElementById('next').onclick=e=>{go(cur+1);e.target.blur()};
+document.getElementById('prev').onclick=e=>{go(cur-1);e.target.blur()};
+document.addEventListener('click',e=>{
+  if(e.target.closest('[data-sol]')){toggleSol();e.target.blur()}
+  if(e.target.closest('[data-ans]'))openAns();
+  const st=e.target.closest('.stp');
+  if(st&&SL[cur].walk){clearInterval(walkTimer);walkApply(SL[cur].el,WALK[SL[cur].walk],+st.dataset.k)}
+});
+let tx=null,ty=null;
+document.addEventListener('touchstart',e=>{tx=e.touches[0].clientX;ty=e.touches[0].clientY},{passive:true});
+document.addEventListener('touchend',e=>{
+  if(tx==null||!modal.hidden){tx=null;return}
+  const dx=e.changedTouches[0].clientX-tx,dy=e.changedTouches[0].clientY-ty;tx=null;
+  if(document.body.classList.contains('rot90')){if(Math.abs(dy)>60&&Math.abs(dy)>Math.abs(dx))go(cur+(dy<0?1:-1))}   // deck is rotated: swipe up = next
+  else if(Math.abs(dx)>60&&Math.abs(dx)>Math.abs(dy))go(cur+(dx<0?1:-1));
+},{passive:true});
+document.getElementById('mnext').onclick=e=>{go(cur+1);e.target.blur()};
+document.getElementById('mprev').onclick=e=>{go(cur-1);e.target.blur()};
+
+/* ═══════════════ Fit the deck to the window ═══════════════ */
+const fitbox=document.getElementById('fitbox'),deck=document.getElementById('deck');
+function layout(){
+  if(typing)return;
+  const cs=getComputedStyle(document.body);
+  const vv=window.visualViewport;
+  const W=Math.floor(vv?vv.width:innerWidth)-parseFloat(cs.paddingLeft)-parseFloat(cs.paddingRight);
+  const H=Math.floor(vv?vv.height:innerHeight)-parseFloat(cs.paddingTop)-parseFloat(cs.paddingBottom);
+  const small=Math.min(W,H)<640,rot=small&&H>W;
+  document.body.classList.toggle('small',small);document.body.classList.toggle('rot90',rot);
+  let s;
+  if(small){
+    // phone: drop the chrome and stretch the 16:9 stage to the screen's real shape
+    const aw=rot?H:W,ah=rot?W:H,dh=619,s0=ah/dh,dw=Math.min(1500,Math.max(1100,aw/s0));
+    s=Math.min(s0,aw/dw);
+    vp.style.width=dw+'px';deck.style.width=dw+'px';deck.style.height=dh+'px';
+    fitbox.style.width=(rot?dh*s:dw*s)+'px';fitbox.style.height=(rot?dw*s:dh*s)+'px';
+    deck.style.transform=rot?`translate(${dh*s}px,0) rotate(90deg) scale(${s})`:`scale(${s})`;
+  }else{
+    s=Math.min((W-12)/1100,(H-12)/707);
+    vp.style.width='1100px';deck.style.width='1100px';deck.style.height='707px';
+    fitbox.style.width=1100*s+'px';fitbox.style.height=707*s+'px';deck.style.transform=`scale(${s})`;
+  }
+  SC=Math.max(.2,s);
+}
+addEventListener('resize',layout);addEventListener('orientationchange',()=>setTimeout(layout,120));if(window.visualViewport)visualViewport.addEventListener('resize',layout);layout();
+
+/* ═══════════════ Ambient aurora + master loop ═══════════════ */
+const amb=fit(document.getElementById('amb'));
+const blobs=[[.2,.3,'#6366f1'],[.75,.25,'#a855f7'],[.55,.75,'#ec4899'],[.15,.8,'#6366f1']];
+const specks=Array.from({length:46},(_,i)=>[(i*.6180339)%1,(i*.3819661+.17)%1,i*1.7]);
+function aurora(f){
+  amb.rs();const{ctx,W,H}=amb;if(!W)return;
+  ctx.fillStyle='#07070d';ctx.fillRect(0,0,W,H);ctx.globalCompositeOperation='lighter';
+  blobs.forEach(([bx,by,col],i)=>{
+    const x=W*bx+Math.sin(f*.004+i)*70,y=H*by+Math.cos(f*.003+i*1.7)*50,r=Math.min(W,H)*(.42+.05*Math.sin(f*.006+i));
+    const g=ctx.createRadialGradient(x,y,0,x,y,r);g.addColorStop(0,col+'22');g.addColorStop(1,col+'00');
+    ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y,r,0,7);ctx.fill();
+  });
+  ctx.globalCompositeOperation='source-over';
+  specks.forEach(([dx,dy,ph])=>{ctx.fillStyle=`rgba(200,190,255,${.18+.18*Math.sin(f*.02+ph)})`;ctx.beginPath();ctx.arc(dx*W,dy*H,1.1,0,7);ctx.fill()});
+  const v=ctx.createRadialGradient(W/2,H/2,Math.min(W,H)*.3,W/2,H/2,Math.max(W,H)*.75);
+  v.addColorStop(0,'rgba(5,5,9,0)');v.addColorStop(1,'rgba(5,5,9,.7)');ctx.fillStyle=v;ctx.fillRect(0,0,W,H);
+}
+function tick(){
+  frame++;aurora(frame);
+  for(const o of live){
+    if(o.slide!==cur)continue;
+    o.s.rs();const{ctx,W,H}=o.s;if(!W)continue;
+    ctx.clearRect(0,0,W,H);CW=W;
+    o.def.draw(ctx,W,H,(frame-t0)%o.def.cycle,frame,o);
+  }
+  requestAnimationFrame(tick);
+}
+go(0);tick();
+window.__go=go;
+</script>
+</body>
+</html>
