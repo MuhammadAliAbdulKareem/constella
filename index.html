@@ -10,6 +10,29 @@
   /* apply the saved theme before first paint */
   try { document.documentElement.dataset.theme = localStorage.getItem('cs:theme') === 'light' ? 'light' : 'dark'; } catch (e) {}
 </script>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-analytics.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyA0JanmuZsdknlfLS3vvNvGViub_31OFC4",
+    authDomain: "constella-a3dc1.firebaseapp.com",
+    projectId: "constella-a3dc1",
+    storageBucket: "constella-a3dc1.firebasestorage.app",
+    messagingSenderId: "674965826159",
+    appId: "1:674965826159:web:14f129659959e65add3b9a",
+    measurementId: "G-C8FHGJFDZ7"
+  };
+
+  try {
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+    window.firebaseApp = app;
+    window.firebaseAnalytics = analytics;
+  } catch (e) {
+    console.warn("Firebase initialization:", e);
+  }
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
