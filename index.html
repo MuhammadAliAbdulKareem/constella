@@ -105,18 +105,30 @@ html[data-theme="light"] .i-sun{display:none}
 /* ---------- hero ---------- */
 .hero{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:clamp(28px,5vw,80px);align-items:end;padding:clamp(56px,10vw,124px) 0 clamp(48px,7vw,88px)}
 h1{font:800 clamp(2.7rem,7.2vw,5.1rem)/1 var(--display);letter-spacing:-.035em;margin:0 0 22px;color:var(--ink)}
-h1 .w{display:inline-block;overflow:hidden;vertical-align:top;padding:0 .03em .16em;margin-bottom:-.16em}
-h1 .ch{
-  display:inline-block;transform:translateY(112%);animation:rise .85s cubic-bezier(.2,.9,.2,1) forwards;animation-delay:calc(.15s + var(--i) * 34ms);
-  background:linear-gradient(100deg,var(--ink) 0 42%,var(--gold) 50%,var(--ink) 58% 100%);
-  background-size:1800% 100%;background-position:calc(100% + var(--i) * -55%) 0;
-  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
-  animation:rise .85s cubic-bezier(.2,.9,.2,1) forwards, shimmer 6s ease-in-out 2.1s infinite;
-  animation-delay:calc(.15s + var(--i) * 34ms), 2.1s;
+h1 .w{
+  display:inline-block;overflow:hidden;vertical-align:top;padding:0 .04em .18em;margin-bottom:-.18em;
+  background:linear-gradient(108deg,var(--ink) 0%,var(--ink) 36%,var(--gold) 48%,#fff8e1 52%,var(--gold) 56%,var(--ink) 68%,var(--ink) 100%);
+  background-size:260% 100%;
+  background-position:130% 0;
+  -webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;
+  animation:shimmer 7.5s ease-in-out 1.2s infinite;
 }
-@supports not ((-webkit-background-clip:text) or (background-clip:text)){h1 .ch{background:none;-webkit-text-fill-color:var(--ink)}}
+h1 .ch{
+  display:inline-block;transform:translateY(112%);
+  animation:rise .85s cubic-bezier(.2,.9,.2,1) forwards;
+  animation-delay:calc(.1s + var(--i) * 35ms);
+  -webkit-text-fill-color:transparent;
+}
+@supports not ((-webkit-background-clip:text) or (background-clip:text)){
+  h1 .w{background:none;-webkit-text-fill-color:var(--ink)}
+  h1 .ch{-webkit-text-fill-color:var(--ink)}
+}
 @keyframes rise{to{transform:none}}
-@keyframes shimmer{0%,10%{background-position-x:calc(1800% + var(--i) * -55%)}70%,100%{background-position-x:calc(-100% + var(--i) * -55%)}}
+@keyframes shimmer{
+  0%,15%{background-position:130% 0}
+  60%,100%{background-position:-30% 0}
+}
 @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}}
 .tag{margin:0;color:var(--dim);font-size:1.12rem;max-width:36ch;animation:fadeUp .9s .95s backwards}
 .owner{margin:18px 0 0;color:var(--faint);font-size:.95rem;animation:fadeUp .9s 1.1s backwards}
