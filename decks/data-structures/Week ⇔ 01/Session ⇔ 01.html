@@ -189,10 +189,12 @@ pre.code,pre.code *,code{font-variant-ligatures:none!important;font-feature-sett
 .ans-btns{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
 .ans-btns button{cursor:pointer;padding:9px 16px;border-radius:999px;border:1px solid rgba(168,85,247,.6);background:linear-gradient(90deg,#6366f1,#a855f7);color:#fff;font:800 13px Inter,system-ui,sans-serif}
 .ans-btns button.ghost{background:transparent;color:#9a9ab5;border-color:rgba(255,255,255,.15)}
-@media (max-height:500px){.ansmodal{padding-top:6px}.ans-card{padding:12px}.ans-h{font-size:14px;margin-bottom:8px}.ans-fb{margin-top:8px}.ans-btns{margin-top:10px}}
+#rotbtn{display:none;position:fixed;top:max(8px,env(safe-area-inset-top,8px));right:max(8px,env(safe-area-inset-right,8px));z-index:60;padding:7px 14px;border-radius:999px;border:1px solid rgba(168,85,247,.6);background:rgba(12,12,20,.85);color:#f0eeff;font:800 12px Inter,system-ui,sans-serif;cursor:pointer;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);box-shadow:0 4px 14px rgba(0,0,0,.4)}
+.portrait #rotbtn{display:block}
 </style>
 </head>
 <body>
+<button id="rotbtn" type="button" tabindex="-1">⟳ Rotate view</button>
 <div id="fitbox"><div id="deck">
   <div class="brand-bar">
     <div class="brand-left">
@@ -1285,13 +1287,17 @@ document.getElementById('mprev').onclick=e=>{go(cur-1);e.target.blur()};
 
 /* ═══════════════ Fit the deck to the window ═══════════════ */
 const fitbox=document.getElementById('fitbox'),deck=document.getElementById('deck');
+let rotPref=false;try{rotPref=localStorage.getItem('rotpref')==='1'}catch(_){}
 function layout(){
   if(typing)return;
   const cs=getComputedStyle(document.body);
   const vv=window.visualViewport;
   const W=Math.floor(vv?vv.width:innerWidth)-parseFloat(cs.paddingLeft)-parseFloat(cs.paddingRight);
   const H=Math.floor(vv?vv.height:innerHeight)-parseFloat(cs.paddingTop)-parseFloat(cs.paddingBottom);
-  const small=Math.min(W,H)<640,rot=small&&H>W;
+  const small=Math.min(W,H)<640,portrait=small&&H>W,rot=portrait&&rotPref;
+  document.body.classList.toggle('portrait',portrait);
+  const rotbtn=document.getElementById('rotbtn');
+  if(rotbtn) rotbtn.textContent=rot?'⟲ Normal view':'⟳ Rotate view';
   document.body.classList.toggle('small',small);document.body.classList.toggle('rot90',rot);
   let s;
   if(small){
@@ -1307,6 +1313,10 @@ function layout(){
     fitbox.style.width=1100*s+'px';fitbox.style.height=707*s+'px';deck.style.transform=`scale(${s})`;
   }
   SC=Math.max(.2,s);
+}
+const rotBtnEl=document.getElementById('rotbtn');
+if(rotBtnEl){
+  rotBtnEl.onclick=e=>{rotPref=!rotPref;try{localStorage.setItem('rotpref',rotPref?'1':'0')}catch(_){}layout();e.target.blur()};
 }
 addEventListener('resize',layout);addEventListener('orientationchange',()=>setTimeout(layout,120));if(window.visualViewport)visualViewport.addEventListener('resize',layout);layout();
 
