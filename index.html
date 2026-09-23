@@ -3,16 +3,36 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Course Sessions</title>
+<title>Constella — Interactive Course Sessions</title>
+<link rel="canonical" href="https://constella.web.app/">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="manifest" href="manifest.json">
-<meta name="description" content="Interactive weekly sessions for my courses.">
+<meta name="description" content="Constella — Interactive weekly university course sessions, presentation decks, and learning paths by Eng. Muhammad Ali Abdul Kareem, Faculty of Computer Science &amp; Information Technology, Sinai University.">
+<meta name="author" content="Muhammad Ali Abdul Kareem">
+<meta name="keywords" content="Constella, Sinai University, Course Sessions, Multimedia, Python, Data Structures, C++, Computer Science, Interactive Slides">
 <meta name="theme-color" content="#070b17" id="themeColorMeta">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Constella">
+
+<!-- Open Graph / Facebook / WhatsApp / LinkedIn -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://constella.web.app/">
+<meta property="og:title" content="Constella — Interactive Course Sessions">
+<meta property="og:description" content="Constella — Interactive weekly university course sessions, presentation decks, and learning paths by Eng. Muhammad Ali Abdul Kareem, Sinai University.">
+<meta property="og:image" content="https://constella.web.app/icon-512.png">
+<meta property="og:image:alt" content="Constella — Interactive Course Sessions">
+<meta property="og:site_name" content="Constella">
+<meta property="og:locale" content="en_US">
+
+<!-- Twitter / X -->
+<meta name="twitter:card" content="summary">
+<meta name="twitter:url" content="https://constella.web.app/">
+<meta name="twitter:title" content="Constella — Interactive Course Sessions">
+<meta name="twitter:description" content="Constella — Interactive weekly university course sessions, presentation decks, and learning paths by Eng. Muhammad Ali Abdul Kareem, Sinai University.">
+<meta name="twitter:image" content="https://constella.web.app/icon-512.png">
 
 <script>
   /* apply the saved theme before first paint */
@@ -674,7 +694,7 @@ h2::after{content:"";position:absolute;left:1px;right:100%;bottom:-2px;height:3p
 
   /* ---------- hero text ---------- */
   var title = S.title || 'Course Sessions';
-  document.title = title;
+  document.title = title + ' — Interactive Course Sessions';
   $('#brandName').textContent = title;
   var h1 = $('#heroTitle'), ci = 0;
   h1.setAttribute('aria-label', title);

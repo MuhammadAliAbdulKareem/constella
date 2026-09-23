@@ -1,7 +1,7 @@
 {
-  "name": "Constella — Course Sessions",
+  "name": "Constella — Interactive Course Sessions",
   "short_name": "Constella",
-  "description": "Interactive weekly sessions and constellations for university courses.",
+  "description": "Interactive weekly university course sessions and learning constellations by Eng. Muhammad Ali Abdul Kareem, Sinai University.",
   "start_url": "./index.html",
   "id": "constella-sessions-app",
   "scope": "./",
