@@ -216,8 +216,6 @@ pre.code,pre.code *,code,.wr .op,.wr .we,.wr .pp,.wr .wres,.stv,.stn{font-varian
 .walk.dense .stp b{font-size:13.5px;margin-bottom:1px}
 .walk.dense .stp span{font-size:12.5px}
 
-#rotbtn{display:none;position:fixed;top:8px;right:8px;z-index:60;padding:7px 14px;border-radius:999px;border:1px solid rgba(168,85,247,.6);background:rgba(12,12,20,.85);color:#f0eeff;font:800 12px Inter,system-ui,sans-serif;cursor:pointer}
-.portrait #rotbtn{display:block}
 #boot{position:fixed;inset:0;display:grid;place-items:center;background:#07070d;color:#9a9ab5;font:700 14px system-ui,sans-serif;z-index:200}
 
 /* ── code windows: editor look, line numbers, hug the content ── */
@@ -246,7 +244,6 @@ pre.code .ln::before{content:counter(ln);display:inline-block;width:2ch;margin-r
 </head>
 <body>
 <div id="boot">Loading…</div>
-<button id="rotbtn" type="button" tabindex="-1">⟳ Rotate view</button>
 <div id="fitbox"><div id="deck">
   <div class="brand-bar">
     <div class="brand-left">
@@ -1311,23 +1308,22 @@ document.getElementById('mprev').onclick=e=>{go(cur-1);e.target.blur()};
 
 /* ═══════════════ Fit the deck to the window (phones fill the screen) ═══════════════ */
 const fitbox=document.getElementById('fitbox'),deck=document.getElementById('deck');
-let rotPref=false;try{rotPref=localStorage.getItem('rotpref')==='1'}catch(_){}
 function layout(){
   if(typing)return;
   const cs=getComputedStyle(document.body),vv=window.visualViewport;
   const W=Math.floor(vv?vv.width:innerWidth)-parseFloat(cs.paddingLeft)-parseFloat(cs.paddingRight);
   const H=Math.floor(vv?vv.height:innerHeight)-parseFloat(cs.paddingTop)-parseFloat(cs.paddingBottom);
-  const small=Math.min(W,H)<640,portrait=small&&H>W,rot=portrait&&rotPref;
+  const small=Math.min(W,H)<640,portrait=small&&H>W;
   document.body.classList.toggle('portrait',portrait);
-  document.getElementById('rotbtn').textContent=rot?'⟲ Normal view':'⟳ Rotate view';
-  document.body.classList.toggle('small',small);document.body.classList.toggle('rot90',rot);
+  document.body.classList.toggle('small',small);
+  document.body.classList.toggle('rot90',false);
   let s;
   if(small){
-    const aw=rot?H:W,ah=rot?W:H,dh=619,s0=ah/dh,dw=Math.min(1500,Math.max(1100,aw/s0));
+    const aw=W,ah=H,dh=619,s0=ah/dh,dw=Math.min(1500,Math.max(1100,aw/s0));
     s=Math.min(s0,aw/dw);
     vp.style.width=dw+'px';deck.style.width=dw+'px';deck.style.height=dh+'px';
-    fitbox.style.width=(rot?dh*s:dw*s)+'px';fitbox.style.height=(rot?dw*s:dh*s)+'px';
-    deck.style.transform=rot?`translate(${dh*s}px,0) rotate(90deg) scale(${s})`:`scale(${s})`;
+    fitbox.style.width=dw*s+'px';fitbox.style.height=dh*s+'px';
+    deck.style.transform=`scale(${s})`;
   }else{
     s=Math.min((W-12)/1100,(H-12)/707);
     vp.style.width='1100px';deck.style.width='1100px';deck.style.height='707px';
@@ -1335,7 +1331,6 @@ function layout(){
   }
   SC=Math.max(.2,s);
 }
-document.getElementById('rotbtn').onclick=e=>{rotPref=!rotPref;try{localStorage.setItem('rotpref',rotPref?'1':'0')}catch(_){}layout();e.target.blur()};
 addEventListener('resize',layout);addEventListener('orientationchange',()=>setTimeout(layout,120));
 if(window.visualViewport)visualViewport.addEventListener('resize',layout);layout();
 
