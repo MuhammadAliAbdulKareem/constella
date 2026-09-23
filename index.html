@@ -808,9 +808,22 @@ h2::after{content:"";position:absolute;left:1px;right:100%;bottom:-2px;height:3p
   });
 
   /* ---------- creative cosmic session transition ---------- */
+  function clearPortals() {
+    $$('.starlight-portal').forEach(function (p) {
+      p.classList.remove('active');
+      setTimeout(function () { if (p.parentNode) p.remove(); }, 200);
+    });
+  }
+  window.addEventListener('pageshow', clearPortals);
+  window.addEventListener('popstate', clearPortals);
+  document.addEventListener('visibilitychange', function () { if (!document.hidden) clearPortals(); });
+  clearPortals();
+
   function openSession(a, e) {
     var href = a.getAttribute('href');
     if (!href) return;
+    clearPortals();
+
     var x = e && e.clientX, y = e && e.clientY;
     if (x == null || (e && !e.detail)) {
       var b = a.getBoundingClientRect();
@@ -836,6 +849,14 @@ h2::after{content:"";position:absolute;left:1px;right:100%;bottom:-2px;height:3p
     setTimeout(function () {
       location.href = href;
     }, 280);
+
+    // Auto-remove portal after navigation so returning back via bfcache/browser history never stays stuck
+    setTimeout(function () {
+      if (portal && portal.parentNode) {
+        portal.classList.remove('active');
+        setTimeout(function () { if (portal.parentNode) portal.remove(); }, 250);
+      }
+    }, 700);
   }
 
   /* ---------- touch & click navigation ---------- */
