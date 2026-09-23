@@ -1315,17 +1315,17 @@ function layout(){
   const cs=getComputedStyle(document.body),vv=window.visualViewport;
   const W=Math.floor(vv?vv.width:innerWidth)-parseFloat(cs.paddingLeft)-parseFloat(cs.paddingRight);
   const H=Math.floor(vv?vv.height:innerHeight)-parseFloat(cs.paddingTop)-parseFloat(cs.paddingBottom);
-  const small=Math.min(W,H)<640,portrait=small&&H>W;
+  const small=Math.min(W,H)<640,portrait=small&&H>W,rot=portrait;
   document.body.classList.toggle('portrait',portrait);
   document.body.classList.toggle('small',small);
-  document.body.classList.toggle('rot90',false);
+  document.body.classList.toggle('rot90',rot);
   let s;
   if(small){
-    const aw=W,ah=H,dh=619,s0=ah/dh,dw=Math.min(1500,Math.max(1100,aw/s0));
+    const aw=rot?H:W,ah=rot?W:H,dh=619,s0=ah/dh,dw=Math.min(1500,Math.max(1100,aw/s0));
     s=Math.min(s0,aw/dw);
     vp.style.width=dw+'px';deck.style.width=dw+'px';deck.style.height=dh+'px';
-    fitbox.style.width=dw*s+'px';fitbox.style.height=dh*s+'px';
-    deck.style.transform=`scale(${s})`;
+    fitbox.style.width=(rot?dh*s:dw*s)+'px';fitbox.style.height=(rot?dw*s:dh*s)+'px';
+    deck.style.transform=rot?`translate(${dh*s}px,0) rotate(90deg) scale(${s})`:`scale(${s})`;
   }else{
     s=Math.min((W-12)/1100,(H-12)/707);
     vp.style.width='1100px';deck.style.width='1100px';deck.style.height='707px';
