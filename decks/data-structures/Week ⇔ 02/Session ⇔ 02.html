@@ -266,8 +266,10 @@ body.light-mode .mcq-feedback.correct{background:rgba(52,211,153,.14); color:#06
 .controls button:hover{color:var(--tp); border-color:var(--c)}
 .controls kbd{padding:1px 6px; border-radius:5px; background:rgba(128,128,128,.14); font:700 11px var(--mono); color:var(--ts)}
 
-.mnav{display:none; position:absolute; top:50%; z-index:9; width:38px; height:38px; margin-top:-19px; border-radius:50%; border:1px solid var(--card-border); background:var(--card); color:var(--tp); font:800 20px/1 Inter,system-ui,sans-serif; cursor:pointer; place-items:center; padding:0; opacity:.85}
-.mnav.mp{left:6px}.mnav.mn{right:6px}
+.mnav{display:none; position:absolute; top:50%; z-index:99; width:44px; height:44px; margin-top:-22px; border-radius:50%; border:1px solid var(--card-border); background:var(--card); color:var(--tp); font:800 22px/1 Inter,system-ui,sans-serif; cursor:pointer; place-items:center; padding:0; opacity:.85; box-shadow:0 4px 16px rgba(0,0,0,.35); transition:transform .15s, opacity .15s;}
+.mnav:active{transform:scale(0.92); opacity:1;}
+.mnav.mp{left:8px}.mnav.mn{right:8px}
+body.small{padding:0!important}
 .small .mnav{display:grid}
 .small .brand-bar,.small .controls{display:none}
 .small .vp{border-radius:12px}
@@ -1115,6 +1117,42 @@ document.addEventListener('keydown', e=>{
 
 document.getElementById('next').onclick=e=>{go(cur+1);e.target.blur()};
 document.getElementById('prev').onclick=e=>{go(cur-1);e.target.blur()};
+const mnext = document.getElementById('mnext');
+const mprev = document.getElementById('mprev');
+if(mnext) mnext.onclick = e => { go(cur+1); e.target.blur(); };
+if(mprev) mprev.onclick = e => { go(cur-1); e.target.blur(); };
+
+/* Mobile Touch & Swipe Handling (Supporting Portrait Rotated Deck & Landscape) */
+let tx=null, ty=null;
+document.addEventListener('touchstart', e => {
+  if(e.touches && e.touches.length > 0) {
+    tx = e.touches[0].clientX;
+    ty = e.touches[0].clientY;
+  }
+}, {passive:true});
+
+document.addEventListener('touchend', e => {
+  if(tx == null || !e.changedTouches || e.changedTouches.length === 0) { tx = null; ty = null; return; }
+  const dx = e.changedTouches[0].clientX - tx;
+  const dy = e.changedTouches[0].clientY - ty;
+  tx = null; ty = null;
+
+  // Don't swipe when tapping on interactive controls
+  if(e.target && e.target.closest && e.target.closest('button, .mcq-btn, .copy-btn, .solbtn, .theme-btn, a')) return;
+
+  if(document.body.classList.contains('rot90')){
+    // Portrait orientation: deck is rotated 90deg, vertical swipe maps to horizontal slide step
+    if(Math.abs(dy) > 50 && Math.abs(dy) > Math.abs(dx)) {
+      go(cur + (dy < 0 ? 1 : -1));
+    }
+  } else {
+    // Landscape orientation or desktop
+    if(Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) {
+      go(cur + (dx < 0 ? 1 : -1));
+    }
+  }
+}, {passive:true});
+
 document.addEventListener('click',e=>{
   if(e.target.closest('[data-sol]')){toggleSol();e.target.blur()}
 });
@@ -1137,26 +1175,32 @@ if(localStorage.getItem('deck_theme') === 'light'){ setTheme(true); } else { upd
 
 const fitbox=document.getElementById('fitbox'),deck=document.getElementById('deck');
 function layout(){
-  const cs=getComputedStyle(document.body);
-  const W=innerWidth-parseFloat(cs.paddingLeft)-parseFloat(cs.paddingRight);
-  const H=innerHeight-parseFloat(cs.paddingTop)-parseFloat(cs.paddingBottom);
-  const small=Math.min(W,H)<640,rot=small&&H>W;
-  document.body.classList.toggle('small',small);document.body.classList.toggle('rot90',rot);
+  const cs = getComputedStyle(document.body);
+  const vv = window.visualViewport;
+  const W = Math.floor(vv ? vv.width : innerWidth) - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+  const H = Math.floor(vv ? vv.height : innerHeight) - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+  const small = Math.min(W,H) < 640, portrait = small && H > W, rot = portrait;
+  document.body.classList.toggle('portrait', portrait);
+  document.body.classList.toggle('small', small);
+  document.body.classList.toggle('rot90', rot);
   let s;
   if(small){
-    const aw=rot?H:W,ah=rot?W:H,dh=619,s0=ah/dh,dw=Math.min(1500,Math.max(1100,aw/s0));
-    s=Math.min(s0,aw/dw);
-    vp.style.width=dw+'px';deck.style.width=dw+'px';deck.style.height=dh+'px';
-    fitbox.style.width=(rot?dh*s:dw*s)+'px';fitbox.style.height=(rot?dw*s:dh*s)+'px';
-    deck.style.transform=rot?`translate(${dh*s}px,0) rotate(90deg) scale(${s})`:`scale(${s})`;
-  }else{
-    s=Math.min((W-12)/1100,(H-12)/707);
-    vp.style.width='1100px';deck.style.width='1100px';deck.style.height='707px';
-    fitbox.style.width=1100*s+'px';fitbox.style.height=707*s+'px';deck.style.transform=`scale(${s})`;
+    const aw = rot ? H : W, ah = rot ? W : H, dh = 619, s0 = ah / dh, dw = Math.min(1500, Math.max(1100, aw / s0));
+    s = Math.min(s0, aw / dw);
+    vp.style.width = dw + 'px'; deck.style.width = dw + 'px'; deck.style.height = dh + 'px';
+    fitbox.style.width = (rot ? dh * s : dw * s) + 'px'; fitbox.style.height = (rot ? dw * s : dh * s) + 'px';
+    deck.style.transform = rot ? `translate(${dh * s}px,0) rotate(90deg) scale(${s})` : `scale(${s})`;
+  } else {
+    s = Math.min((W - 12) / 1100, (H - 12) / 707);
+    vp.style.width = '1100px'; deck.style.width = '1100px'; deck.style.height = '707px';
+    fitbox.style.width = 1100 * s + 'px'; fitbox.style.height = 707 * s + 'px'; deck.style.transform = `scale(${s})`;
   }
-  SC=Math.max(.2,s);
+  SC = Math.max(.2, s);
 }
-addEventListener('resize',layout);layout();
+addEventListener('resize', layout);
+addEventListener('orientationchange', () => setTimeout(layout, 120));
+if(window.visualViewport) visualViewport.addEventListener('resize', layout);
+layout();
 
 const amb=fit(document.getElementById('amb'));
 const blobs=[[.2,.3,'#6366f1'],[.75,.25,'#a855f7'],[.55,.75,'#ec4899'],[.15,.8,'#6366f1']];
