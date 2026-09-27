@@ -1,0 +1,1196 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Multimedia — Session ⇔ 02 · Object-Oriented Programming (OOP) in Python</title>
+<meta name="description" content="Multimedia Course — Session 02: Object-Oriented Programming in Python by Eng. Muhammad Ali Abdul Kareem, Sinai University.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<style>
+:root{
+  color-scheme:dark;
+  --c:#ec4899; --c-2:#a855f7;
+  --c-grad:linear-gradient(90deg,var(--c),var(--c-2));
+  --bg:#07070d; --card:rgba(18,18,28,.82); --border:rgba(255,255,255,.07);
+  --tp:#f0eeff; --ts:#9a9ab5; --tm:#6b6b85; --warn:#fb7185;
+  --syntax-grad:linear-gradient(135deg,#6366f1,#a855f7,#ec4899);
+  --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;height:100dvh;background:var(--bg);color:var(--tp);font-family:Inter,system-ui,"Segoe UI",Roboto,Arial,sans-serif;overflow:hidden}
+body{padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px);display:flex;align-items:center;justify-content:center}
+body.small{padding:0!important}
+#fitbox{position:relative;flex:none;overflow:hidden;width:100%;height:100%;}
+#deck{position:absolute;left:0;top:0;transform-origin:top left}
+
+/* Brand Bar */
+.brand-bar{height:44px;display:flex;justify-content:space-between;align-items:center;padding:0 20px;}
+.brand-left{display:flex;align-items:center;gap:11px}
+.logo{width:30px;height:30px;border-radius:9px;background:var(--syntax-grad);display:grid;place-items:center;font:800 13px var(--mono);color:#fff;letter-spacing:-1px}
+.brand-name{font-size:15px;font-weight:900;background:var(--syntax-grad);-webkit-background-clip:text;background-clip:text;color:transparent;line-height:1.2}
+.brand-sub{font-size:11px;color:var(--tm);font-weight:600}
+.brand-right{font-size:11.5px;color:var(--ts);font-weight:700}
+
+/* Stage Viewport */
+.vp{width:1100px;height:619px;position:relative;border-radius:20px;overflow:hidden;border:1px solid var(--border);background:var(--bg);box-shadow:0 0 0 1px rgba(168,85,247,.08),0 32px 70px rgba(0,0,0,.8)}
+.vp.part-intro{--c:#ec4899;--c-2:#a855f7}
+.vp.part-warm{--c:#3b82f6;--c-2:#60a5fa}
+.vp.part-class{--c:#6366f1;--c-2:#8b5cf6}
+.vp.part-meth{--c:#22d3ee;--c-2:#06b6d4}
+.vp.part-props{--c:#f59e0b;--c-2:#fbbf24}
+.vp.part-inh{--c:#10b981;--c-2:#34d399}
+.vp.part-poly{--c:#ec4899;--c-2:#f43f5e}
+.vp.part-encap{--c:#a855f7;--c-2:#c084fc}
+
+.vp-bg{position:absolute;inset:0;width:100%;height:100%;display:block;z-index:0}
+.vp-progress{position:absolute;top:0;left:0;right:0;height:3px;background:rgba(255,255,255,.05);z-index:6}
+.vp-progress span{display:block;height:100%;width:0;background:var(--syntax-grad);box-shadow:0 0 12px #a855f7;border-radius:0 3px 3px 0;transition:width .45s ease}
+.slide-counter{position:absolute;top:14px;left:50%;transform:translateX(-50%);z-index:6;padding:5px 14px;border-radius:999px;background:rgba(12,12,20,.75);border:1px solid var(--border);font-size:12px;font-weight:800;color:var(--ts)}
+
+/* Slides */
+.slide{position:absolute;inset:0;display:none;flex-direction:column;padding:46px 52px 40px;z-index:2}
+.slide.active{display:flex}
+.slide>*{animation:revealUp .6s ease both}
+.slide>*:nth-child(2){animation-delay:.08s}
+.slide>*:nth-child(3){animation-delay:.16s}
+.slide>*:nth-child(4){animation-delay:.24s}
+.slide>*:nth-child(5){animation-delay:.32s}
+@keyframes revealUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+
+.lbl{font-size:12.5px;font-weight:800;color:var(--c);margin-bottom:6px;letter-spacing:.4px;text-transform:uppercase}
+h2{margin:0 0 6px;font-size:27px;font-weight:900;line-height:1.3;letter-spacing:-.3px}
+h2 em{font-style:normal;background:var(--c-grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.sub{margin:0;font-size:14.5px;color:var(--ts);line-height:1.6;max-width:860px}
+.sub strong{color:var(--tp)}
+code,pre.code{font-variant-ligatures:none;font-feature-settings:"liga" 0,"calt" 0}
+code{font-family:var(--mono);font-size:.92em;color:#c7b3ff;background:rgba(255,255,255,.06);padding:1px 6px;border-radius:6px}
+.stage{flex:1;position:relative;min-height:0;margin-top:10px}
+.viz{position:absolute;inset:0}
+.viz canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+
+/* Footer */
+.sf{display:flex;align-items:center;justify-content:space-between;font-size:11px;color:var(--tm);font-weight:600;margin-top:10px;height:16px}
+.pd{display:flex;gap:4px;align-items:center}
+.dot{width:5px;height:5px;border-radius:99px;background:rgba(255,255,255,.14);transition:.3s}
+.dot.on{width:18px;background:var(--c-grad)}
+
+/* Hero Slide */
+.hero-slide{justify-content:center}
+.hero-slide .lbl{margin-top:auto}
+.hero-slide h1{margin:6px 0 10px;font-size:72px;line-height:1.02;font-weight:900;letter-spacing:-2px}
+.hero-slide h1 em{font-style:normal;background:var(--syntax-grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero-slide .tag{font-size:21px;color:var(--ts);font-weight:600;max-width:780px;line-height:1.45}
+.inst{display:flex;align-items:center;gap:14px;margin-top:30px}
+.avatar{width:56px;height:56px;border-radius:50%;background:var(--syntax-grad);display:grid;place-items:center;font-weight:900;font-size:23px;box-shadow:0 0 24px rgba(168,85,247,.45)}
+.inst small{display:block;font-size:11px;letter-spacing:1.6px;text-transform:uppercase;color:var(--tm);font-weight:800;margin-bottom:2px}
+.inst b{font-size:21px;font-weight:800}
+.chips{display:flex;gap:10px;margin-top:26px;flex-wrap:wrap}
+.chips span{padding:6px 14px;border-radius:999px;border:1px solid var(--border);background:rgba(255,255,255,.04);font-size:13px;font-weight:700;color:var(--ts)}
+.hero-slide .sf{margin-top:auto}
+.herobg{position:absolute;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none}
+
+/* Tasks */
+.task{display:grid;grid-template-columns:.92fr 1.08fr;gap:24px;position:absolute;inset:0}
+.tleft{display:flex;flex-direction:column;gap:14px;justify-content:center;min-width:0}
+.chip{align-self:flex-start;padding:5px 13px;border-radius:999px;background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--c);font-weight:800;font-size:11.5px;letter-spacing:.4px;text-transform:uppercase}
+.req{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+.req li{position:relative;padding-left:26px;font-size:15px;line-height:1.5;color:var(--tp)}
+.req li::before{content:'';position:absolute;left:0;top:.42em;width:11px;height:11px;border-radius:3px;background:var(--c-grad)}
+.tright{position:relative;min-height:0}
+.solbtn{position:absolute;top:30px;right:52px;z-index:7;cursor:pointer;padding:8px 16px;border-radius:999px;border:1px solid var(--c);background:rgba(12,12,20,.85);color:var(--tp);font:800 12.5px Inter,system-ui,sans-serif;letter-spacing:.3px}
+.solbtn:hover{background:var(--c);color:#07070d}
+.solbtn kbd{margin-left:6px;padding:1px 6px;border-radius:5px;background:rgba(255,255,255,.1);font:700 11px var(--mono)}
+
+/* Solutions Modal Panel */
+.sol{display:none;position:absolute;inset:0;background:#07070d;padding:30px 48px 36px;z-index:8;flex-direction:column;gap:12px}
+.sol.open{display:flex}
+.sol-h{display:flex;justify-content:space-between;align-items:center}
+.sol-h .lbl{margin:0;font-size:13px}
+.sol-body{display:grid;grid-template-columns:2.1fr 0.9fr;gap:22px;flex:1;min-height:0;align-items:center}
+.notes{display:flex;flex-direction:column;gap:12px;justify-content:center}
+.note-h{font-size:12px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:var(--tm)}
+.note{padding:12px 15px;border-radius:12px;border:1px solid var(--border);border-left:3px solid var(--c);background:rgba(255,255,255,.03);font-size:13.5px;line-height:1.55}
+
+/* Code Windows */
+.codecard{background:#0b0b14;border:1px solid rgba(255,255,255,.11);border-radius:14px;padding:0;overflow:hidden;box-shadow:0 12px 34px rgba(0,0,0,.45);width:100%}
+.ed-bar{display:flex;align-items:center;gap:6px;padding:9px 14px;background:rgba(255,255,255,.05);border-bottom:1px solid var(--c)}
+.ed-bar i{width:9px;height:9px;border-radius:50%;display:block;flex:none}
+.ed-file{margin-left:10px;font:600 11.5px var(--mono);color:var(--ts);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ed-actions{margin-left:auto;display:flex;align-items:center;gap:10px}
+.ed-lang{font:800 10px Inter,system-ui,sans-serif;letter-spacing:.9px;text-transform:uppercase;color:var(--c)}
+.cp-btn{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);color:var(--ts);font:600 10.5px Inter,system-ui,sans-serif;padding:3px 8px;border-radius:5px;cursor:pointer;display:inline-flex;align-items:center;gap:4px;transition:.2s}
+.cp-btn:hover{background:var(--c);color:#07070d;border-color:var(--c)}
+.ed-body{padding:14px 16px;overflow-x:auto}
+pre.code{margin:0;font:500 12.5px/1.55 var(--mono);color:#e8e6ff;white-space:pre;tab-size:4;counter-reset:ln}
+pre.code .ln{counter-increment:ln;display:block;padding:1px 6px;margin:0 -6px;border-radius:4px;opacity:1}
+pre.code .ln::before{content:counter(ln);display:inline-block;width:2ch;margin-right:14px;text-align:right;color:#4b4b66;user-select:none}
+pre.code .k{color:var(--c);font-weight:700}
+pre.code .t{color:#67e8f9}
+pre.code .s{color:#34d399}
+pre.code .n{color:#fbbf24}
+pre.code .c{color:#6b6b85;font-style:italic}
+pre.code .p{color:#a855f7}
+pre.code .f{color:#a5b4fc}
+pre.code .o{color:#f9a8d4}
+
+/* Walkthroughs */
+.walk{display:grid;grid-template-columns:1.58fr 1fr;gap:20px;position:absolute;inset:0;grid-template-rows:minmax(0,1fr)}
+.walk .codecard{max-height:100%;overflow:hidden;align-self:center;display:block;padding:0}
+.walk pre.code .ln{opacity:.45}
+.walk pre.code .ln.on{opacity:1;background:rgba(255,255,255,.08);box-shadow:inset 3px 0 0 var(--c)}
+.steps{display:flex;flex-direction:column;gap:10px;justify-content:center;min-width:0}
+.stp{display:flex;gap:12px;align-items:flex-start;padding:11px 14px;border-radius:12px;border:1px solid var(--border);background:rgba(255,255,255,.02);cursor:pointer;opacity:.5;transition:opacity .25s,border-color .25s,background .25s}
+.stp.on{opacity:1;border-color:var(--c);background:rgba(255,255,255,.06)}
+.stp i{flex:none;width:24px;height:24px;border-radius:50%;background:var(--c-grad);color:#07070d;font:900 12px Inter,system-ui,sans-serif;font-style:normal;display:grid;place-items:center;margin-top:1px}
+.stp b{display:block;font-size:14px;margin-bottom:3px}
+.stp code{white-space:pre}
+.stp span b{display:inline;font-size:inherit;margin:0;color:var(--tp)}
+.stp span{font-size:12.5px;color:var(--ts);line-height:1.5;display:block}
+.walk.dense .stp{padding:7px 12px}
+.walk.dense .steps{gap:7px}
+.walk.dense .stp b{font-size:13.5px;margin-bottom:1px}
+.walk.dense .stp span{font-size:12.5px}
+
+/* Challenge */
+.chal{display:grid;grid-template-columns:1.1fr 1fr;gap:20px;position:absolute;inset:0}
+.chal .col{display:flex;flex-direction:column;gap:14px;min-height:0}
+.chal .codecard{flex:none;align-self:center}
+.q{padding:16px 18px;border-radius:14px;border:1px solid var(--c);background:rgba(255,255,255,.03);flex:1;display:flex;flex-direction:column;justify-content:center;gap:10px}
+.q b{font-size:18px}
+.q .term{font:600 16px var(--mono);color:var(--ts);cursor:pointer;min-height:24px}
+.q .term .typed{color:var(--tp)}
+.q .term i{display:inline-block;width:9px;height:18px;background:var(--c);vertical-align:-3px;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.ansbtn{align-self:flex-start;cursor:pointer;padding:9px 18px;border-radius:999px;border:1px solid var(--c);background:rgba(255,255,255,.05);color:var(--tp);font:800 13.5px Inter,system-ui,sans-serif}
+.ansbtn:hover{background:var(--c);color:#07070d}
+.ansbtn kbd{margin-left:8px;padding:1px 6px;border-radius:5px;background:rgba(255,255,255,.12);font:700 11px var(--mono)}
+
+/* Modal */
+.ansmodal{position:fixed;inset:0;z-index:100;display:flex;justify-content:center;align-items:flex-start;padding:8vh 12px 12px;background:rgba(5,5,10,.78)}
+.ansmodal[hidden]{display:none}
+.ans-card{width:min(94vw,480px);background:#0b0b14;border:1px solid rgba(168,85,247,.65);border-radius:16px;padding:18px;box-shadow:0 20px 60px rgba(0,0,0,.7);font-family:Inter,system-ui,sans-serif;color:#f0eeff}
+.ans-h{font-weight:800;font-size:16px;margin-bottom:12px}
+.ans-row{display:flex;align-items:center;gap:8px;background:#05050a;border:1px solid var(--border);border-radius:10px;padding:8px 12px}
+.ans-row span{font:700 16px "JetBrains Mono",ui-monospace,monospace;color:#9a9ab5}
+.ans-row input{flex:1;min-width:0;background:transparent;border:0;outline:0;color:#34d399;font:600 16px "JetBrains Mono",ui-monospace,monospace}
+.ans-fb{font-size:13.5px;line-height:1.55;margin-top:12px;min-height:0}
+.ans-fb.ok{color:#34d399}.ans-fb.bad{color:#fb7185}
+.ans-btns{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.ans-btns button{cursor:pointer;padding:9px 16px;border-radius:999px;border:1px solid rgba(168,85,247,.6);background:linear-gradient(90deg,#6366f1,#a855f7);color:#fff;font:800 13px Inter,system-ui,sans-serif}
+.ans-btns button.ghost{background:transparent;color:#9a9ab5;border-color:rgba(255,255,255,.15)}
+
+/* Controls & Mobile */
+.controls{height:44px;display:flex;align-items:center;justify-content:space-between;color:var(--tm);font-size:12px;font-weight:600;padding:0 20px;}
+.controls button{cursor:pointer;padding:7px 16px;border-radius:999px;border:1px solid var(--border);background:rgba(255,255,255,.04);color:var(--ts);font:700 12px Inter,system-ui,sans-serif}
+.controls button:hover{color:var(--tp);border-color:rgba(255,255,255,.25)}
+.controls kbd{padding:1px 6px;border-radius:5px;background:rgba(255,255,255,.08);font:700 11px var(--mono);color:var(--ts)}
+.mnav{display:none;position:absolute;top:50%;z-index:99;width:44px;height:44px;margin-top:-22px;border-radius:50%;border:1px solid var(--border);background:rgba(12,12,20,.75);color:var(--tp);font:800 22px/1 Inter,system-ui,sans-serif;cursor:pointer;place-items:center;padding:0;opacity:.85;box-shadow:0 4px 16px rgba(0,0,0,.35);transition:transform .15s, opacity .15s;}
+.mnav:active{transform:scale(0.92);opacity:1;}
+.mnav.mp{left:8px}.mnav.mn{right:8px}
+.small .mnav{display:grid}
+.small .brand-bar,.small .controls{display:none}
+.small .vp{border-radius:0!important;border:none!important;box-shadow:none!important}
+
+#boot{position:fixed;inset:0;display:grid;place-items:center;background:#07070d;color:#9a9ab5;font:700 14px system-ui,sans-serif;z-index:200}
+</style>
+</head>
+<body>
+<div id="boot">Loading…</div>
+<div id="fitbox"><div id="deck">
+  <div class="brand-bar">
+    <div class="brand-left">
+      <a href="../../../index.html" style="padding:6px 13px;border-radius:999px;background:rgba(255,255,255,.07);color:#e9edff;font:600 12px/1 system-ui,sans-serif;text-decoration:none;border:1px solid rgba(255,255,255,.2);display:inline-flex;align-items:center;gap:6px;transition:background .2s,border-color .2s;flex-shrink:0" onmouseover="this.style.background='rgba(255,255,255,.14)';this.style.borderColor='rgba(255,255,255,.35)'" onmouseout="this.style.background='rgba(255,255,255,.07)';this.style.borderColor='rgba(255,255,255,.2)'">← Back to sessions</a>
+      <div class="logo">{ }</div>
+      <div>
+        <div class="brand-name">Multimedia</div>
+        <div class="brand-sub">Session ⇔ 02 · Object-Oriented Programming (OOP) in Python · Sinai University</div>
+      </div>
+    </div>
+    <div class="brand-right">Instructor · Muhammad Ali Abdul Kareem</div>
+  </div>
+  <div class="vp part-intro" id="vp">
+    <canvas class="vp-bg" id="amb"></canvas>
+    <div class="vp-progress"><span id="prog"></span></div>
+    <div class="slide-counter" id="counter">1 / 1</div>
+    <button class="mnav mp" id="mprev" aria-label="Previous slide">‹</button>
+    <button class="mnav mn" id="mnext" aria-label="Next slide">›</button>
+  </div>
+  <div class="controls">
+    <button id="prev" tabindex="-1">‹ Prev</button>
+    <span><kbd>→</kbd> next &nbsp;·&nbsp; <kbd>←</kbd> back &nbsp;·&nbsp; <kbd>S</kbd> task solution &nbsp;·&nbsp; <kbd>F</kbd> fullscreen</span>
+    <button id="next" tabindex="-1">Next ›</button>
+  </div>
+</div></div>
+
+<div class="ansmodal" id="ansmodal" hidden>
+  <div class="ans-card">
+    <div class="ans-h">What is printed to the console?</div>
+    <div class="ans-row"><span>&gt;</span><input id="ans" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="done" placeholder="e.g. False"></div>
+    <div class="ans-fb" id="ansfb"></div>
+    <div class="ans-btns"><button id="anschk">Check</button><button id="ansrev" class="ghost">Show answer</button><button id="ansx" class="ghost">Close</button></div>
+  </div>
+</div>
+
+<script>
+'use strict';
+window.addEventListener('error',function(e){
+  var d=document.createElement('div');
+  d.style.cssText='position:fixed;left:8px;right:8px;bottom:8px;z-index:999;background:#3b0a14;color:#fecdd3;font:12px/1.4 monospace;padding:10px;border-radius:8px;white-space:pre-wrap';
+  d.textContent='Error: '+(e.message||'unknown')+(e.lineno?'  (line '+e.lineno+')':'');
+  (document.body||document.documentElement).appendChild(d);
+});
+(function(){
+  var url='https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&family=Lemonada:wght@400;600;700&display=swap';
+  function add(){var l=document.createElement('link');l.rel='stylesheet';l.href=url;document.head.appendChild(l)}
+  if(document.readyState==='complete')add();else window.addEventListener('load',add);
+})();
+
+/* ═══════════════ Core Helpers & Whiteboard Toolkit ═══════════════ */
+const CL={indigo:'#6366f1',violet:'#a855f7',pink:'#ec4899',cyan:'#67e8f9',green:'#34d399',amber:'#fbbf24',chalk:'#eef0ff',dim:'#8a8aa3',board:'#0a0a13'};
+const FONTS={ui:'Inter, system-ui, sans-serif',marker:'Lemonada, Inter, sans-serif',mono:'"JetBrains Mono", ui-monospace, Menlo, monospace'};
+let PC='#ec4899',PC2='#a855f7',SC=1;
+const at=(f,a,b)=>Math.min(1,Math.max(0,(f-a)/(b-a)));
+const ease=t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
+const lerp=(a,b,t)=>a+(b-a)*t;
+const rgba=(h,a)=>{const n=parseInt(h.slice(1),16);return `rgba(${n>>16},${(n>>8)&255},${n&255},${a})`};
+
+function fit(cv){
+  const ctx=cv.getContext('2d'),s={ctx,W:0,H:0,d:0},p=cv.parentElement;
+  s.rs=()=>{
+    const w=p.clientWidth,h=p.clientHeight,d=Math.min((devicePixelRatio||1)*SC,3);
+    if(!w||!h||(w===s.W&&h===s.H&&Math.abs(d-s.d)<.01))return;
+    s.W=w;s.H=h;s.d=d;cv.width=Math.round(w*d);cv.height=Math.round(h*d);ctx.setTransform(d,0,0,d,0,0);
+  };
+  s.rs();return s;
+}
+function rr(c,x,y,w,h,r){c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath()}
+
+function marker(c,pts,prog,col,lw=2.4){
+  if(prog<=0||pts.length<2)return;
+  let total=0;const seg=[];
+  for(let i=1;i<pts.length;i++){const d=Math.hypot(pts[i][0]-pts[i-1][0],pts[i][1]-pts[i-1][1]);seg.push(d);total+=d}
+  const target=total*prog;c.save();
+  c.strokeStyle=col;c.lineWidth=lw;c.lineJoin='round';c.lineCap='round';c.shadowColor=col;c.shadowBlur=6;
+  c.beginPath();c.moveTo(pts[0][0],pts[0][1]);let acc=0;
+  for(let i=1;i<pts.length;i++){const d=seg[i-1];
+    if(acc+d<=target){c.lineTo(pts[i][0],pts[i][1]);acc+=d}
+    else{const r=(target-acc)/d;c.lineTo(pts[i-1][0]+(pts[i][0]-pts[i-1][0])*r,pts[i-1][1]+(pts[i][1]-pts[i-1][1])*r);break}
+  }
+  c.stroke();c.restore();
+}
+const mrect=(c,x,y,w,h,p,col,lw)=>marker(c,[[x,y],[x+w,y],[x+w,y+h],[x,y+h],[x,y-1]],p,col,lw);
+function mbox(c,x,y,w,h,p,col,fa=.09){
+  if(p<=0)return;
+  c.save();rr(c,x,y,w,h,8);c.fillStyle=rgba(col,fa*p);c.fill();
+  c.restore();
+  mrect(c,x,y,w,h,p,col,2.2);
+}
+function head(c,x1,y1,x2,y2,col,s=8){
+  const a=Math.atan2(y2-y1,x2-x1);c.save();c.fillStyle=col;c.beginPath();c.moveTo(x2,y2);
+  c.lineTo(x2-s*Math.cos(a-.42),y2-s*Math.sin(a-.42));c.lineTo(x2-s*Math.cos(a+.42),y2-s*Math.sin(a+.42));c.closePath();c.fill();c.restore();
+}
+function arrow(c,pts,p,col,lw=2.2){
+  marker(c,pts,p,col,lw);
+  if(p>=.98){const n=pts.length;head(c,pts[n-2][0],pts[n-2][1],pts[n-1][0],pts[n-1][1],col)}
+}
+let CW=0;
+function txt(c,s,x,y,o={}){
+  const{size=13,col=CL.chalk,weight=700,align='center',a=1,font='ui',base='middle'}=o;
+  if(!s||!(a>0))return;
+  c.save();c.globalAlpha=a;c.font=`${weight} ${size}px ${FONTS[font]}`;
+  if(font==='mono'&&'letterSpacing' in c)c.letterSpacing='.3px';
+  const w=c.measureText(s).width;
+  let ax=align==='center'?x-w/2:align==='right'?x-w:x;
+  if(CW)ax=Math.max(12,Math.min(ax,CW-12-w));
+  c.fillStyle=col;c.textAlign='left';c.textBaseline=base;c.fillText(s,ax,y);c.restore();
+}
+function board(c,W,H,o={}){
+  const p=6,x=p,y=p,w=W-p*2,h=H-p*2;
+  rr(c,x,y,w,h,16);c.fillStyle=CL.board;c.fill();
+  c.save();rr(c,x,y,w,h,16);c.clip();c.fillStyle='rgba(168,85,247,.055)';
+  for(let gx=x+22;gx<x+w;gx+=26)for(let gy=y+22;gy<y+h;gy+=26){c.beginPath();c.arc(gx,gy,1,0,7);c.fill()}
+  c.restore();
+  const g=c.createLinearGradient(x,y,x+w,y+h);
+  g.addColorStop(0,CL.indigo);g.addColorStop(.5,CL.violet);g.addColorStop(1,CL.pink);
+  c.save();c.strokeStyle=g;c.lineWidth=2;c.shadowColor=CL.violet;c.shadowBlur=10+5*Math.sin((o.frame||0)*.03);
+  rr(c,x,y,w,h,16);c.stroke();c.restore();
+  if(o.title)txt(c,o.title,x+22,y+28,{size:16,col:CL.chalk,align:'left',font:'marker',weight:600});
+  return{x,y,w,h};
+}
+function pill(c,x,y,w,h,label,col,p=1,o={}){
+  if(p<=0)return;c.save();c.globalAlpha=p;rr(c,x,y,w,h,h/2);c.fillStyle=rgba(col,o.fa??.16);c.fill();c.strokeStyle=col;c.lineWidth=1.6;c.stroke();c.restore();
+  txt(c,label,x+w/2,y+h/2,{size:o.size||12,font:o.font||'mono',col:o.tc||CL.chalk,a:p,weight:700});
+}
+function edPanel(c,x,y,w,h,name,p=1,o={}){
+  if(p<=0)return;const a=Math.min(1,p),acc=o.acc||CL.violet;
+  c.save();c.globalAlpha=a;
+  rr(c,x,y,w,h,12);c.fillStyle='#0b0b14';c.fill();
+  c.save();rr(c,x,y,w,h,12);c.clip();c.fillStyle='rgba(255,255,255,.05)';c.fillRect(x,y,w,30);c.fillStyle=rgba(acc,.6);c.fillRect(x,y+30,w,1.5);c.restore();
+  c.strokeStyle='rgba(255,255,255,.13)';c.lineWidth=1.2;rr(c,x,y,w,h,12);c.stroke();
+  ['#fb7185','#fbbf24','#34d399'].forEach((k,i)=>{c.fillStyle=k;c.beginPath();c.arc(x+16+i*14,y+15,4,0,7);c.fill()});
+  c.restore();
+  txt(c,name,x+w-16,y+15,{size:11,font:'mono',col:CL.dim,align:'right',a,weight:600});
+}
+
+/* Syntax Tokenizer */
+const PYC={k:null,t:'#67e8f9',s:'#34d399',n:'#fbbf24',c:'#6b6b85',p:'#a855f7',f:'#a5b4fc','':'#eef0ff'};
+function pyTok(src){
+  const re=/(#[^\n]*)|("(?:[^"\\\n]|\\.)*"|'(?:[^'\\\n]|\\.)*')|\b(\d+(?:\.\d+)?j?)\b|\b(class|def|return|if|elif|else|for|while|in|and|or|not|break|continue|import|from|pass|lambda|del)\b|\b(True|False|None|self|super)\b|\b(int|str|float|bool|list|set|dict|tuple|range)\b(?!\()|\b([A-Za-z_]\w*)(?=\()/g;
+  const out=[];let last=0,m;
+  while((m=re.exec(src))){
+    if(m.index>last)out.push([src.slice(last,m.index),'']);
+    const cls=m[1]?'c':m[2]?'s':m[3]?'n':m[4]?'k':m[5]?'p':m[6]?'t':'f';
+    out.push([m[0],cls]);last=m.index+m[0].length;
+  }
+  if(last<src.length)out.push([src.slice(last),'']);
+  return out;
+}
+function drawCode(c,x,y,lines,o={}){
+  const{size=13,lh=24,f=1e9,start=0,per=30,active=null,a=1}=o;
+  c.save();c.font=`500 ${size}px ${FONTS.mono}`;if('letterSpacing' in c)c.letterSpacing='.3px';
+  c.textAlign='left';c.textBaseline='middle';
+  lines.forEach((ln,i)=>{
+    const p=at(f,start+i*per,start+i*per+per*.9);if(p<=0||!ln)return;
+    let n=Math.ceil(ln.length*p),cx=x;
+    c.globalAlpha=a*((active&&!active.includes(i))?.4:1);
+    for(const[t,cl]of pyTok(ln)){
+      if(n<=0)break;const part=t.slice(0,n);n-=t.length;
+      c.fillStyle=cl==='k'?PC:PYC[cl];c.fillText(part,cx,y+i*lh);cx+=c.measureText(part).width;
+    }
+  });
+  c.restore();
+}
+
+function terminal(c,x,y,w,h,f,lines,o={}){
+  const{start=26,speed=.5,pause=18,title='Expected output'}=o;
+  const p=ease(at(f,0,30));
+  c.save();c.globalAlpha=p;
+  rr(c,x,y,w,h,14);c.fillStyle='#0b0b14';c.fill();
+  c.save();rr(c,x,y,w,h,14);c.clip();c.fillStyle='rgba(255,255,255,.05)';c.fillRect(x,y,w,36);c.restore();
+  c.strokeStyle=rgba(PC,.6);c.lineWidth=1.6;rr(c,x,y,w,h,14);c.stroke();
+  ['#fb7185','#fbbf24','#34d399'].forEach((k,i)=>{c.fillStyle=k;c.beginPath();c.arc(x+22+i*18,y+18,5,0,7);c.fill()});
+  c.restore();
+  txt(c,title,x+w-18,y+18,{size:11.5,col:CL.dim,align:'right',a:p});
+  const lh=Math.min(32,(h-76)/lines.length);
+  let t=(f-start)*speed,ly=y+34+lh*.9+12,last=null,cur=null;
+  lines.forEach(seg=>{
+    const len=seg.reduce((n,s)=>n+s[0].length,0);
+    if(t>0){
+      let budget=Math.min(len,Math.floor(t)),cx=x+22;
+      seg.forEach(([tx,ck])=>{
+        const part=tx.slice(0,Math.max(0,budget));budget-=tx.length;
+        if(part){c.save();c.font=`500 15px ${FONTS.mono}`;if('letterSpacing' in c)c.letterSpacing='.3px';c.fillStyle=CL[ck]||CL.chalk;c.textAlign='left';c.textBaseline='middle';c.fillText(part,cx,ly);cx+=c.measureText(part).width;c.restore()}
+      });
+      last=[cx,ly];
+      if(t<len+pause*speed)cur=[cx,ly];
+    }
+    t-=len+pause*speed;ly+=lh;
+  });
+  const cp=cur||last;
+  if(cp&&Math.floor(f/24)%2===0){c.fillStyle=PC;c.fillRect(cp[0]+3,cp[1]-9,9,18)}
+}
+
+/* ═══════════════ Canvas Whiteboard Visualisations ═══════════════ */
+const VIZ={};
+
+/* Hero Tokens */
+VIZ.tokens={cycle:100000,draw(c,W,H,f){
+  const T=['class','object','__init__','self','inheritance','super()','override','__private','methods','del','state','behaviour'];
+  T.forEach((t,i)=>{
+    const sx=((i*137.5)%100)/100,sy=((i*61.8)%100)/100;
+    const x=W*sx+Math.sin(f*.01+i)*18,y=(((H*sy-f*(.12+(i%4)*.05))%H)+H)%H;
+    txt(c,t,x,y,{size:15+(i%3)*4,col:i%2?PC:PC2,a:.1+.08*Math.sin(f*.02+i),font:'mono',weight:700});
+  });
+}};
+
+/* 2 — Roadmap (4x4 Grid) */
+VIZ.ooproad={cycle:720,draw(c,W,H,f,frame){
+  const b=board(c,W,H,{title:'Session 02: Object-Oriented Programming (OOP) Roadmap',frame});
+  const T=[
+    ['Factorial & Loop',0],['Concept & Blueprint',0],['Classes & Instances',1],['Instantiation Flow',1],
+    ['__init__() Constructor',2],['The self Parameter',2],['Object Methods',2],['Modifying Props',3],
+    ['del Attribute',3],['del Object Instance',3],['Inheritance Core',4],['super() Function',4],
+    ['Method Overriding',5],['Polymorphism Flow',5],['Encapsulation & __c',5]
+  ];
+  const col=[CL.cyan,CL.violet,CL.amber,CL.green,CL.pink,CL.indigo];
+  const gx=14,gy=14,cw=220,ch=44;
+  const x0=b.x+Math.floor((b.w-(4*cw+3*gx))/2);
+  const y0=b.y+62;
+  
+  T.forEach(([n,g],i)=>{
+    const r=Math.floor(i/4),k=i%4,x=x0+k*(cw+gx),y=y0+r*(ch+gy),p=at(f,10+i*14,40+i*14);
+    const on=f>=260&&(Math.floor((f-260)/24)%15===i);
+    mbox(c,x,y,cw,ch,p,col[g],on?.32:.08);
+    txt(c,String(i+1).padStart(2,'0'),x+16,y+ch/2,{size:11,font:'mono',col:col[g],a:ease(p),align:'left',weight:800});
+    txt(c,n,x+40,y+ch/2,{size:11.5,font:'marker',a:ease(at(f,30+i*14,60+i*14)),col:CL.chalk,align:'left'});
+  });
+  txt(c,'Mastering Blueprints, State, Behavior & The 4 OOP Pillars in Python',b.x+b.w/2,b.y+b.h-22,{size:13,col:PC,font:'marker',a:ease(at(f,240,280))});
+}};
+
+/* 5 — Blueprint Metaphor */
+VIZ.blueprint={cycle:760,draw(c,W,H,f,frame){
+  const b=board(c,W,H,{title:'Class (The Architectural Blueprint) → Objects (Living Instances)',frame});
+  const bx=b.x+40,by=b.y+65,bw=320,bh=215;
+  mbox(c,bx,by,bw,bh,at(f,10,50),CL.cyan,.08);
+  txt(c,'BLUEPRINT (Class)',bx+20,by+24,{size:13,font:'mono',col:CL.cyan,align:'left',weight:800});
+  txt(c,'class Person:',bx+20,by+58,{size:15,font:'mono',col:PC,align:'left',weight:700});
+  txt(c,'  attributes: name, age',bx+34,by+92,{size:13,font:'mono',col:CL.dim,align:'left'});
+  txt(c,'  methods: myfunc()',bx+34,by+122,{size:13,font:'mono',col:CL.dim,align:'left'});
+  txt(c,'Single logical constructor blueprint',bx+20,by+175,{size:12,font:'marker',col:CL.amber,align:'left'});
+
+  const ox=b.x+b.w-370,ow=330;
+  const p1=at(f,120,180),p2=at(f,240,300);
+  arrow(c,[[bx+bw,by+60],[ox,by+60]],p1,CL.violet,2);
+  arrow(c,[[bx+bw,by+155],[ox,by+155]],p2,CL.pink,2);
+
+  mbox(c,ox,by+15,ow,84,p1,CL.violet,.14);
+  txt(c,'Instance p1 = Person("John", 36)',ox+18,by+40,{size:12.5,font:'mono',col:CL.chalk,align:'left',weight:700});
+  txt(c,'State: p1.name = "John", p1.age = 36',ox+18,by+68,{size:12,font:'mono',col:CL.green,align:'left'});
+
+  mbox(c,ox,by+115,ow,84,p2,CL.pink,.14);
+  txt(c,'Instance p2 = Person("Mike", 25)',ox+18,by+140,{size:12.5,font:'mono',col:CL.chalk,align:'left',weight:700});
+  txt(c,'State: p2.name = "Mike", p2.age = 25',ox+18,by+168,{size:12,font:'mono',col:CL.green,align:'left'});
+
+  txt(c,'A Class is the recipe. Objects are the actual instances allocated in memory.',b.x+b.w/2,b.y+b.h-26,{size:13.5,col:PC,font:'marker',a:ease(at(f,320,380))});
+}};
+
+/* 7 — Self Binding */
+VIZ.selfbind={cycle:760,draw(c,W,H,f,frame){
+  const b=board(c,W,H,{title:'How Python Resolves `self` Under the Hood',frame});
+  const lx=b.x+30,ly=b.y+65,lw=470;
+  edPanel(c,lx,ly,lw,185,'instance_call.py',at(f,0,30),{acc:CL.violet});
+  const codeLines=[
+    'p1 = Person("John", 36)',
+    '',
+    '# When you write this:',
+    'p1.myfunc()',
+    '',
+    '# Python translates it into:',
+    'Person.myfunc(p1)  # self receives p1'
+  ];
+  drawCode(c,lx+24,ly+56,codeLines,{f,start:10,per:30,size:13,lh:20});
+
+  const rx=lx+lw+24,rw=b.x+b.w-rx-30;
+  mbox(c,rx,ly,rw,185,at(f,100,160),CL.amber,.1);
+  txt(c,'MEMORY DISPATCH',rx+20,ly+24,{size:11.5,font:'mono',col:CL.amber,align:'left',weight:800});
+  txt(c,'self = Calling Instance',rx+20,ly+58,{size:13,font:'mono',col:CL.chalk,align:'left',weight:700});
+  txt(c,'• Must be the 1st parameter',rx+20,ly+92,{size:12,font:'ui',col:CL.ts,align:'left'});
+  txt(c,'• Can be named anything',rx+20,ly+116,{size:12,font:'ui',col:CL.ts,align:'left'});
+  txt(c,'  (e.g., mysillyobject)',rx+20,ly+138,{size:11.5,font:'mono',col:CL.dim,align:'left'});
+
+  const pt=at(f,280,340);
+  txt(c,'`self` allows methods to access and modify the specific attributes of that calling instance.',b.x+b.w/2,b.y+b.h-26,{size:13.5,col:PC,font:'marker',a:ease(pt)});
+}};
+
+/* 9 — Del Animation */
+VIZ.delanim={cycle:760,draw(c,W,H,f,frame){
+  const b=board(c,W,H,{title:'Dynamic Mutation & `del` Keyword Lifecycle',frame});
+  const cx=b.x+40,cy=b.y+65,cw=450,ch=190;
+  mbox(c,cx,cy,cw,ch,at(f,0,40),CL.violet,.08);
+  txt(c,'p1 = Person("John", 36)',cx+20,cy+28,{size:13,font:'mono',col:CL.violet,align:'left',weight:700});
+  
+  const stepA=f>=80,stepB=f>=240,stepC=f>=440;
+  txt(c,'1. p1.age = 40  → Modifies age to 40',cx+20,cy+66,{size:12.5,font:'mono',col:stepA?CL.green:CL.dim,align:'left'});
+  txt(c,'2. del p1.age   → Removes attribute completely',cx+20,cy+104,{size:12.5,font:'mono',col:stepB?CL.amber:CL.dim,align:'left'});
+  txt(c,'3. del p1       → Destroys object reference',cx+20,cy+142,{size:12.5,font:'mono',col:stepC?CL.pink:CL.dim,align:'left'});
+
+  const rx=cx+cw+24,rw=b.x+b.w-rx-30;
+  edPanel(c,rx,cy,rw,ch,'exceptions_log',at(f,20,60),{acc:CL.pink});
+  if(f>=300){
+    txt(c,'print(p1.age)',rx+20,cy+52,{size:11.5,font:'mono',col:CL.chalk,align:'left'});
+    txt(c,'AttributeError:',rx+20,cy+72,{size:12,font:'mono',col:CL.pink,align:'left',weight:700});
+    txt(c,"'Person' object has no 'age'",rx+20,cy+92,{size:10.5,font:'mono',col:CL.dim,align:'left'});
+  }
+  if(f>=500){
+    txt(c,'print(p1)',rx+20,cy+128,{size:11.5,font:'mono',col:CL.chalk,align:'left'});
+    txt(c,'NameError:',rx+20,cy+148,{size:12,font:'mono',col:CL.pink,align:'left',weight:700});
+    txt(c,"name 'p1' is not defined",rx+20,cy+168,{size:10.5,font:'mono',col:CL.dim,align:'left'});
+  }
+  txt(c,'Deleting an attribute leaves the instance intact; deleting the instance clears the reference.',b.x+b.w/2,b.y+b.h-26,{size:13.5,col:PC,font:'marker',a:ease(at(f,560,620))});
+}};
+
+/* 10 — Inheritance Architecture Tree */
+VIZ.inhtree={cycle:760,draw(c,W,H,f,frame){
+  const b=board(c,W,H,{title:'Inheritance Architecture: Base (Parent) → Derived (Child)',frame});
+  const px=b.x+b.w/2-140,py=b.y+54,pw=280,ph=80;
+  mbox(c,px,py,pw,ph,at(f,10,50),CL.indigo,.12);
+  txt(c,'PARENT CLASS: Person',px+pw/2,py+25,{size:13,font:'mono',col:CL.indigo,weight:800});
+  txt(c,'attributes: firstname, lastname',px+pw/2,py+46,{size:11.5,font:'mono',col:CL.chalk});
+  txt(c,'method: printname()',px+pw/2,py+64,{size:11.5,font:'mono',col:CL.dim});
+
+  const pArrow=at(f,120,180);
+  arrow(c,[[px+pw/2,py+ph],[px+pw/2,py+ph+50]],pArrow,CL.violet,2.5);
+
+  const cx=px,cy=py+ph+50,cw=pw,ch=95;
+  mbox(c,cx,cy,cw,ch,at(f,170,220),CL.green,.12);
+  txt(c,'CHILD CLASS: Student(Person)',cx+cw/2,cy+24,{size:13,font:'mono',col:CL.green,weight:800});
+  txt(c,'inherits all methods & properties',cx+cw/2,cy+46,{size:11.5,font:'ui',col:CL.ts});
+  txt(c,'+ adds: graduationyear',cx+cw/2,cy+66,{size:11.5,font:'mono',col:CL.amber});
+  txt(c,'+ adds: welcome() method',cx+cw/2,cy+84,{size:11.5,font:'mono',col:CL.cyan});
+
+  txt(c,'super().__init__(fname, lname) delegates constructor execution directly to the parent class.',b.x+b.w/2,b.y+b.h-26,{size:13.5,col:PC,font:'marker',a:ease(at(f,280,340))});
+}};
+
+/* 13 — Polymorphism Dispatch */
+VIZ.polydisp={cycle:760,draw(c,W,H,f,frame){
+  const b=board(c,W,H,{title:'Polymorphism & Method Overriding in Action',frame});
+  const leftX = b.x + 36;
+  const childW = 275, childH = 76, childGap = 20;
+  const s1x = leftX, s1y = b.y + 160;
+  const s2x = s1x + childW + childGap, s2y = s1y;
+  
+  const parentW = 300, parentH = 58;
+  const bx = Math.round(s1x + (childW * 2 + childGap - parentW) / 2);
+  const by = b.y + 60;
+
+  mbox(c, bx, by, parentW, parentH, at(f,10,40), CL.dim, .1);
+  txt(c, 'class Bird: flight()', bx + parentW/2, by + parentH/2, {size:13, font:'mono', col:CL.chalk, weight:700});
+
+  mbox(c, s1x, s1y, childW, childH, at(f,80,120), CL.cyan, .14);
+  txt(c, 'class sparrow(Bird):', s1x + childW/2, s1y + 24, {size:12, font:'mono', col:CL.cyan, weight:700});
+  txt(c, 'flight() -> "Sparrows can fly."', s1x + childW/2, s1y + 52, {size:11, font:'mono', col:CL.green});
+
+  mbox(c, s2x, s2y, childW, childH, at(f,140,180), CL.pink, .14);
+  txt(c, 'class ostrich(Bird):', s2x + childW/2, s2y + 24, {size:12, font:'mono', col:CL.pink, weight:700});
+  txt(c, 'flight() -> "Ostriches cannot fly."', s2x + childW/2, s2y + 52, {size:11, font:'mono', col:CL.pink});
+
+  arrow(c, [[bx + 75, by + parentH], [s1x + childW/2, s1y]], at(f,60,100), CL.dim, 1.8);
+  arrow(c, [[bx + parentW - 75, by + parentH], [s2x + childW/2, s2y]], at(f,100,140), CL.dim, 1.8);
+
+  const rx = s2x + childW + 28, ry = by, rw = b.x + b.w - rx - 24, rh = 180;
+  edPanel(c, rx, ry, rw, rh, 'uniform_dispatch.py', at(f,180,220), {acc:CL.green});
+  const codeLines=['for bird in [sparrow(), ostrich()]:', '    bird.flight()'];
+  drawCode(c, rx + 18, ry + 56, codeLines, {f, start:210, per:40, size:12, lh:24});
+  if(f >= 340){
+    txt(c, 'Output:', rx + 18, ry + 120, {size:11, font:'mono', col:CL.dim, align:'left'});
+    txt(c, 'Sparrows can fly.', rx + 18, ry + 140, {size:11.5, font:'mono', col:CL.green, align:'left'});
+    txt(c, 'Ostriches cannot fly.', rx + 18, ry + 158, {size:11.5, font:'mono', col:CL.pink, align:'left'});
+  }
+  txt(c, 'Same method name across different classes produces specialized subtype behaviors.', b.x + b.w/2, b.y + b.h - 22, {size:13, col:PC, font:'marker', a:ease(at(f,380,440))});
+}};
+
+/* 15 — Encapsulation Shield (Fixed Terminal Box Sequence & Text Sync) */
+VIZ.encapanim = {
+  cycle: 760,
+  draw(c, W, H, f, frame) {
+    const b = board(c, W, H, {
+      title: 'Encapsulation & Private Members (`__c`)',
+      frame
+    });
+
+    const cx = b.x + 40, cy = b.y + 65, cw = 380, ch = 195;
+    mbox(c, cx, cy, cw, ch, at(f, 10, 50), CL.violet, 0.09);
+    txt(c, 'OBJECT CONTAINER (Base)', cx + 20, cy + 28, {
+      size: 12.5,
+      font: 'mono',
+      col: CL.violet,
+      align: 'left',
+      weight: 800
+    });
+
+    pill(c, cx + 25, cy + 60, 330, 38, 'self.a = "Public"  (Accessible)', CL.green, at(f, 40, 80), { size: 12 });
+    pill(c, cx + 25, cy + 118, 330, 38, 'self.__c = "Private" (Protected)', CL.pink, at(f, 90, 130), { size: 12 });
+
+    const rx = cx + cw + 35;
+    const rw = b.x + b.w - rx - 35;
+    const pPan = ease(at(f, 100, 140));
+
+    edPanel(c, rx, cy, rw, ch, 'access_test.py', pPan, { acc: CL.pink });
+
+    if (f >= 140) {
+      const pCode = ease(at(f, 140, 180));
+      txt(c, 'obj = Base()', rx + 20, cy + 48, { size: 12, font: 'mono', col: CL.chalk, align: 'left', a: pCode });
+      txt(c, 'print(obj.a)   # OK', rx + 20, cy + 74, { size: 12, font: 'mono', col: CL.green, align: 'left', a: pCode });
+      txt(c, 'print(obj.__c) # ERROR!', rx + 20, cy + 104, { size: 12, font: 'mono', col: CL.pink, align: 'left', weight: 700, a: pCode });
+    }
+
+    if (f >= 220) {
+      const pErr = ease(at(f, 220, 250));
+      txt(c, 'AttributeError:', rx + 20, cy + 138, { size: 12, font: 'mono', col: CL.pink, align: 'left', weight: 800, a: pErr });
+      txt(c, "'Base' has no attribute '__c'", rx + 20, cy + 160, { size: 11, font: 'mono', col: CL.dim, align: 'left', a: pErr });
+    }
+
+    txt(c, 'Name mangling prevents direct outside modification. Data is guarded inside the class!', b.x + b.w / 2, b.y + b.h - 26, {
+      size: 13.5,
+      col: PC,
+      font: 'marker',
+      a: ease(at(f, 280, 340))
+    });
+  }
+};
+
+/* 17 — Inverted Pyramid (Base on Top: Next Session, Apex at Bottom: Pillars Reversed, Centered Content) */
+VIZ.oopclose = {
+  cycle: 720,
+  draw(c, W, H, f, frame) {
+    const b = board(c, W, H, {
+      title: 'The 4 Pillars of OOP Mastered in Session 02',
+      frame
+    });
+
+    const cardH = 40;
+    const gap = 11;
+    const startY = b.y + 60;
+
+    // 1. أعلى الهرم: القاعدة الأوسع وتحتوي على بنر الجلسة القادمة (Next Session)
+    const bannerTxt = 'Next Session: Advanced Python & Multimedia Applications';
+    const bannerW = 880;
+    const bannerX = Math.round(b.x + (b.w - bannerW) / 2);
+    const bannerY = startY;
+    const pt = at(f, 10, 50);
+
+    mbox(c, bannerX, bannerY, bannerW, cardH, pt, PC, 0.16 + 0.08 * Math.sin(f * 0.06));
+    txt(c, bannerTxt, b.x + b.w / 2, bannerY + cardH / 2, {
+      size: 13,
+      font: 'ui',
+      col: PC,
+      align: 'center',
+      a: ease(at(f, 25, 65)),
+      weight: 800
+    });
+
+    // 2. المحتوى يتدرج نزولاً حتى الرأس في الأسفل، مع توسيط الكلام تماماً في المنتصف
+    const L = [
+      { text: '1. Encapsulation: Bundling data & restricting direct access (__private)', col: CL.cyan,   w: 790 },
+      { text: '2. Abstraction: Hiding complex implementation details behind interfaces', col: CL.violet, w: 700 },
+      { text: '3. Inheritance: Reusing parent blueprints via super() & extension',     col: CL.amber,  w: 610 },
+      { text: '4. Polymorphism: Uniform interface with specialized child overrides',     col: CL.green,  w: 520 }
+    ];
+
+    L.forEach((item, i) => {
+      const x = Math.round(b.x + (b.w - item.w) / 2);
+      const y = startY + (i + 1) * (cardH + gap);
+      const p = at(f, 30 + i * 35, 75 + i * 35);
+
+      mbox(c, x, y, item.w, cardH, p, item.col, 0.12);
+
+      const textAlpha = ease(at(f, 50 + i * 35, 95 + i * 35));
+
+      // وضع النص كاملاً في منتصف الصندوق أفقياً ورأسياً
+      txt(c, item.text, x + item.w / 2, y + cardH / 2, {
+        size: 12.5,
+        font: 'ui',
+        col: CL.chalk,
+        weight: 700,
+        align: 'center',
+        a: textAlpha
+      });
+    });
+  }
+};
+
+VIZ.terminal={cycle:560,draw(c,W,H,f,frame,o){
+  const h=Math.min(H-8,Math.max(200,o.data.lines.length*34+90));
+  terminal(c,4,(H-h)/2,W-8,h,f,o.data.lines,{title:o.data.title||'Expected output'});
+}};
+
+/* ═══════════════ Code Walkthroughs & Reference Data ═══════════════ */
+const CODE={
+t1:`def factorial(n):
+    result = 1
+    for i in range(1, n + 1):
+        result *= i
+    return result
+
+num = int(input("Enter a number: "))
+print("Factorial of", num, "is", factorial(num))`,
+t2:`def evenOddChecker():
+    while True:
+        num = int(input("Enter a number: "))
+        if num % 2 == 0:
+            print(num, "is Even")
+        else:
+            print(num, "is Odd")
+            
+        prompt = "Do you want to check another number? (yes/no): "
+        choice = input(prompt).lower()
+        if choice != "yes":
+            print("Thanks for using Even/Odd Checker")
+            break
+
+evenOddChecker()`,
+w_class:`class MyClass:
+    # Class Attribute (shared across all instances)
+    category = "Blueprint Example"
+    x = 5
+
+print(MyClass)
+# Instantiating an object
+p1 = MyClass()
+print("Value of x:", p1.x)
+print("Is p1 a MyClass instance?", isinstance(p1, MyClass))`,
+w_init:`class Person:
+    def __init__(self, name, age):
+        # Instance Attributes (unique to each object)
+        self.name = name
+        self.age = age
+
+    def myfunc(self):
+        print("Hello my name is " + self.name)
+        
+    def __str__(self):
+        return f"Person({self.name}, {self.age})"
+
+p1 = Person("John", 36)
+print(p1)  # Clean string representation
+p1.myfunc()`,
+w_inh:`class Person:
+    def __init__(self, fname, lname):
+        self.firstname = fname
+        self.lastname = lname
+    def printname(self):
+        print(self.firstname, self.lastname)
+
+class Student(Person):
+    def __init__(self, fname, lname, year):
+        # super() delegates to Parent constructor cleanly
+        super().__init__(fname, lname)
+        self.graduationyear = year
+    def welcome(self):
+        print("Welcome", self.firstname, self.lastname, "to class of", self.graduationyear)
+
+x = Student("Mike", "Olsen", 2019)
+x.printname()
+x.welcome()`,
+w_poly:`class Bird:
+    def flight(self):
+        print("Most of the birds can fly but some cannot.")
+
+class sparrow(Bird):
+    def flight(self):
+        print("Sparrows can fly.")
+
+class ostrich(Bird):
+    def flight(self):
+        print("Ostriches cannot fly.")
+
+# Uniform Interface: polymorphic dispatch
+for b in (Bird(), sparrow(), ostrich()):
+    b.flight()`,
+w_encap:`class Base:
+    def __init__(self):
+        self.a = "Public Geeks"
+        self.__c = "Private Geeks"  # Name-mangled to _Base__c
+
+obj = Base()
+print("Public member:", obj.a)
+
+# Accessing obj.__c directly raises AttributeError
+# To access safely, use class methods or obj._Base__c`,
+c1:`class Counter:
+    def __init__(self):
+        self.count = 10
+        self.__secret = 42
+
+c = Counter()
+del c.count
+print(hasattr(c, "count"))`
+};
+
+const TASKS={
+t1:{n:1,req:['Implement <code>def factorial(n):</code> using an iterative loop','Initialize accumulator <code>result = 1</code>','Loop from <code>1</code> to <code>n + 1</code> multiplying <code>result *= i</code>','Return <code>result</code> and test with user input'],
+  lines:[[['Enter a number: ','dim'],['5','amber']],[['Factorial of 5 is 120','green']]],
+  notes:['Accumulator starts at 1 (not 0, else all multiplications yield 0).','<code>range(1, n + 1)</code> ensures $n$ is included.','Factorial $0!$ returns 1 as the loop range is empty.']},
+t2:{n:2,req:['Build continuous loop with <code>while True:</code>','Test parity with modulo: <code>num % 2 == 0</code>','Prompt user <code>choice = input(...).lower()</code>','Break and exit with thank you message if choice is not "yes"'],
+  title:'Interactive Number Parity Checker',
+  lines:[[['Enter a number: ','dim'],['8','amber']],[['8 is Even','green']],[['Do you want to check another number? (yes/no): ','dim'],['yes','amber']],[['Enter a number: ','dim'],['7','amber']],[['7 is Odd','green']],[['Do you want to check another number? (yes/no): ','dim'],['no','amber']],[['Thanks for using Even/Odd Checker','pink']]],
+  notes:['<code>num % 2 == 0</code>: even numbers have zero remainder when divided by 2.','<code>choice.lower()</code> allows handling "Yes", "YES", or "yes".','<code>break</code> stops the infinite loop immediately.']}
+};
+
+/* ═══════════════ Fully Calibrated Trace Steps ═══════════════ */
+const WALK = {
+  class_obj: {
+    code: 'w_class',
+    file: 'class_intro.py',
+    steps: [
+      {
+        lines: [1, 2, 3, 4],
+        h: 'Class Attributes vs Blueprint',
+        t: `<code>category</code> and <code>x = 5</code> belong to the class blueprint itself.`
+      },
+      {
+        lines: [6],
+        h: 'Class Identity',
+        t: `<code>print(MyClass)</code> prints constructor type: <code>&lt;class '__main__.MyClass'&gt;</code>.`
+      },
+      {
+        lines: [7, 8, 9],
+        h: 'Object Instantiation',
+        t: `<code>p1 = MyClass()</code> allocates memory. <code>p1.x</code> accesses the property.`
+      },
+      {
+        lines: [10],
+        h: 'Type Introspection',
+        t: `<code>isinstance(p1, MyClass)</code> checks relationship and returns <b>True</b>.`
+      }
+    ]
+  },
+  init_self: {
+    code: 'w_init',
+    file: 'person_class.py',
+    steps: [
+      {
+        lines: [1, 2, 3, 4, 5],
+        h: '__init__() Constructor',
+        t: `Executes automatically upon creation. Sets independent instance state.`
+      },
+      {
+        lines: [7, 8],
+        h: 'Instance Method & self',
+        t: `<code>myfunc(self)</code> binds explicitly to the calling instance.`
+      },
+      {
+        lines: [10, 11],
+        h: '__str__() String Representation',
+        t: `Dunder method defining how <code>print(p1)</code> renders cleanly.`
+      },
+      {
+        lines: [13, 14, 15],
+        h: 'Object Lifecycle',
+        t: `Instantiates John (36), prints formatted string, and executes method.`
+      }
+    ]
+  },
+  inh_super: {
+    code: 'w_inh',
+    file: 'inheritance.py',
+    steps: [
+      {
+        lines: [1, 2, 3, 4, 5, 6],
+        h: 'Parent (Base) Class',
+        t: `<code>Person</code> handles basic identity: firstname, lastname, and <code>printname()</code>.`
+      },
+      {
+        lines: [8, 9, 10, 11, 12],
+        h: 'Child Class & super()',
+        t: `<code>class Student(Person):</code> inherits from Person. <code>super().__init__()</code> delegates construction.`
+      },
+      {
+        lines: [13, 14],
+        h: 'Extending Behavior',
+        t: `Adds <code>graduationyear</code> and a custom <code>welcome()</code> method.`
+      },
+      {
+        lines: [16, 17, 18],
+        h: 'Execution',
+        t: `<code>x = Student("Mike", "Olsen", 2019)</code> runs both inherited and child methods.`
+      }
+    ]
+  },
+  poly_walk: {
+    code: 'w_poly',
+    file: 'polymorphism.py',
+    steps: [
+      {
+        lines: [1, 2, 3],
+        h: 'Base Class Method',
+        t: `<code>Bird.flight()</code> provides general default behavior.`
+      },
+      {
+        lines: [5, 6, 7, 9, 10, 11],
+        h: 'Method Overriding',
+        t: `Both <code>sparrow</code> and <code>ostrich</code> override <code>flight()</code> with custom logic.`
+      },
+      {
+        lines: [13, 14, 15],
+        h: 'Polymorphic Dispatch',
+        t: `Iterating across diverse objects calling <code>b.flight()</code> invokes the respective class version.`
+      }
+    ]
+  },
+  encap_walk: {
+    code: 'w_encap',
+    file: 'encapsulation.py',
+    steps: [
+      {
+        lines: [1, 2, 3, 4],
+        h: 'Public vs Private (__c)',
+        t: `<code>self.a</code> is public. <code>self.__c</code> uses double underscores (Name-mangled).`
+      },
+      {
+        lines: [6, 7],
+        h: 'Public Access',
+        t: `<code>print(obj.a)</code> works normally and prints 'Public Geeks'.`
+      },
+      {
+        lines: [9, 10],
+        h: 'AttributeError Restriction',
+        t: `Accessing <code>obj.__c</code> directly raises an <code>AttributeError</code>.`
+      }
+    ]
+  }
+};
+
+const HERO=`
+<div class="lbl">Sinai University · Faculty of Information Technology and Computer Science</div>
+<h1><em>Multimedia</em></h1>
+<div class="tag">Session ⇔ 02 · Python OOP: Classes, Objects, Inheritance, Polymorphism &amp; Encapsulation</div>
+<div class="inst"><div class="avatar">M</div><div><small>Instructor</small><b>Muhammad Ali Abdul Kareem</b></div></div>
+<div class="chips"><span>Problem Solving</span><span>Classes &amp; Objects</span><span>__init__ &amp; self</span><span>del Keyword</span><span>Inheritance &amp; super()</span><span>Polymorphism</span><span>Encapsulation</span></div>`;
+
+const SL=[
+{part:'part-intro',hero:true,next:'Where are we heading today?'},
+{part:'part-intro',lbl:'Session 02 Roadmap',h2:`Object-Oriented Programming: <em>What We Will Cover</em>`,sub:`From warm-up algorithmic problems to mastering the 4 pillars of OOP in Python.`,viz:'ooproad',next:'Algorithmic warm-up: Factorial'},
+{part:'part-warm',task:'t1',lbl:'Problem 01 · Accumulator',h2:`Problem 1: <em>Factorial Function</em>`,sub:`Calculate $n!$ iteratively. Try it yourself first, then inspect the reference solution.`,next:'Next problem: Parity checker'},
+{part:'part-warm',task:'t2',lbl:'Problem 02 · Interactive Loops',h2:`Problem 2: <em>Even/Odd Number Checker</em>`,sub:`Continuous user input loop using <code>while True:</code> and modulo remainder.`,next:'Now entering OOP'},
+{part:'part-class',lbl:'Introduction to OOP',h2:`The Object-Oriented <em>Paradigm</em>`,sub:`Structuring software into reusable blueprints (classes) that create individual instances (objects).`,viz:'blueprint',next:'Classes and objects in code'},
+{part:'part-class',walk:'class_obj',lbl:'Classes & Objects · In Code',h2:`Class Definition &amp; <em>Object Creation</em>`,sub:`Creating <code>MyClass</code> with class attributes and checking instances with <code>isinstance()</code>.`,next:'Constructors: __init__()'},
+{part:'part-meth',lbl:'Constructors & Methods',h2:`The <em>__init__()</em> Function &amp; <em>self</em>`,sub:`How Python initializes instances automatically and binds the current object reference.`,viz:'selfbind',next:'See constructors in code'},
+{part:'part-meth',walk:'init_self',lbl:'Methods & self · In Code',h2:`Constructors &amp; Methods <em>in Code</em>`,sub:`The <code>Person</code> class with instance attributes, methods, and <code>__str__()</code>.`,next:'Modifying & deleting properties'},
+{part:'part-props',lbl:'Object Lifecycle',h2:`Modifying &amp; <em>Deleting Properties</em>`,sub:`Reassigning values, deleting attributes with <code>del</code>, and instance destruction.`,viz:'delanim',next:'First Pillar: Inheritance'},
+{part:'part-inh',lbl:'Inheritance · Architecture',h2:`Base Class &amp; <em>Derived Class</em>`,sub:`Inherit all methods and properties from a parent class without duplicating code.`,viz:'inhtree',next:'See inheritance & super() in code'},
+{part:'part-inh',walk:'inh_super',lbl:'Inheritance · In Code',h2:`Inheritance &amp; <em>super()</em> in Code`,sub:`Creating <code>Student(Person)</code> and calling <code>super().__init__()</code>.`,next:'Second Pillar: Polymorphism'},
+{part:'part-poly',lbl:'Polymorphism · Concept',h2:`Polymorphism &amp; <em>Method Overriding</em>`,sub:`Re-implementing a parent method in a child class with customized behavior.`,viz:'polydisp',next:'See polymorphism in code'},
+{part:'part-poly',walk:'poly_walk',lbl:'Polymorphism · In Code',h2:`Polymorphism &amp; Overriding <em>in Code</em>`,sub:`Unified interface <code>bird.flight()</code> with specialized sparrow and ostrich classes.`,next:'Third Pillar: Encapsulation'},
+{part:'part-encap',lbl:'Encapsulation · Concept',h2:`Encapsulation &amp; <em>Private Members</em>`,sub:`Wrapping data within a unit and restricting access via double underscore <code>__c</code>.`,viz:'encapanim',next:'See encapsulation in code'},
+{part:'part-encap',walk:'encap_walk',lbl:'Encapsulation · In Code',h2:`Encapsulation <em>in Code</em>`,sub:`Prevent accidental tampering with private member variables.`,next:'Knowledge check challenge'},
+{part:'part-poly',lbl:'Mastery Challenge',h2:`Read the Code. <em>Predict the Output.</em>`,sub:`A class with constructor, property deletion, and introspection check.`,chal:true,next:'Session recap'},
+{part:'part-intro',lbl:'Recap & Synthesis',h2:`Session 02 OOP — <em>Your Mastered Toolbox</em>`,sub:`All core OOP paradigms and pillars are now ready for advanced software design.`,viz:'oopclose',next:'Thank you'}
+];
+const N=SL.length;
+
+/* ═══════════════ Highlighting & Deck Builder ═══════════════ */
+function highlight(src){
+  const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  return pyTok(src).map(([t,c])=>c?`<span class="${c}">${esc(t)}</span>`:esc(t)).join('');
+}
+const LANG='Python';
+
+const walkStyle = k => {
+  const n = CODE[k].split('\n').length;
+  let fs = n <= 7 ? 15 : n <= 10 ? 14 : n <= 13 ? 13 : n <= 16 ? 12.2 : 11.5;
+  let lh = Math.min(fs * 1.6, 320 / n);
+  if (lh < fs * 1.35) fs = lh / 1.35;
+  return `font-size:${fs.toFixed(1)}px;line-height:${lh.toFixed(1)}px`;
+};
+
+const lineCode=(k,st)=>`<pre class="code"${st?` style="${st}"`:''}>${highlight(CODE[k]).split('\n').map(l=>`<span class="ln">${l||'&nbsp;'}</span>`).join('')}</pre>`;
+const edWrap=(inner,file,codeKey)=>`<div class="codecard"><div class="ed-bar"><i style="background:#fb7185"></i><i style="background:#fbbf24"></i><i style="background:#34d399"></i><span class="ed-file">${file}</span><div class="ed-actions"><button class="cp-btn" onclick="copyCodeText('${codeKey}',this)">📋 Copy</button><span class="ed-lang">${LANG}</span></div></div><div class="ed-body">${inner}</div></div>`;
+
+function copyCodeText(k, btn){
+  if(!CODE[k]) return;
+  navigator.clipboard.writeText(CODE[k]).then(()=>{
+    const old = btn.innerHTML;
+    btn.innerHTML = '✅ Copied';
+    setTimeout(()=>{ btn.innerHTML = old; }, 2000);
+  });
+}
+
+const vp=document.getElementById('vp'),live=[];
+const dots=i=>Array.from({length:N},(_,k)=>`<i class="dot${k===i?' on':''}"></i>`).join('');
+const footer=(i,next)=>`<div class="sf"><span>Multimedia · Lab 02</span><div class="pd">${dots(i)}</div><span>${next}</span></div>`;
+
+SL.forEach((s,i)=>{
+  const el=document.createElement('section');
+  el.className='slide'+(s.hero?' hero-slide':'');
+  let h='';
+  if(s.hero){
+    h=HERO+footer(i,s.next)+'<canvas class="herobg" data-viz="tokens"></canvas>';
+  }else{
+    let stage='';
+    if(s.viz)stage=`<div class="viz"><canvas data-viz="${s.viz}"></canvas></div>`;
+    else if(s.task){
+      const T=TASKS[s.task];
+      stage=`<div class="task"><div class="tleft"><div class="chip">What to build</div><ul class="req">${T.req.map(r=>`<li>${r}</li>`).join('')}</ul></div><div class="tright"><div class="viz"><canvas data-viz="terminal" data-task="${s.task}"></canvas></div></div></div>`;
+    }else if(s.walk){
+      const W=WALK[s.walk];
+      stage=`<div class="walk${W.dense?' dense':''}">${edWrap(lineCode(W.code,walkStyle(W.code)),W.file,W.code)}<div class="steps">${W.steps.map((p,k)=>`<div class="stp" data-k="${k}"><i>${k+1}</i><div><b>${p.h}</b><span>${p.t}</span></div></div>`).join('')}</div></div>`;
+    }else if(s.chal){
+      stage=`<div class="chal" style="grid-template-columns:1fr 1fr">${edWrap(lineCode('c1','font-size:16px;line-height:1.75'),'challenge.py','c1')}<div class="col"><div class="q"><b>What is printed to the console?</b><div class="term" data-ans>&gt; <span class="typed" id="lastans"></span><i></i></div><button class="ansbtn" data-ans>Type your answer<kbd>A</kbd></button></div><div class="note" style="flex:none">Tip: What does <code>del c.count</code> do to the instance attribute? What does <code>hasattr()</code> return?</div></div></div>`;
+    }
+    h=`<div class="lbl">${s.lbl}</div><h2>${s.h2}</h2>${s.sub?`<p class="sub">${s.sub}</p>`:''}<div class="stage">${stage}</div>${footer(i,s.next)}`;
+    if(s.task){
+      const T=TASKS[s.task];
+      h+=`<button class="solbtn" data-sol>Show solution<kbd>S</kbd></button>
+      <div class="sol"><div class="sol-h"><div class="lbl">Reference solution · Problem ${T.n}</div><button class="solbtn" style="position:static" data-sol>Hide<kbd>S</kbd></button></div>
+      <div class="sol-body">${edWrap(lineCode(s.task,'font-size:13px;line-height:1.6'),'problem'+T.n+'.py',s.task)}<div class="notes"><div class="note-h">What to notice</div>${T.notes.map(n=>`<div class="note">${n}</div>`).join('')}</div></div></div>`;
+    }
+  }
+  el.innerHTML=h;vp.appendChild(el);s.el=el;
+  el.querySelectorAll('canvas[data-viz]').forEach(cv=>{
+    const def=VIZ[cv.dataset.viz];
+    live.push({cv,s:fit(cv),def,slide:i,data:cv.dataset.task?{lines:TASKS[cv.dataset.task].lines,title:TASKS[cv.dataset.task].title}:null});
+  });
+});
+
+/* ═══════════════ Modal Challenge Interaction ═══════════════ */
+const modal=document.getElementById('ansmodal'),inp=document.getElementById('ans'),fb=document.getElementById('ansfb');
+let typing=false;
+function openAns(){modal.hidden=false;typing=true;inp.value='';fb.textContent='';fb.className='ans-fb';setTimeout(()=>inp.focus(),60)}
+function closeAns(){modal.hidden=true;typing=false;inp.blur();setTimeout(layout,300)}
+const WHY='<code>del c.count</code> removes the attribute from <code>c</code>. Therefore, <code>hasattr(c, "count")</code> returns <b>False</b>.';
+function showOk(){fb.className='ans-fb ok';fb.innerHTML='<b>Output: False</b><br>'+WHY}
+function checkAns(){
+  const raw=inp.value.trim(),v=raw.toLowerCase().replace(/\s+/g,'').replace(/^>/,'');
+  if(!v){fb.className='ans-fb bad';fb.textContent='Type True or False, then press Check.';return}
+  const last=document.getElementById('lastans');if(last)last.textContent=raw;
+  if(v==='false'){fb.className='ans-fb ok';fb.innerHTML='Correct! <b>Output: False</b><br>'+WHY}
+  else{fb.className='ans-fb bad';fb.textContent='Incorrect. Hint: Does the attribute still exist after being deleted with del?'}
+}
+document.getElementById('anschk').onclick=checkAns;
+document.getElementById('ansrev').onclick=showOk;
+document.getElementById('ansx').onclick=closeAns;
+modal.addEventListener('click',e=>{if(e.target===modal)closeAns()});
+inp.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();checkAns()}else if(e.key==='Escape')closeAns()});
+
+/* ═══════════════ Navigation Engine & Hover Interaction ═══════════════ */
+let cur=-1,frame=0,t0=0;
+const counter=document.getElementById('counter'),prog=document.getElementById('prog');
+function closeSol(){document.querySelectorAll('.sol.open').forEach(e=>e.classList.remove('open'))}
+function toggleSol(){const el=SL[cur].el.querySelector('.sol');if(el)el.classList.toggle('open')}
+let walkTimer=null;
+function walkApply(el,W,k){
+  el.querySelectorAll('.stp').forEach((e,i)=>e.classList.toggle('on',i===k));
+  const on=new Set(W.steps[k].lines);
+  el.querySelectorAll('.ln').forEach((e,i)=>e.classList.toggle('on',on.has(i+1)));
+}
+function walkStart(i){
+  clearInterval(walkTimer);const s=SL[i];if(!s.walk)return;
+  const W=WALK[s.walk];let k=0;walkApply(s.el,W,k);
+  walkTimer=setInterval(()=>{k=(k+1)%W.steps.length;walkApply(s.el,W,k)},3200);
+}
+function go(i){
+  i=Math.max(0,Math.min(N-1,i));if(i===cur)return;
+  if(cur>=0){SL[cur].el.classList.remove('active');closeSol()}
+  cur=i;SL[i].el.classList.add('active');
+  vp.className='vp '+SL[i].part;
+  const cs=getComputedStyle(vp);PC=cs.getPropertyValue('--c').trim();PC2=cs.getPropertyValue('--c-2').trim();
+  walkStart(i);counter.textContent=(i+1)+' / '+N;prog.style.width=((i+1)/N*100)+'%';t0=frame;
+}
+
+const isKey=(e,latin,arabic)=>e.code==='Key'+latin||e.key===latin.toLowerCase()||e.key===latin||e.key===arabic;
+document.addEventListener('keydown',e=>{
+  if(!modal.hidden)return;
+  if(e.metaKey||e.ctrlKey||e.altKey)return;const k=e.key;
+  if(['ArrowRight','ArrowDown','PageDown',' ','Enter'].includes(k)){e.preventDefault();go(cur+1)}
+  else if(['ArrowLeft','ArrowUp','PageUp','Backspace'].includes(k)){e.preventDefault();go(cur-1)}
+  else if(k==='Home')go(0);else if(k==='End')go(N-1);
+  else if(isKey(e,'S','س'))toggleSol();
+  else if(isKey(e,'A','ش')&&SL[cur].chal)openAns();
+  else if(k==='Escape')closeSol();
+  else if(isKey(e,'F','ب')){try{document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen()}catch(_){}}
+});
+document.getElementById('next').onclick=e=>{go(cur+1);e.target.blur()};
+document.getElementById('prev').onclick=e=>{go(cur-1);e.target.blur()};
+
+document.addEventListener('click',e=>{
+  if(e.target.closest('[data-sol]')){toggleSol();e.target.blur()}
+  if(e.target.closest('[data-ans]'))openAns();
+  const st=e.target.closest('.stp');
+  if(st&&SL[cur].walk){clearInterval(walkTimer);walkApply(SL[cur].el,WALK[SL[cur].walk],+st.dataset.k)}
+});
+
+/* Hover-to-Trace Interaction */
+document.addEventListener('mouseover', e => {
+  const st = e.target.closest('.stp');
+  if (st && SL[cur] && SL[cur].walk) {
+    clearInterval(walkTimer);
+    walkApply(SL[cur].el, WALK[SL[cur].walk], +st.dataset.k);
+  }
+});
+
+let tx=null,ty=null;
+document.addEventListener('touchstart',e=>{
+  if(!e.touches||e.touches.length===0)return;
+  tx=e.touches[0].clientX;ty=e.touches[0].clientY;
+},{passive:true});
+document.addEventListener('touchend',e=>{
+  if(tx==null||!e.changedTouches||e.changedTouches.length===0){tx=null;ty=null;return;}
+  const dx=e.changedTouches[0].clientX-tx,dy=e.changedTouches[0].clientY-ty;
+  tx=null;ty=null;
+  if(modal&&!modal.hidden)return;
+  if(e.target&&e.target.closest&&e.target.closest('button, .cp-btn, .solbtn, .ansbtn, a, input, .stp'))return;
+
+  if(document.body.classList.contains('rot90')){
+    if(Math.abs(dy)>50&&Math.abs(dy)>Math.abs(dx))go(cur+(dy<0?1:-1));
+  }else{
+    if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy))go(cur+(dx<0?1:-1));
+  }
+},{passive:true});
+const mnext=document.getElementById('mnext'),mprev=document.getElementById('mprev');
+if(mnext)mnext.onclick=e=>{go(cur+1);e.target.blur()};
+if(mprev)mprev.onclick=e=>{go(cur-1);e.target.blur()};
+
+/* ═══════════════ Responsive Fitting ═══════════════ */
+const fitbox=document.getElementById('fitbox'),deck=document.getElementById('deck');
+function layout(){
+  if(typing)return;
+  const vv=window.visualViewport;
+  const W=Math.floor(vv?vv.width:innerWidth);
+  const H=Math.floor(vv?vv.height:innerHeight);
+  const small=Math.min(W,H)<680;
+  const portrait=H>W;
+  const rot=portrait;
+  document.body.classList.toggle('portrait',portrait);
+  document.body.classList.toggle('small',small);
+  document.body.classList.toggle('rot90',rot);
+
+  let s,dw,dh,totalH;
+  if(rot){
+    dh=619;
+    s=W/dh;
+    dw=Math.round(H/s);
+    vp.style.width=dw+'px';
+    vp.style.height=dh+'px';
+    deck.style.width=dw+'px';
+    deck.style.height=dh+'px';
+    fitbox.style.width=W+'px';
+    fitbox.style.height=H+'px';
+    deck.style.transform=`translate(${W}px,0) rotate(90deg) scale(${s})`;
+  }else{
+    totalH=small?619:707;
+    dh=619;
+    s=Math.min(W/1050,H/totalH);
+    dw=Math.max(1050,Math.round(W/s));
+    vp.style.width=dw+'px';
+    vp.style.height=dh+'px';
+    deck.style.width=dw+'px';
+    deck.style.height=totalH+'px';
+    fitbox.style.width=Math.round(dw*s)+'px';
+    fitbox.style.height=Math.round(totalH*s)+'px';
+    deck.style.transform=`scale(${s})`;
+  }
+  SC=Math.max(.2,s);
+}
+addEventListener('resize',layout);
+addEventListener('orientationchange',()=>setTimeout(layout,120));
+if(window.visualViewport)visualViewport.addEventListener('resize',layout);
+layout();
+
+/* ═══════════════ Ambient Canvas & Master Render Loop ═══════════════ */
+const amb=fit(document.getElementById('amb'));
+const blobs=[[.2,.3,'#6366f1'],[.75,.25,'#a855f7'],[.55,.75,'#ec4899'],[.15,.8,'#6366f1']];
+const specks=Array.from({length:46},(_,i)=>[(i*.6180339)%1,(i*.3819661+.17)%1,i*1.7]);
+
+function aurora(f){
+  amb.rs();const{ctx,W,H}=amb;if(!W)return;
+  ctx.fillStyle='#07070d';ctx.fillRect(0,0,W,H);ctx.globalCompositeOperation='lighter';
+  blobs.forEach(([bx,by,col],i)=>{
+    const x=W*bx+Math.sin(f*.004+i)*70,y=H*by+Math.cos(f*.003+i*1.7)*50,r=Math.min(W,H)*(.42+.05*Math.sin(f*.006+i));
+    const g=ctx.createRadialGradient(x,y,0,x,y,r);g.addColorStop(0,col+'22');g.addColorStop(1,col+'00');
+    ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y,r,0,7);ctx.fill();
+  });
+  ctx.globalCompositeOperation='source-over';
+  specks.forEach(([dx,dy,ph])=>{ctx.fillStyle=`rgba(200,190,255,${.18+.18*Math.sin(f*.02+ph)})`;ctx.beginPath();ctx.arc(dx*W,dy*H,1.1,0,7);ctx.fill()});
+  const v=ctx.createRadialGradient(W/2,H/2,Math.min(W,H)*.3,W/2,H/2,Math.max(W,H)*.75);
+  v.addColorStop(0,'rgba(5,5,9,0)');v.addColorStop(1,'rgba(5,5,9,.7)');ctx.fillStyle=v;ctx.fillRect(0,0,W,H);
+}
+
+function tick(){
+  frame++;aurora(frame);
+  for(const o of live){
+    if(o.slide!==cur)continue;
+    o.s.rs();const{ctx,W,H}=o.s;if(!W)continue;
+    ctx.clearRect(0,0,W,H);CW=W;
+    o.def.draw(ctx,W,H,(frame-t0)%o.def.cycle,frame,o);
+  }
+  requestAnimationFrame(tick);
+}
+
+go(0);tick();
+const bt=document.getElementById('boot');if(bt)bt.remove();
+window.__go=go;
+</script>
+</body>
+</html>

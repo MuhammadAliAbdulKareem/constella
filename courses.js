@@ -40,8 +40,16 @@ window.SITE = {
           file: "decks/multimedia/Week ⇔ 01/Session ⇔ 01.html",
           date: "2026-09-22",
           duration: "75 min"
+        },
+        {
+          week: 2,
+          title: "Object-Oriented Programming (OOP) in Python",
+          topics: ["classes & objects", "__init__() & self", "properties & del", "inheritance & super()", "polymorphism", "encapsulation"],
+          file: "decks/multimedia/Week ⇔ 02/Session ⇔ 02.html",
+          date: "2026-09-29",
+          duration: "75 min"
         }
-        // ,{ week: 2, title: "…", topics: ["…"], file: "decks/multimedia/Week ⇔ 02/Session ⇔ 02.html", date: "2026-09-29" }
+        // ,{ week: 3, title: "…", topics: ["…"], file: "decks/multimedia/Week ⇔ 03/Session ⇔ 03.html", date: "2026-10-06" }
       ]
     },
 
