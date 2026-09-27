@@ -763,8 +763,8 @@ html[data-theme="light"] .update-toast{background:rgba(255,255,255,.96);border-c
   var C1 = 2 * Math.PI * 32, C2 = 2 * Math.PI * 23;
   var courseEls = courses.map(function (course) {
     var L = layout(course);
-    var weeksDesc = course.weeks.slice().sort(function (a, b) { return b.week - a.week; });
-    var rows = weeksDesc.map(function (w, idx) {
+    var weeksAsc = course.weeks.slice().sort(function (a, b) { return a.week - b.week; });
+    var rows = weeksAsc.map(function (w, idx) {
       var key = course.id + ':' + w.week;
       var search = (w.title + ' ' + (w.topics || []).join(' ')).toLowerCase();
       var isLatest = w.week === L.maxWeek;
