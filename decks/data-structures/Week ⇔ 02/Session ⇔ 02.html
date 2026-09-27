@@ -1,0 +1,1197 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Data Structures — Time Complexity & Growth Structures in C++</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&family=Lemonada:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  color-scheme: dark;
+  --c:#ec4899; --c-2:#a855f7;
+  --c-grad:linear-gradient(90deg,var(--c),var(--c-2));
+  
+  /* Dark Theme Tokens */
+  --bg:#07070d;
+  --stage-bg:#090912;
+  --card:rgba(18,18,28,.82);
+  --card-border:rgba(255,255,255,.08);
+  --tp:#f0eeff;
+  --ts:#9a9ab5;
+  --tm:#6b6b85;
+  --warn:#fb7185;
+  --syntax-grad:linear-gradient(135deg,#6366f1,#a855f7,#ec4899);
+  --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+  
+  --cv-board:#0a0a13;
+  --cv-grid:rgba(168,85,247,.055);
+  --cv-axis:rgba(255,255,255,.25);
+  --cv-text-dim:#8a8aa3;
+  --cv-text-main:#eef0ff;
+  --shadow-vp:0 32px 70px rgba(0,0,0,.8);
+}
+
+/* Light Theme Tokens */
+body.light-mode{
+  color-scheme: light;
+  --bg:#ebe9f5;
+  --stage-bg:#ffffff;
+  --card:#ffffff;
+  --card-border:rgba(120,110,160,.16);
+  --tp:#181528;
+  --ts:#524d70;
+  --tm:#7f789e;
+  --warn:#e11d48;
+  --syntax-grad:linear-gradient(135deg,#4f46e5,#9333ea,#db2777);
+  
+  --cv-board:#ffffff;
+  --cv-grid:rgba(99,102,241,.06);
+  --cv-axis:rgba(24,21,40,.2);
+  --cv-text-dim:#6d678a;
+  --cv-text-main:#181528;
+  --shadow-vp:0 24px 60px rgba(100,90,140,.14);
+}
+
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;height:100dvh;background:var(--bg);color:var(--tp);font-family:Inter,system-ui,"Segoe UI",Roboto,Arial,sans-serif;overflow:hidden;transition:background .3s ease, color .3s ease;}
+body{padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px);display:flex;align-items:center;justify-content:center}
+#fitbox{position:relative;flex:none}
+#deck{width:1100px;height:707px;position:absolute;left:0;top:0;transform-origin:top left}
+
+/* Brand Bar */
+.brand-bar{height:44px;display:flex;justify-content:space-between;align-items:center}
+.brand-left{display:flex;align-items:center;gap:11px}
+
+/* Big-O Speed Pulse Icon */
+.brand-icon{
+  width:32px; height:32px; border-radius:9px;
+  background:var(--syntax-grad); display:flex; align-items:center; justify-content:center;
+  box-shadow:0 4px 14px rgba(168,85,247,.4); flex-shrink:0;
+}
+.brand-icon svg{ width:20px; height:20px; fill:none; stroke:#ffffff; stroke-linecap:round; stroke-linejoin:round; }
+
+.brand-name{font-size:15px;font-weight:900;background:var(--syntax-grad);-webkit-background-clip:text;background-clip:text;color:transparent;line-height:1.2}
+.brand-sub{font-size:11px;color:var(--tm);font-weight:600}
+.brand-right{display:flex;align-items:center;gap:14px;font-size:11.5px;color:var(--ts);font-weight:700}
+
+/* Theme Toggle Button */
+.theme-btn{
+  width:32px;height:32px;border-radius:8px;border:1px solid var(--card-border);background:var(--card);
+  display:grid;place-items:center;cursor:pointer;color:var(--tp);transition:.2s;padding:0;
+}
+.theme-btn:hover{border-color:var(--c);transform:scale(1.05);}
+.theme-btn svg{width:16px;height:16px;stroke-width:2;}
+
+/* Stage Engine */
+.vp{
+  width:1100px;height:619px;position:relative;border-radius:20px;overflow:hidden;
+  border:1px solid var(--card-border);background:var(--stage-bg);box-shadow:var(--shadow-vp);
+  transition:background .3s ease, border-color .3s ease, box-shadow .3s ease;
+}
+.vp.part-intro{--c:#ec4899;--c-2:#a855f7}
+.vp.part-classes{--c:#06b6d4;--c-2:#3b82f6}
+.vp.part-rules{--c:#8b5cf6;--c-2:#ec4899}
+.vp.part-seq{--c:#6366f1;--c-2:#8b5cf6}
+.vp.part-sel{--c:#f59e0b;--c-2:#fbbf24}
+.vp.part-rep{--c:#22d3ee;--c-2:#06b6d4}
+.vp.part-fn{--c:#10b981;--c-2:#34d399}
+
+body.light-mode .vp.part-intro{--c:#db2777;--c-2:#9333ea}
+body.light-mode .vp.part-classes{--c:#0284c7;--c-2:#2563eb}
+body.light-mode .vp.part-rules{--c:#7c3aed;--c-2:#db2777}
+body.light-mode .vp.part-seq{--c:#4f46e5;--c-2:#7c3aed}
+body.light-mode .vp.part-sel{--c:#d97706;--c-2:#b45309}
+body.light-mode .vp.part-rep{--c:#0891b2;--c-2:#0284c7}
+body.light-mode .vp.part-fn{--c:#059669;--c-2:#10b981}
+
+.vp-bg{position:absolute;inset:0;width:100%;height:100%;display:block;z-index:0}
+.vp-progress{position:absolute;top:0;left:0;right:0;height:3px;background:rgba(128,128,128,.1);z-index:6}
+.vp-progress span{display:block;height:100%;width:0;background:var(--syntax-grad);box-shadow:0 0 12px var(--c);border-radius:0 3px 3px 0;transition:width .45s ease}
+.slide-counter{
+  position:absolute;top:14px;left:50%;transform:translateX(-50%);z-index:6;
+  padding:5px 14px;border-radius:999px;background:var(--card);border:1px solid var(--card-border);
+  font-size:12px;font-weight:800;color:var(--ts);box-shadow:0 4px 16px rgba(0,0,0,.08);
+}
+
+/* Slide Animation */
+.slide{position:absolute;inset:0;display:none;flex-direction:column;padding:32px 46px 24px;z-index:2}
+.slide.active{display:flex}
+.slide>*{animation:revealUp .6s ease both}
+.slide>*:nth-child(2){animation-delay:.08s}
+.slide>*:nth-child(3){animation-delay:.16s}
+.slide>*:nth-child(4){animation-delay:.24s}
+.slide>*:nth-child(5){animation-delay:.32s}
+@keyframes revealUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.lbl{font-size:11.5px;font-weight:800;color:var(--c);margin-bottom:3px;letter-spacing:.4px;text-transform:uppercase}
+h2{margin:0 0 4px;font-size:24px;font-weight:900;line-height:1.2;letter-spacing:-.3px}
+h2 em{font-style:normal;background:var(--c-grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.sub{margin:0 0 4px;font-size:13.5px;color:var(--ts);line-height:1.45;max-width:850px}
+.sub strong{color:var(--tp)}
+code,pre.code{font-variant-ligatures:none;font-feature-settings:"liga" 0,"calt" 0}
+code{font-family:var(--mono);font-size:.92em;color:var(--c);background:rgba(128,128,128,.1);padding:1px 6px;border-radius:6px}
+
+/* Fully Stretched Stage */
+.stage{flex:1;position:relative;min-height:0;margin-top:10px;display:flex;flex-direction:column;}
+.viz{position:absolute;inset:0}
+.viz canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+
+/* Footer elements */
+.sf{display:flex;align-items:center;justify-content:space-between;font-size:11px;color:var(--tm);font-weight:600;margin-top:6px;height:16px;flex-shrink:0;}
+.pd{display:flex;gap:4px;align-items:center;max-width:650px;overflow:hidden}
+.dot{width:5px;height:5px;border-radius:99px;background:rgba(128,128,128,.2);transition:.3s;flex:none}
+.dot.on{width:18px;background:var(--c-grad)}
+
+/* Hero View */
+.hero-slide{justify-content:center}
+.hero-slide .lbl{margin-top:auto}
+.hero-slide h1{margin:6px 0 10px;font-size:62px;line-height:1.05;font-weight:900;letter-spacing:-2px}
+.hero-slide h1 em{font-style:normal;background:var(--syntax-grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero-slide .tag{font-size:20px;color:var(--ts);font-weight:600;max-width:820px;line-height:1.45}
+.inst{display:flex;align-items:center;gap:14px;margin-top:26px}
+.avatar{width:54px;height:54px;border-radius:50%;background:var(--syntax-grad);display:grid;place-items:center;font-weight:900;font-size:22px;box-shadow:0 0 24px rgba(168,85,247,.35);color:#fff}
+.inst small{display:block;font-size:11px;letter-spacing:1.6px;text-transform:uppercase;color:var(--tm);font-weight:800;margin-bottom:2px}
+.inst b{font-size:20px;font-weight:800}
+.chips{display:flex;gap:10px;margin-top:22px;flex-wrap:wrap}
+.chips span{padding:6px 14px;border-radius:999px;border:1px solid var(--card-border);background:var(--card);font-size:12.5px;font-weight:700;color:var(--ts)}
+.hero-slide .sf{margin-top:auto}
+.herobg{position:absolute;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none}
+
+/* Split Layouts & Tasks */
+.task{display:grid;grid-template-columns:1fr 1fr;gap:24px;flex:1;min-height:0;height:100%;align-items:center;}
+.tleft{display:flex;flex-direction:column;gap:10px;justify-content:center;min-width:0;overflow-y:auto;padding-right:4px}
+.chip{align-self:flex-start;padding:3px 10px;border-radius:999px;background:rgba(128,128,128,.1);border:1px solid var(--card-border);color:var(--c);font-weight:800;font-size:10.5px;letter-spacing:.4px;text-transform:uppercase}
+.req{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.req li{position:relative;padding-left:22px;font-size:13px;line-height:1.45;color:var(--tp)}
+.req li::before{content:'';position:absolute;left:0;top:.45em;width:8px;height:8px;border-radius:2.5px;background:var(--c-grad)}
+.trap{padding:9px 12px;border-radius:10px;border:1px solid rgba(251,113,133,.4);background:rgba(251,113,133,.08);font-size:12px;line-height:1.45;color:var(--tp)}
+.trap b{color:var(--warn)}
+.tright{position:relative;min-height:0;display:flex;flex-direction:column;justify-content:center;height:100%;}
+
+/* Fit-Content Code Window (No unnecessary giant black boxes) */
+.code-window{
+  background:#090912; border:1px solid var(--card-border); border-radius:12px;
+  overflow:hidden; display:flex; flex-direction:column; width:100%;
+  box-shadow:0 16px 40px rgba(0,0,0,.35);
+  height:fit-content; max-height:100%; align-self:center;
+}
+body.light-mode .code-window{
+  background:#13111f; border-color:rgba(120,110,160,.18); box-shadow:0 14px 30px rgba(50,40,90,.15);
+}
+.code-header{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:7px 14px; background:rgba(255,255,255,.04); border-bottom:1px solid rgba(255,255,255,.07);
+  flex-shrink:0;
+}
+.dots{display:flex; gap:5px;}
+.dots span{width:8px; height:8px; border-radius:50%;}
+.dots span:nth-child(1){background:#ff5f56;}
+.dots span:nth-child(2){background:#ffbd2e;}
+.dots span:nth-child(3){background:#27c93f;}
+.copy-btn{
+  background:transparent; border:1px solid rgba(255,255,255,.15); color:#a5a0c2;
+  font:600 10.5px Inter,system-ui; padding:2px 8px; border-radius:5px; cursor:pointer;
+  transition:.2s; display:flex; align-items:center; gap:4px;
+}
+.copy-btn:hover{color:#ffffff; border-color:var(--c); background:rgba(255,255,255,.08);}
+.copy-btn.copied{color:#34d399; border-color:#34d399;}
+
+.codecard{
+  padding:14px 18px; overflow-x:auto; overflow-y:auto;
+}
+pre.code{margin:0; font:500 13px/1.55 var(--mono); color:#e8e6ff; white-space:pre; tab-size:4; width:100%;}
+pre.code .k{color:#ff79c6; font-weight:700}
+pre.code .t{color:#67e8f9}
+pre.code .s{color:#34d399}
+pre.code .n{color:#fbbf24}
+pre.code .c{color:#797599; font-style:italic}
+pre.code .p{color:#c084fc}
+pre.code .f{color:#93c5fd}
+pre.code .o{color:#f472b6}
+
+/* Cards Layout: Center aligned vertically & natural height */
+.cards{
+  display:grid; gap:20px; width:100%; height:100%;
+  grid-template-columns:repeat(2, 1fr); align-items:center;
+}
+.cc{
+  display:flex; flex-direction:column; gap:8px; min-width:0;
+  height:fit-content; max-height:100%;
+}
+.cc-h{font-size:11.5px; font-weight:800; letter-spacing:.6px; text-transform:uppercase; color:var(--c); flex-shrink:0;}
+.cc .code-window{height:fit-content;}
+.cc-n{font-size:12px; line-height:1.45; color:var(--ts); flex-shrink:0; margin-top:2px;}
+.cc-n b{color:var(--tp)}
+
+/* Solution Popover */
+.sol-actions{display:flex; align-items:center; gap:10px; margin-top:4px;}
+.solbtn{
+  cursor:pointer; padding:6px 14px; border-radius:999px; border:1px solid var(--c);
+  background:var(--card); color:var(--tp); font:800 11.5px Inter,system-ui,sans-serif;
+  letter-spacing:.3px; align-self:flex-start; transition:.2s;
+}
+.solbtn:hover{background:var(--c); color:#ffffff}
+.solbtn kbd{margin-left:5px; padding:1px 4px; border-radius:3px; background:rgba(128,128,128,.15); font:700 10px var(--mono)}
+.sol{display:none; position:absolute; inset:0; background:var(--stage-bg); padding:30px 44px; z-index:8; flex-direction:column; gap:10px}
+.sol.open{display:flex}
+.sol-h{display:flex; justify-content:space-between; align-items:center}
+.sol-h .lbl{margin:0; font-size:13px}
+.sol-body{display:grid; grid-template-columns:1.4fr 1fr; gap:18px; flex:1; min-height:0}
+.notes{display:flex; flex-direction:column; gap:8px; justify-content:center}
+.note-h{font-size:11px; font-weight:800; letter-spacing:.8px; text-transform:uppercase; color:var(--tm)}
+.note{padding:8px 12px; border-radius:8px; border:1px solid var(--card-border); border-left:3px solid var(--c); background:var(--card); font-size:12.5px; line-height:1.45}
+
+/* MCQ Interactive Challenge Box */
+.mcq-box{display:flex; flex-direction:column; gap:10px;}
+.mcq-options{display:grid; grid-template-columns:repeat(2, 1fr); gap:9px; margin-top:2px;}
+.mcq-btn{
+  background:var(--card); border:1px solid var(--card-border);
+  border-radius:9px; padding:10px 12px; color:var(--tp); font:700 13px var(--mono);
+  cursor:pointer; transition:.2s; text-align:center;
+}
+.mcq-btn:hover{border-color:var(--c); transform:translateY(-1px);}
+.mcq-btn.correct{background:rgba(52,211,153,.18); border-color:#34d399; color:#059669;}
+body.light-mode .mcq-btn.correct{color:#047857; background:rgba(52,211,153,.25);}
+.mcq-btn.wrong{background:rgba(251,113,133,.18); border-color:#fb7185; color:#e11d48;}
+.mcq-feedback{min-height:44px; font-size:12.5px; line-height:1.45; padding:8px 12px; border-radius:9px; display:none;}
+.mcq-feedback.show{display:block;}
+.mcq-feedback.correct{background:rgba(52,211,153,.08); border:1px solid rgba(52,211,153,.3); color:#059669;}
+body.light-mode .mcq-feedback.correct{background:rgba(52,211,153,.14); color:#065f46;}
+.mcq-feedback.wrong{background:rgba(251,113,133,.08); border:1px solid rgba(251,113,133,.3); color:#e11d48;}
+
+/* Bottom Controls */
+.controls{height:44px; display:flex; align-items:center; justify-content:space-between; color:var(--tm); font-size:12px; font-weight:600}
+.controls button{cursor:pointer; padding:6px 14px; border-radius:999px; border:1px solid var(--card-border); background:var(--card); color:var(--ts); font:700 12px Inter,system-ui,sans-serif; transition:.2s}
+.controls button:hover{color:var(--tp); border-color:var(--c)}
+.controls kbd{padding:1px 6px; border-radius:5px; background:rgba(128,128,128,.14); font:700 11px var(--mono); color:var(--ts)}
+
+.mnav{display:none; position:absolute; top:50%; z-index:9; width:38px; height:38px; margin-top:-19px; border-radius:50%; border:1px solid var(--card-border); background:var(--card); color:var(--tp); font:800 20px/1 Inter,system-ui,sans-serif; cursor:pointer; place-items:center; padding:0; opacity:.85}
+.mnav.mp{left:6px}.mnav.mn{right:6px}
+.small .mnav{display:grid}
+.small .brand-bar,.small .controls{display:none}
+.small .vp{border-radius:12px}
+</style>
+</head>
+<body>
+<div id="fitbox"><div id="deck">
+  <div class="brand-bar">
+    <div class="brand-left">
+      <a href="../../../index.html" style="padding:6px 13px;border-radius:999px;background:rgba(255,255,255,.07);color:var(--tp);font:600 12px/1 system-ui,sans-serif;text-decoration:none;border:1px solid var(--card-border);display:inline-flex;align-items:center;gap:6px;transition:background .2s,border-color .2s;flex-shrink:0" onmouseover="this.style.background='rgba(255,255,255,.14)';this.style.borderColor='var(--c)'" onmouseout="this.style.background='rgba(255,255,255,.07)';this.style.borderColor='var(--card-border)'">← Back to sessions</a>
+      <!-- Speed / Complexity Gauge Logo Icon -->
+      <div class="brand-icon">
+        <svg viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="9" stroke-width="2"/>
+          <path d="M12 7v5l3 3" stroke-width="2"/>
+          <circle cx="12" cy="12" r="1.5" fill="#ffffff"/>
+        </svg>
+      </div>
+      <div>
+        <div class="brand-name">Data Structures</div>
+        <div class="brand-sub">Session 02 · Time Complexity &amp; Interactive Predictions</div>
+      </div>
+    </div>
+    <div class="brand-right">
+      <span>Instructor · Muhammad Ali Abdul Kareem</span>
+      <button class="theme-btn" id="themeToggle" title="Toggle Light / Dark mode" aria-label="Toggle theme">
+        <svg id="themeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+      </button>
+    </div>
+  </div>
+  <div class="vp part-intro" id="vp">
+    <canvas class="vp-bg" id="amb"></canvas>
+    <div class="vp-progress"><span id="prog"></span></div>
+    <div class="slide-counter" id="counter">1 / 1</div>
+    <button class="mnav mp" id="mprev" aria-label="Previous slide">‹</button>
+    <button class="mnav mn" id="mnext" aria-label="Next slide">›</button>
+  </div>
+  <div class="controls">
+    <button id="prev" tabindex="-1">‹ Prev</button>
+    <span><kbd>→</kbd> next &nbsp;·&nbsp; <kbd>←</kbd> back &nbsp;·&nbsp; <kbd>S</kbd> solution &nbsp;·&nbsp; <kbd>F</kbd> fullscreen</span>
+    <button id="next" tabindex="-1">Next ›</button>
+  </div>
+</div></div>
+
+<script>
+'use strict';
+let isLight = false;
+let CL = {
+  indigo:'#6366f1', violet:'#a855f7', pink:'#ec4899', cyan:'#06b6d4', green:'#10b981', amber:'#f59e0b',
+  chalk:'#eef0ff', dim:'#8a8aa3', board:'#0a0a13', grid:'rgba(168,85,247,.055)', axis:'rgba(255,255,255,.25)'
+};
+
+function updateThemeTokens(){
+  isLight = document.body.classList.contains('light-mode');
+  if(isLight){
+    CL = {
+      indigo:'#4f46e5', violet:'#9333ea', pink:'#db2777', cyan:'#0284c7', green:'#059669', amber:'#d97706',
+      chalk:'#181528', dim:'#6d678a', board:'#ffffff', grid:'rgba(99,102,241,.06)', axis:'rgba(24,21,40,.2)'
+    };
+  } else {
+    CL = {
+      indigo:'#6366f1', violet:'#a855f7', pink:'#ec4899', cyan:'#06b6d4', green:'#10b981', amber:'#f59e0b',
+      chalk:'#eef0ff', dim:'#8a8aa3', board:'#0a0a13', grid:'rgba(168,85,247,.055)', axis:'rgba(255,255,255,.25)'
+    };
+  }
+}
+
+const FONTS={ui:'Inter, system-ui, sans-serif',marker:'Lemonada, Inter, sans-serif',mono:'"JetBrains Mono", ui-monospace, Menlo, monospace'};
+let PC='#ec4899',PC2='#a855f7',SC=1;
+const at=(f,a,b)=>Math.min(1,Math.max(0,(f-a)/(b-a)));
+const ease=t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
+const rgba=(h,a)=>{const n=parseInt(h.slice(1),16);return `rgba(${n>>16},${(n>>8)&255},${n&255},${a})`};
+
+function fit(cv){
+  const ctx=cv.getContext('2d'),s={ctx,W:0,H:0,d:0},p=cv.parentElement;
+  s.rs=()=>{
+    const w=p.clientWidth,h=p.clientHeight,d=Math.min((devicePixelRatio||1)*SC,3);
+    if(!w||!h||(w===s.W&&h===s.H&&Math.abs(d-s.d)<.01))return;
+    s.W=w;s.H=h;s.d=d;cv.width=Math.round(w*d);cv.height=Math.round(h*d);ctx.setTransform(d,0,0,d,0,0);
+  };
+  s.rs();return s;
+}
+function rr(c,x,y,w,h,r){c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath()}
+
+function marker(c,pts,prog,col,lw=2.4){
+  if(prog<=0||pts.length<2)return;
+  let total=0;const seg=[];
+  for(let i=1;i<pts.length;i++){const d=Math.hypot(pts[i][0]-pts[i-1][0],pts[i][1]-pts[i-1][1]);seg.push(d);total+=d}
+  const target=total*prog;c.save();
+  c.strokeStyle=col;c.lineWidth=lw;c.lineJoin='round';c.lineCap='round';
+  if(!isLight){ c.shadowColor=col; c.shadowBlur=6; }
+  c.beginPath();c.moveTo(pts[0][0],pts[0][1]);let acc=0;
+  for(let i=1;i<pts.length;i++){const d=seg[i-1];
+    if(acc+d<=target){c.lineTo(pts[i][0],pts[i][1]);acc+=d}
+    else{const r=(target-acc)/d;c.lineTo(pts[i-1][0]+(pts[i][0]-pts[i-1][0])*r,pts[i-1][1]+(pts[i][1]-pts[i-1][1])*r);break}
+  }
+  c.stroke();c.restore();
+}
+
+let CW=0;
+function txt(c,s,x,y,o={}){
+  const{size=13,col=CL.chalk,weight=700,align='center',a=1,font='ui',base='middle'}=o;
+  if(!s||!(a>0))return;
+  c.save();c.globalAlpha=a;c.font=`${weight} ${size}px ${FONTS[font]}`;
+  const w=c.measureText(s).width;
+  let ax=align==='center'?x-w/2:align==='right'?x-w:x;
+  if(CW)ax=Math.max(12,Math.min(ax,CW-12-w));
+  c.fillStyle=col;c.textAlign='left';c.textBaseline=base;c.fillText(s,ax,y);c.restore();
+}
+function board(c,W,H,o={}){
+  const p=6,x=p,y=p,w=W-p*2,h=H-p*2;
+  rr(c,x,y,w,h,16);c.fillStyle=CL.board;c.fill();
+  c.save();rr(c,x,y,w,h,16);c.clip();c.fillStyle=CL.grid;
+  for(let gx=x+22;gx<x+w;gx+=26)for(let gy=y+22;gy<y+h;gy+=26){c.beginPath();c.arc(gx,gy,1,0,7);c.fill()}
+  c.restore();
+  const g=c.createLinearGradient(x,y,x+w,y+h);
+  g.addColorStop(0,CL.indigo);g.addColorStop(.5,CL.violet);g.addColorStop(1,CL.pink);
+  c.save();c.strokeStyle=g;c.lineWidth=isLight?1.5:2;
+  if(!isLight){ c.shadowColor=CL.violet; c.shadowBlur=10+5*Math.sin((o.frame||0)*.03); }
+  rr(c,x,y,w,h,16);c.stroke();c.restore();
+  if(o.title)txt(c,o.title,x+22,y+28,{size:16,col:CL.chalk,align:'left',font:'marker',weight:600});
+  return{x,y,w,h};
+}
+function table(c,x,y,w,cols,rows,f,o={}){
+  const{rowH=40,hdrH=34,start=14,per=55,col=PC}=o;
+  const hp=at(f,start-10,start+24);
+  c.save();rr(c,x,y,w,hdrH,8);c.fillStyle=rgba(col,(isLight?.12:.16)*ease(hp));c.fill();c.restore();
+  let cx=x;
+  cols.forEach(cd=>{const cw=cd.w*w;
+    txt(c,cd.h,cd.al==='left'?cx+12:cx+cw/2,y+hdrH/2,{size:11.5,col:col,weight:800,align:cd.al==='left'?'left':'center',a:ease(hp)});
+    cx+=cw});
+  marker(c,[[x,y+hdrH],[x+w,y+hdrH]],hp,col,1.6);
+  const first=start+30;
+  rows.forEach((row,r)=>{
+    const s0=first+r*per,p=at(f,s0,s0+24),ry=y+hdrH+8+r*rowH;
+    if(p<=0)return;
+    const active=f>=s0&&f<s0+per;
+    c.save();c.globalAlpha=ease(p);
+    if(active){rr(c,x,ry,w,rowH-4,8);c.fillStyle=rgba(col,isLight?.08:.10);c.fill();c.strokeStyle=rgba(col,.55);c.lineWidth=1.4;c.stroke()}
+    let cx2=x;
+    row.forEach((cell,i)=>{
+      const cd=cols[i],cw=cd.w*w,o2=typeof cell==='string'?{t:cell}:cell;
+      if(o2.hl&&active){c.fillStyle=rgba(o2.col||col,isLight?.16:.24);rr(c,cx2+3,ry+3,cw-6,rowH-10,6);c.fill()}
+      txt(c,o2.t,cd.al==='left'?cx2+12:cx2+cw/2,ry+(rowH-4)/2,{size:cd.size||12.5,col:o2.col||CL.chalk,weight:o2.hl?800:600,align:cd.al==='left'?'left':'center',font:cd.mono?'mono':'ui'});
+      cx2+=cw;
+    });
+    c.restore();
+  });
+  return Math.max(-1,Math.min(rows.length-1,Math.floor((f-first)/per)));
+}
+
+function terminal(c,x,y,w,h,f,lines,o={}){
+  const{start=20,speed=.55,pause=18,title='Expected Console Output'}=o;
+  const p=ease(at(f,0,30));
+  c.save();c.globalAlpha=p;
+  rr(c,x,y,w,h,14);c.fillStyle=isLight?'#13111f':'#090912';c.fill();
+  c.save();rr(c,x,y,w,h,14);c.clip();c.fillStyle='rgba(255,255,255,.05)';c.fillRect(x,y,w,36);c.restore();
+  c.strokeStyle=rgba(PC,.6);c.lineWidth=1.6;rr(c,x,y,w,h,14);c.stroke();
+  ['#ff5f56','#ffbd2e','#27c93f'].forEach((k,i)=>{c.fillStyle=k;c.beginPath();c.arc(x+22+i*18,y+18,5,0,7);c.fill()});
+  c.restore();
+  txt(c,title,x+w-18,y+18,{size:11.5,col:CL.dim,align:'right',a:p});
+  const lh=Math.min(30,(h-70)/lines.length);
+  let t=(f-start)*speed,ly=y+34+lh*.9+10,last=null,cur=null;
+  lines.forEach(seg=>{
+    const len=seg.reduce((n,s)=>n+s[0].length,0);
+    if(t>0){
+      let budget=Math.min(len,Math.floor(t)),cx=x+22;
+      seg.forEach(([tx,ck])=>{
+        const part=tx.slice(0,Math.max(0,budget));budget-=tx.length;
+        if(part){c.save();c.font=`500 14.5px ${FONTS.mono}`;c.fillStyle=CL[ck]||'#f0eeff';c.textAlign='left';c.textBaseline='middle';c.fillText(part,cx,ly);cx+=c.measureText(part).width;c.restore()}
+      });
+      last=[cx,ly];
+      if(t<len+pause*speed)cur=[cx,ly];
+    }
+    t-=len+pause*speed;ly+=lh;
+  });
+  const cp=cur||last;
+  if(cp&&Math.floor(f/24)%2===0){c.fillStyle=PC;c.fillRect(cp[0]+3,cp[1]-8,8,16)}
+}
+
+const VIZ={};
+VIZ.tokens={cycle:100000,draw(c,W,H,f){
+  const T=['O(1)','O(log n)','O(√n)','O(n)','O(n log n)','O(n²)','Predict','int&','cin >>','cout <<'];
+  T.forEach((t,i)=>{
+    const sx=((i*137.5)%100)/100,sy=((i*61.8)%100)/100;
+    const x=W*sx+Math.sin(f*.01+i)*18,y=(((H*sy-f*(.12+(i%4)*.05))%H)+H)%H;
+    txt(c,t,x,y,{size:15+(i%3)*4,col:i%2?PC:PC2,a:(isLight?.22:.12)+.08*Math.sin(f*.02+i),font:'mono',weight:700});
+  });
+}};
+
+VIZ.terminal={cycle:600,draw(c,W,H,f,frame,o){
+  const h=Math.min(H-10,Math.max(210,o.data.lines.length*34+80));
+  terminal(c,4,(H-h)/2,W-8,h,f,o.data.lines,{title:o.data.title||'Expected Console Output'});
+}};
+
+/* Growth Curves with Exact Symmetry and Axis Alignment */
+VIZ.growthCurves = {
+  cycle: 700,
+  draw(c, W, H, f, frame) {
+    const b = board(c, W, H, { title: 'Growth Rate: The 8 Complexity Classes', frame });
+    const ox = b.x + 85;
+    const oy = b.y + b.h - 60;
+    const w  = b.w - 230;
+    const h  = b.h - 130;
+
+    marker(c, [[ox, oy], [ox + w, oy]], 1, CL.axis, 1.5);
+    marker(c, [[ox, oy], [ox, oy - h]], 1, CL.axis, 1.5);
+    
+    // سهم المحور الرأسي
+    c.save();
+    c.fillStyle = CL.axis;
+    c.beginPath();
+    c.moveTo(ox, oy - h - 6);
+    c.lineTo(ox - 4, oy - h + 2);
+    c.lineTo(ox + 4, oy - h + 2);
+    c.closePath();
+    c.fill();
+    c.restore();
+
+    // نص المحور الرأسي فوق السهم مباشرة
+    txt(c, 'Operations (time)', ox, oy - h - 16, { size: 12, font: 'mono', col: CL.dim, align: 'center', weight: 600 });
+    
+    // سهم المحور الأفقي
+    c.save();
+    c.fillStyle = CL.axis;
+    c.beginPath();
+    c.moveTo(ox + w + 6, oy);
+    c.lineTo(ox + w - 2, oy - 4);
+    c.lineTo(ox + w - 2, oy + 4);
+    c.closePath();
+    c.fill();
+    c.restore();
+
+    // نص المحور الأفقي على نهاية السهم
+    txt(c, 'Input size (n) →', ox + w + 16, oy, { size: 11.5, font: 'mono', col: CL.dim, align: 'left', base: 'middle' });
+
+    const p = ease(at(f, 15, 180));
+    const samples = 80;
+    const yConst = oy - 8;
+
+    // 1. O(1)
+    marker(c, [[ox, yConst], [ox + w, yConst]], p, CL.violet, 2.5);
+    txt(c, 'O(1)', ox + w + 16, yConst - 18, { size: 12, font: 'mono', col: CL.violet, align: 'left', weight: 700 });
+
+    // 2. O(log n)
+    const logPts = [];
+    for (let i = 0; i <= samples; i++) {
+      const u = i / samples;
+      const yVal = (Math.log2(u * 31 + 1) / 5) * (h * 0.22);
+      logPts.push([ox + u * w, yConst - yVal]);
+    }
+    marker(c, logPts, p, CL.cyan, 2.5);
+    txt(c, 'O(log n)', ox + w + 16, logPts[logPts.length - 1][1], { size: 12, font: 'mono', col: CL.cyan, align: 'left', weight: 700 });
+
+    // 3. O(sqrt n)
+    const sqPts = [];
+    for (let i = 0; i <= samples; i++) {
+      const u = i / samples;
+      const yVal = Math.sqrt(u) * (h * 0.42);
+      sqPts.push([ox + u * w, yConst - yVal]);
+    }
+    marker(c, sqPts, p, CL.green, 2.5);
+    txt(c, 'O(√n)', ox + w + 16, sqPts[sqPts.length - 1][1], { size: 12, font: 'mono', col: CL.green, align: 'left', weight: 700 });
+
+    // 4. O(n)
+    const linearPts = [[ox, yConst], [ox + w * 0.88, yConst - h * 0.78]];
+    marker(c, linearPts, p, CL.amber, 2.5);
+    txt(c, 'O(n)', ox + w * 0.88 + 8, yConst - h * 0.78, { size: 12, font: 'mono', col: CL.amber, align: 'left', weight: 700 });
+
+    // 5. O(n log n)
+    const nLogPts = [];
+    for (let i = 0; i <= 50; i++) {
+      const u = i / 50;
+      const normU = u * 0.62;
+      const yVal = (normU * Math.log2(normU * 15 + 1)) * (h * 0.48);
+      if (yVal > h * 0.96) break;
+      nLogPts.push([ox + normU * w, yConst - yVal]);
+    }
+    marker(c, nLogPts, p, '#ff79c6', 2.2);
+    txt(c, 'O(n log n)', nLogPts[nLogPts.length - 1][0] + 8, nLogPts[nLogPts.length - 1][1], { size: 11.5, font: 'mono', col: '#ff79c6', align: 'left', weight: 700 });
+
+    // 6. O(n²)
+    const qPts = [];
+    for (let i = 0; i <= 35; i++) {
+      const u = i / 35;
+      const normU = u * 0.35;
+      const yVal = (u * u) * (h * 0.98);
+      qPts.push([ox + normU * w, yConst - yVal]);
+    }
+    marker(c, qPts, p, CL.pink, 2.5);
+    txt(c, 'O(n²)', qPts[qPts.length - 1][0] + 8, qPts[qPts.length - 1][1] + 12, { size: 12, font: 'mono', col: CL.pink, align: 'left', weight: 700 });
+
+    txt(c, 'O(1) < O(log n) < O(n^¼) < O(n^⅓) < O(√n) < O(n) < O(n log n) < O(n²)', b.x + b.w / 2, b.y + b.h - 22, {
+      size: 13, font: 'mono', col: CL.chalk, weight: 700, align: 'center'
+    });
+  }
+};
+
+VIZ.opTable={cycle:560,draw(c,W,H,f,frame){
+  const b=board(c,W,H,{title:'Operation count as n grows',frame});
+  const cols=[{h:'COMPLEXITY',w:.20,mono:1},{h:'n = 10',w:.20,mono:1},{h:'n = 100',w:.20,mono:1},{h:'n = 1,000',w:.20,mono:1},{h:'n = 100,000',w:.20,mono:1}];
+  const rows=[
+    ['O(1)','1','1','1','1'],
+    ['O(log n)','4','7','10','17'],
+    ['O(√n)','3','10','32','316'],
+    ['O(n)','10','100','1,000','100,000'],
+    ['O(n log n)','40','700','10,000','1,700,000'],
+    ['O(n²)',{t:'100',hl:1},{t:'10,000',hl:1},{t:'1,000,000',hl:1},{t:'10,000,000,000',col:CL.pink,hl:1}]
+  ];
+  table(c,b.x+24,b.y+50,b.w-48,cols,rows,f,{rowH:36,start:10,per:55});
+  txt(c,'Notice how O(n²) explodes to 10 BILLION while O(1) stays exactly 1',b.x+b.w/2,b.y+b.h-24,{size:13,font:'marker',col:CL.amber,a:ease(at(f,340,380))});
+}};
+
+VIZ.t_seq={cycle:500,draw(c,W,H,f,frame){
+  const b=board(c,W,H,{title:'Trace: Sequential Execution (Task 1 Rectangle)',frame});
+  const cols=[{h:'STEP',w:.1},{h:'INSTRUCTION',w:.45,al:'left',mono:1},{h:'area',w:.2,mono:1},{h:'perimeter',w:.25,mono:1}];
+  const rows=[
+    ['1','double length=5.5, width=4.0;','-','-'],
+    ['2','area = length * width; (5.5 * 4.0)',{t:'22.0',hl:1},'-'],
+    ['3','perimeter = 2 * (length + width);','22.0',{t:'19.0',hl:1}],
+    ['4','cout << area << " " << perimeter;','22.0','19.0']
+  ];
+  table(c,b.x+24,b.y+52,b.w-48,cols,rows,f,{rowH:42,start:10,per:60});
+  txt(c,'Complexity: O(1) — Exactly 4 steps, constant cost regardless of dimensions',b.x+b.w/2,b.y+b.h-24,{size:13,font:'marker',col:CL.green,a:ease(at(f,260,300))});
+}};
+
+VIZ.t_sel={cycle:500,draw(c,W,H,f,frame){
+  const b=board(c,W,H,{title:'Trace: Selection Ladder (Task 2 Grade Validation)',frame});
+  const cols=[{h:'INPUT',w:.15,mono:1},{h:'CHECK 1: score < 0 || score > 100',w:.4,al:'left'},{h:'CHECK 2: score >= 50',w:.25},{h:'CONSOLE OUTPUT',w:.2,mono:1}];
+  const rows=[
+    ['105',{t:'true (terminates)',col:CL.pink},'skipped',{t:'"Invalid Score"',hl:1}],
+    ['72','false',{t:'true',col:CL.green},{t:'"Passed"',hl:1}],
+    ['35','false','false',{t:'"Failed"',hl:1}]
+  ];
+  table(c,b.x+24,b.y+52,b.w-48,cols,rows,f,{rowH:44,start:10,per:65});
+  txt(c,'Complexity: O(1) — At most 2 checks executed per run: strictly bounded constant time',b.x+b.w/2,b.y+b.h-24,{size:13,font:'marker',col:CL.green,a:ease(at(f,220,260))});
+}};
+
+VIZ.t_rep={cycle:550,draw(c,W,H,f,frame){
+  const b=board(c,W,H,{title:'Trace: Repetition (Task 3 Factorial Loop)',frame});
+  const cols=[{h:'ITERATION',w:.15},{h:'i',w:.1,mono:1},{h:'CONDITION: i <= 4',w:.3},{h:'factorial (after)',w:.45,mono:1}];
+  const rows=[
+    ['Init','-','-',{t:'1',hl:1}],
+    ['1','1','true (1 <= 4)',{t:'1 * 1 = 1',hl:1}],
+    ['2','2','true (2 <= 4)',{t:'1 * 2 = 2',hl:1}],
+    ['3','3','true (3 <= 4)',{t:'2 * 3 = 6',hl:1}],
+    ['4','4','true (4 <= 4)',{t:'6 * 4 = 24',hl:1}],
+    ['Exit','5','false (5 <= 4) — loop ends','24']
+  ];
+  table(c,b.x+24,b.y+48,b.w-48,cols,rows,f,{rowH:36,start:10,per:50});
+  txt(c,'Complexity: O(n) — The loop executes exactly n times; linear growth',b.x+b.w/2,b.y+b.h-22,{size:13,font:'marker',col:CL.cyan,a:ease(at(f,280,320))});
+}};
+
+VIZ.t_trace={cycle:560,draw(c,W,H,f,frame){
+  const b=board(c,W,H,{title:'Full Trace: Function Inside Loop with Reference',frame});
+  const cols=[{h:'i',w:.1,mono:1},{h:'isEven(i)',w:.25},{h:'runningSum (alias of totalSum)',w:.65,al:'left',mono:1}];
+  const rows=[
+    ['1','false (1 % 2 != 0)','unchanged -> 0'],
+    ['2','true  (2 % 2 == 0)',{t:'0 + 2 = 2',hl:1}],
+    ['3','false (3 % 2 != 0)','unchanged -> 2'],
+    ['4','true  (4 % 2 == 0)',{t:'2 + 4 = 6',hl:1}]
+  ];
+  table(c,b.x+24,b.y+54,b.w-48,cols,rows,f,{rowH:46,start:10,per:65});
+  txt(c,'Product Rule: n iterations * O(1) per call = O(n) overall complexity',b.x+b.w/2,b.y+b.h-24,{size:13,font:'marker',col:CL.amber,a:ease(at(f,280,320))});
+}};
+
+const CODE={
+c_const:`void constantTime(int n) {
+    int result = n * n; // single op
+    cout << "Result: " << result;
+}`,
+c_log:`void logTime(int n) {
+    int steps = 0;
+    for (int i = 1; i < n; i *= 2) {
+        steps++;
+    }
+    cout << "Total steps: " << steps;
+}`,
+c_roots:`void fourthRootTime(int n) {
+    int limit = pow(n, 0.25);
+    for (int i = 0; i < limit; i++) { }
+}
+
+void cubeRootTime(int n) {
+    int limit = cbrt(n);
+    for (int i = 0; i < limit; i++) { }
+}`,
+c_sqrt:`void squareRootTime(int n) {
+    int limit = sqrt(n);
+    for (int i = 0; i < limit; i++) {
+        cout << i << " ";
+    }
+}`,
+c_linear:`void linearTime(int n) {
+    for (int i = 0; i < n; i++) {
+        if (i % (n / 10 == 0 ? 1 : n / 10) == 0)
+            cout << i << " ";
+    }
+}`,
+c_nlogn:`void nLogNTime(int n) {
+    int count = 0;
+    for (int i = 0; i < n; i++)
+        for (int j = 1; j < n; j *= 2)
+            count++;
+}`,
+c_quad_fixed:`void quadraticTime(int n) {
+    int count = 0;
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            count++;
+        }
+    }
+    cout << "Total: " << count;
+}`,
+c_driver:`int main() {
+    int n;
+    cout << "Enter a value for n: ";
+    cin >> n;
+
+    constantTime(n);
+    logTime(n);
+    fourthRootTime(n);
+    cubeRootTime(n);
+    squareRootTime(n);
+    linearTime(n);
+    nLogNTime(n / 10);
+    quadraticTime(n / 100);
+}`,
+w1:`int main() {
+    int firstNumber = 0, secondNumber = 0;
+    cin >> firstNumber;   // user enters 13
+    cin >> secondNumber;  // user enters 5
+
+    int quotient  = firstNumber / secondNumber;
+    int remainder = firstNumber % secondNumber;
+
+    cout << "Quotient: "  << quotient;
+    cout << "Remainder: " << remainder;
+}`,
+w9:`int main() {
+    double length = 0.0, width = 0.0;
+    cin >> length >> width;
+
+    double area      = length * width;
+    double perimeter = 2 * (length + width);
+
+    cout << "Area: "      << area;
+    cout << "Perimeter: " << perimeter;
+}`,
+w2:`int score = 85;
+char letterGrade;
+
+if (score >= 90)      letterGrade = 'A';
+else if (score >= 80) letterGrade = 'B';
+else if (score >= 70) letterGrade = 'C';
+else                  letterGrade = 'F';
+
+cout << "Grade: " << letterGrade;`,
+w10:`int score = 0;
+cin >> score;
+
+if (score < 0 || score > 100) {
+    cout << "Invalid Score";
+} else if (score >= 50) {
+    cout << "Passed";
+} else {
+    cout << "Failed";
+}`,
+w3:`int sum = 0;
+for (int i = 1; i <= n; i += 2) {
+    sum += i;
+}
+cout << "Sum of odds: " << sum;`,
+w4:`long long factorial = 1;
+for (int i = 1; i <= n; ++i) {
+    factorial *= i;
+}
+cout << "Factorial: " << factorial;`,
+w6:`double fahrenheitToCelsius(double f) {
+    return (f - 32.0) * (5.0 / 9.0);
+}`,
+w11:`void swapNumbers(int& x, int& y) {
+    int temp = x;
+    x = y;
+    y = temp;
+}
+
+int main() {
+    int a = 12, b = 45;
+    swapNumbers(a, b);
+    cout << "a = " << a << ", b = " << b;
+}`,
+w8:`bool isEven(int n) { return (n % 2 == 0); }
+
+void processNumbers(int limit, int& runningSum) {
+    for (int i = 1; i <= limit; ++i) {
+        if (isEven(i)) runningSum += i;
+    }
+}
+
+int main() {
+    int totalSum = 0;
+    processNumbers(4, totalSum);
+    cout << "Final Total Sum: " << totalSum;
+}`,
+c_snipD:`for (int i = 0; i < n; i++) { /* O(1) work */ }
+for (int i = 0; i < n; i++)
+    for (int j = 0; j < n; j++) { /* O(1) work */ }`,
+task6_code:`#include <iostream>
+using namespace std;
+
+// 1. Helper function (Selection)
+bool isDivisibleByThree(int val) {
+    return (val % 3 == 0);
+}
+
+// 2. Repetition & Pass by Reference
+void filterAndSum(int n, int& matchedCount, long long& sumResult) {
+    for (int i = 1; i <= n; ++i) {
+        if (isDivisibleByThree(i)) {
+            matchedCount++;
+            sumResult += i;
+        }
+    }
+}
+
+int main() {
+    int n = 0;
+    cout << "Enter positive limit n: ";
+    cin >> n;
+
+    int totalMatches = 0;
+    long long totalSum = 0;
+
+    filterAndSum(n, totalMatches, totalSum);
+
+    cout << "Matched Count: " << totalMatches << endl;
+    cout << "Sum: " << totalSum << endl;
+    return 0;
+}`
+};
+
+const HERO=`
+<div class="lbl">Data Structures · Master Deck</div>
+<h1><em>Time Complexity</em></h1>
+<div class="tag">Visualizing Loop Growth Rates, Line-by-Line Code Traces &amp; Student Capstone Task</div>
+<div class="inst"><div class="avatar">M</div><div><small>Instructor</small><b>Muhammad Ali Abdul Kareem</b></div></div>
+<div class="chips"><span>8 Complexity Classes</span><span>Step-by-Step Traces</span><span>Student Tasks 1–6</span><span>Interactive MCQ Tasks</span></div>`;
+
+/* Master Deck Structure */
+const SL=[
+/* 1 */ {part:'part-intro',hero:true,next:'What is time complexity?'},
+/* 2 */ {part:'part-intro',lbl:'Core Principle',h2:'What is <em>Time Complexity</em>, really?',sub:'Forget the stopwatch. We count <strong>elementary operations</strong> as input size <code>n</code> scales to infinity.',
+ task:{chip:'Fundamental Rule',req:[
+   'Time complexity measures operations count growth, not execution seconds.',
+   'Hardware-independent: identical Big-O applies to microcontrollers or server farms.',
+   'Counting loop trips provides mathematically verified scaling guarantees.',
+   'Ordered: O(1) &lt; O(log n) &lt; O(n^¼) &lt; O(n^⅓) &lt; O(√n) &lt; O(n) &lt; O(n log n) &lt; O(n²).'
+ ],trap:'Wall-clock timing fluctuates with system background loads and CPU throttling. Loop iteration analysis is invariant.',
+ code:'c_const'},next:'Classes 1 & 2: Constant & Logarithmic'},
+/* 3 */ {part:'part-classes',lbl:'Classes 1 &amp; 2',h2:'Flat vs. Doubling Step: <em>O(1) &amp; O(log n)</em>',sub:'Comparing zero loops with a loop whose counter doubles each step.',
+ cards:{fs:13,items:[
+   {h:'O(1) — Constant Time',code:'c_const',n:`Fixed arithmetic cost. Whether <code>n = 10</code> or <code>n = 10,000,000</code>, work count is strictly 1 operation.`},
+   {h:'O(log n) — Logarithmic Time',code:'c_log',n:`<code>i *= 2</code> means distance is halved exponentially. At n = 1,000,000 it finishes in only ~20 steps!`}
+ ]},next:'Classes 3, 4 & 5: Root-bounded loops'},
+/* 4 */ {part:'part-classes',lbl:'Classes 3, 4 &amp; 5',h2:'Root-Bounded Loops: <em>O(n^¼), O(n^⅓) &amp; O(√n)</em>',sub:'Shrinking upper limits with roots instead of scanning to <code>n</code> directly.',
+ cards:{fs:13,items:[
+   {h:'Fourth & Cube Root',code:'c_roots',n:`<code>pow(n, 0.25)</code> vs <code>cbrt(n)</code>. At n = 10,000, fourth root does 10 trips while cube root does 21.`},
+   {h:'O(√n) — Square Root',code:'c_sqrt',n:`Standard primality testing loop. For n = 1,000,000, only 1,000 iterations run instead of 1,000,000.`}
+ ]},next:'Classes 6 & 7: Linear & Log-linear'},
+/* 5 */ {part:'part-classes',lbl:'Classes 6 &amp; 7',h2:'Linear &amp; Log-Linear: <em>O(n) &amp; O(n log n)</em>',sub:'Single linear sweep vs. linear outer loop combined with logarithmic inner loop.',
+ cards:{fs:13,items:[
+   {h:'O(n) — Linear',code:'c_linear',n:`Single pass loop <code>i++</code> up to <code>n</code>. Work scales in direct 1:1 proportion to input size.`},
+   {h:'O(n log n) — Log-Linear',code:'c_nlogn',n:`Outer loop runs <code>n</code> times; inner runs <code>log n</code> times. Hallmark of Merge Sort and Heap Sort.`}
+ ]},next:'Class 8: Quadratic time and bug fix'},
+/* 6 */ {part:'part-classes',lbl:'Class 8 · Code Audit',h2:'Quadratic Time: <em>O(n²) &amp; Compiler Bug Fix</em>',sub:'Two nested loops bounded by <code>n</code>. Notice the syntax error in the raw implementation.',
+ task:{chip:'Compiler Bug Fix',req:[
+   'Original file contains an empty <code>if</code> statement without condition or body.',
+   'Will not compile until condition and body are properly provided.',
+   'Fixed implementation counts every inner iteration.',
+   'Product rule: <code>n × n = n²</code>. For n = 100, inner body executes 10,000 times.'
+ ],trap:'<b>Product Rule:</b> When loops are nested, their iteration limits multiply together.',
+ code:'c_quad_fixed'},next:'Visual curves comparison'},
+/* 7 */ {part:'part-classes',lbl:'Comparative Curves',h2:'All Eight Curves <em>Side-by-Side</em>',sub:'Observe how O(n²) pulls away steeply while O(1) and O(log n) remain virtually flat.',viz:'growthCurves',next:'Exact operation counts table'},
+/* 8 */ {part:'part-classes',lbl:'Growth Scale',h2:'Concrete Metrics: <em>Operation Counts vs. n</em>',sub:'The mathematical proof of why algorithmic complexity dominates hardware upgrades.',viz:'opTable',next:'The 6-step loop analysis formula'},
+/* 9 */ {part:'part-rules',lbl:'Analysis Blueprint',h2:'How to analyze <em>any</em> function complexity',sub:'Six ordered questions to extract the Big-O class without timers or benchmarks.',
+ task:{chip:'6-Step Method',req:[
+   '<b>1. Identify n dependencies:</b> Discard independent O(1) operations.',
+   '<b>2. Bound & step:</b> <code>i++</code> → O(n); <code>i*=2</code> → O(log n); <code>sqrt(n)</code> → O(√n).',
+   '<b>3. Product Rule (Nested):</b> Nested loops multiply: <code>O(n) × O(n) = O(n²)</code>.',
+   '<b>4. Sum Rule (Sequential):</b> Sequential blocks add: <code>O(n) + O(n²) → O(n²)</code>.',
+   '<b>5. Drop lower orders & constants:</b> <code>O(3n² + 5n) → O(n²)</code>.',
+   '<b>6. Counter variable:</b> Validate by printing step count as n doubles.'
+ ],trap:'Sequential blocks never multiply. Keep only the dominant term as n approaches infinity.',
+ code:'c_driver'},next:'Part 2: Worked Examples Intro'},
+/* 10 */ {part:'part-intro',lbl:'Part 2 Intro',h2:'Worked Examples: <em>Structured Programming to Functions</em>',sub:'Tracing real code snippets line-by-line and applying the 6-step complexity framework.',
+ cards:{fs:13,items:[
+   {h:'Pillars 1 & 2: Sequence & Selection',code:'w1',n:`Straight-line I/O, quotient/remainder, rectangle task, and multi-way grade checks — all evaluated as O(1).`},
+   {h:'Pillars 3, 4 & 5: Repetition, Functions, References',code:'w8',n:`Factorial loop O(n), F→C function O(1), reference swap O(1), and full nested trace O(n).`}
+ ]},next:'Pillar 1: Sequence & Task 1'},
+/* 11 */ {part:'part-seq',lbl:'Pillar 1 · Sequence',h2:'Sequence: <em>Quotient, Remainder &amp; Rectangle Task</em>',sub:'Every instruction runs once from top to bottom — no loops, no branching: strictly O(1).',
+ task:{chip:'Pillar 1 Analysis',req:[
+   'Quotient & Remainder: 5 fixed operations, no loops → O(1).',
+   'Student Task 1: Rectangle area & perimeter calculation.',
+   'Replacing <code>int</code> with <code>double</code> changes data width, not time complexity.',
+   'No input-dependent loop: time complexity remains invariant O(1).'
+ ],trap:'More arithmetic operations in sequence add tiny constant nanoseconds, but the Big-O class remains strictly O(1).',
+ code:'w9'},next:'Trace Table: Task 1'},
+/* 12 */ {part:'part-seq',lbl:'Pillar 1 Trace',h2:'Trace Table: <em>Student Task 1 (Rectangle)</em>',sub:'Tracing memory variable state during sequential execution.',viz:'t_seq',next:'Pillar 2: Selection & Task 2'},
+/* 13 */ {part:'part-sel',lbl:'Pillar 2 · Selection',h2:'Selection: <em>Grade Classification &amp; Validation</em>',sub:'Branching decides which path executes, not how many times code repeats.',
+ task:{chip:'Pillar 2 Analysis',req:[
+   'Grade check: at most 3 condition checks executed → O(1).',
+   'Student Task 2: Validate score range (0-100), then classify Passed/Failed.',
+   'Bounds check adds a condition branch, not a loop.',
+   'Evaluating 2 conditions vs 10 conditions is still bounded: strictly O(1).'
+ ],trap:'An <code>if / else if / else</code> ladder runs exactly one branch; branches do not multiply operations.',
+ code:'w10'},next:'Trace Table: Task 2'},
+/* 14 */ {part:'part-sel',lbl:'Pillar 2 Trace',h2:'Trace Table: <em>Student Task 2 (Grade Validation)</em>',sub:'Tracing conditional branches across multiple sample input runs.',viz:'t_sel',next:'Pillar 3: Repetition & Task 3'},
+/* 15 */ {part:'part-rep',lbl:'Pillar 3 · Repetition',h2:'Repetition: <em>Odd Sum &amp; Factorial Task</em>',sub:'Where complexity leaves O(1): iteration trip count is directly proportional to n.',
+ task:{chip:'Pillar 3 Analysis',req:[
+   'Sum of odds: <code>i += 2</code> up to n runs ~n/2 times → O(n).',
+   'Student Task 3: Iterative Factorial (N!) loop.',
+   '<code>factorial *= i</code> accumulates n terms from 1 to n.',
+   'Trips count grows directly 1:1 with n → Linear time O(n).'
+ ],trap:'Using <code>long long</code> prevents integer overflow, but the number of loop trips remains O(n).',
+ code:'w4'},next:'Trace Table: Task 3'},
+/* 16 */ {part:'part-rep',lbl:'Pillar 3 Trace',h2:'Trace Table: <em>Student Task 3 (Factorial N=4)</em>',sub:'Tracing factorial accumulator state iteration by iteration.',viz:'t_rep',next:'Pillars 4 & 5: Functions & References'},
+/* 17 */ {part:'part-fn',lbl:'Pillars 4 &amp; 5',h2:'Functions &amp; References: <em>F→C &amp; Swap Numbers</em>',sub:'Packaging code into functions and passing parameters by value vs. reference.',
+ cards:{fs:13,items:[
+   {h:'Functions: F → C Conversion',code:'w6',n:`Calling a non-looping function is fixed-cost arithmetic: O(1). <code>5.0/9.0</code> avoids integer zero division.`},
+   {h:'References: swapNumbers(int&, int&)',code:'w11',n:`References alias memory addresses. 3 assignments exchange values in O(1) time without copying overhead.`}
+ ]},next:'Full Trace Analysis'},
+/* 18 */ {part:'part-fn',lbl:'Full Trace Analysis',h2:'Comprehensive Trace: <em>Function Inside Loop</em>',sub:'Trace <code>processNumbers(4, totalSum)</code>: nested call with reference accumulation.',viz:'t_trace',next:'Self-Check Challenge'},
+/* 19 */ {part:'part-rules',lbl:'Interactive Predictor',h2:'Task: <em>Predict Time Complexity</em>',sub:'Click the correct Big-O class for the sequential linear + nested quadratic loop.',
+ mcq:true,
+ options:['O(n)', 'O(n log n)', 'O(n²)', 'O(n³)'],
+ answer:'O(n²)',
+ explain:'<b>Correct! O(n²) is dominant.</b> Loop 1 is <code>O(n)</code>. Loop 2 is nested <code>O(n × n) = O(n²)</code>. By the Sum Rule: <code>O(n) + O(n²) = O(n²)</code>.',
+ code:'c_snipD',next:'Student Task 6 (Capstone Task)'},
+
+/* 20 — TASK 6 WITH CLEAN LABELS & TERMINAL VIEW */
+{part:'part-rules',lbl:'Student Task 6',h2:'Task 6: <em>Filter &amp; Accumulate Multiples</em>',sub:'Capstone Task · Function &amp; Reference Complexity Analysis.',
+ task6:true,
+ req:[
+   'Write helper function <code>bool isDivisibleByThree(int val);</code> — checks if val is a multiple of 3.',
+   'Write function <code>void filterAndSum(int n, int& matchedCount, long long& sumResult);</code> passing count and sum by <b>reference</b>.',
+   'Loop from <code>1</code> up to <code>n</code>, invoke the helper function, update reference parameters.',
+   '<b>Time Complexity:</b> Helper is O(1) inside loop of n trips: overall complexity is <b>O(n)</b>.'
+ ],
+ trap:'<b>Product Rule:</b> Loop runs n times. The helper check executes in O(1) constant time. Total = O(n) × O(1) = O(n).',
+ terminalLines:[
+   [['Enter positive limit n: ','dim'],['10','amber']],
+   [['Matched Count: 3','green']],
+   [['Sum: 18','green']]
+ ],
+ sol:'task6_code',next:'End of Session 02'}
+];
+const N=SL.length;
+
+function highlight(src){
+  const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const re=/(\/\/[^\n]*)|(#include\s*<[^>\n]+>)|("(?:[^"\\\n]|\\.)*")|('(?:[^'\\\n]|\\.)')|\b(\d+(?:\.\d+)?)\b|\b(long long|int|double|char|bool|void|float)\b|\b(return|if|else|for|while|do|using|namespace|true|false)\b|\b(cout|cin|endl)\b|\b([A-Za-z_]\w*)(?=\()/g;
+  let out='',last=0,m;
+  while((m=re.exec(src))){
+    out+=esc(src.slice(last,m.index));const t=m[0];
+    const cls=m[1]?'c':m[2]?'p':(m[3]||m[4])?'s':m[5]?'n':m[6]?'t':m[7]?'k':m[8]?'o':'f';
+    out+=`<span class="${cls}">${esc(t)}</span>`;last=m.index+t.length;
+  }
+  return out+esc(src.slice(last));
+}
+
+let codeSeq=0;
+function renderCodeWindow(k){
+  const id="cw_"+(codeSeq++);
+  const raw=CODE[k]||k;
+  return `
+  <div class="code-window">
+    <div class="code-header">
+      <div class="dots"><span></span><span></span><span></span></div>
+      <button class="copy-btn" data-target="${id}">📋 Copy</button>
+    </div>
+    <div class="codecard">
+      <pre class="code" id="${id}">${highlight(raw)}</pre>
+    </div>
+  </div>`;
+}
+
+const vp=document.getElementById('vp'),live=[];
+const dots=i=>Array.from({length:N},(_,k)=>`<i class="dot${k===i?' on':''}"></i>`).join('');
+const footer=(i,next)=>`<div class="sf"><span>Data Structures · Session 02</span><div class="pd">${dots(i)}</div><span>${next}</span></div>`;
+
+SL.forEach((s,i)=>{
+  const el=document.createElement('section');
+  el.className='slide'+(s.hero?' hero-slide':'');
+  let h='';
+  if(s.hero){
+    h=HERO+footer(i,s.next)+'<canvas class="herobg" data-viz="tokens"></canvas>';
+  }else{
+    let stage='';
+    if(s.viz)stage=`<div class="viz"><canvas data-viz="${s.viz}"></canvas></div>`;
+    else if(s.task6){
+      stage=`<div class="task">
+        <div class="tleft">
+          <div class="chip">Student Task 6 · Applied Practice</div>
+          <ul class="req">${s.req.map(r=>`<li>${r}</li>`).join('')}</ul>
+          ${s.trap?`<div class="trap">${s.trap}</div>`:''}
+          <div class="sol-actions"><button class="solbtn" data-sol>Reference Solution<kbd>S</kbd></button></div>
+        </div>
+        <div class="tright">
+          <div class="viz"><canvas data-viz="terminal" data-task="task6"></canvas></div>
+        </div>
+      </div>`;
+    }else if(s.mcq){
+      stage=`<div class="task">
+        <div class="tleft">
+          <div class="chip">Interactive Knowledge Check</div>
+          <p style="font-size:14px;color:var(--ts);line-height:1.5;margin:0 0 6px;">Analyze the code snippet on the right. <b>Predict the overall Big-O Time Complexity:</b></p>
+          <div class="mcq-box" data-ans="${s.answer}" data-exp="${encodeURIComponent(s.explain)}">
+            <div class="mcq-options">
+              ${s.options.map(opt=>`<button class="mcq-btn" data-val="${opt}">${opt}</button>`).join('')}
+            </div>
+            <div class="mcq-feedback"></div>
+          </div>
+        </div>
+        <div class="tright">${renderCodeWindow(s.code)}</div>
+      </div>`;
+    }else if(s.task){
+      stage=`<div class="task">
+        <div class="tleft">
+          <div class="chip">${s.task.chip}</div>
+          <ul class="req">${s.task.req.map(r=>`<li>${r}</li>`).join('')}</ul>
+          ${s.task.trap?`<div class="trap">${s.task.trap}</div>`:''}
+          ${s.sol?`<div class="sol-actions"><button class="solbtn" data-sol>Reference Solution<kbd>S</kbd></button></div>`:''}
+        </div>
+        <div class="tright">${renderCodeWindow(s.task.code)}</div>
+      </div>`;
+    }else if(s.cards){
+      const C=s.cards;
+      stage=`<div class="cards" style="--fs:${C.fs}px;">
+        ${C.items.map(it=>`<div class="cc"><div class="cc-h">${it.h}</div>${renderCodeWindow(it.code)}<div class="cc-n">${it.n}</div></div>`).join('')}
+      </div>`;
+    }
+    h=`<div class="lbl">${s.lbl}</div><h2>${s.h2}</h2>${s.sub?`<p class="sub">${s.sub}</p>`:''}<div class="stage">${stage}</div>${footer(i,s.next)}`;
+
+    if(s.sol){
+      h+=`
+      <div class="sol"><div class="sol-h"><div class="lbl">Task 6 Solution &amp; Complexity Walkthrough</div><button class="solbtn" style="position:static" data-sol>Hide<kbd>S</kbd></button></div>
+      <div class="sol-body">${renderCodeWindow(s.sol)}<div class="notes"><div class="note-h">Key Takeaways</div>
+      <div class="note"><b>1. Time Complexity: O(n)</b> — The <code>for</code> loop iterates exactly n times. In each iteration, <code>isDivisibleByThree()</code> performs one modulo check in O(1) time. Product rule: <code>O(n) × O(1) = O(n)</code>.</div>
+      <div class="note"><b>2. References:</b> <code>matchedCount</code> and <code>sumResult</code> are passed with <code>&amp;</code>, mutating variables in <code>main()</code> without return statements.</div>
+      <div class="note"><b>3. Clean Architecture:</b> Selection (<code>% 3 == 0</code>), Repetition (<code>for</code>), Functions, and Pass-by-Reference combined in a structured workflow.</div>
+      </div></div></div>`;
+    }
+  }
+  el.innerHTML=h;vp.appendChild(el);s.el=el;
+  el.querySelectorAll('canvas[data-viz]').forEach(cv=>{
+    const def=VIZ[cv.dataset.viz];
+    const data = s.task6 ? { lines: s.terminalLines, title: 'Console Output (Expected)' } : null;
+    live.push({cv,s:fit(cv),def,slide:i,data});
+  });
+});
+
+/* Copy-to-Clipboard Event Listener */
+document.addEventListener("click", async e=>{
+  const btn = e.target.closest(".copy-btn");
+  if(!btn) return;
+  const targetId = btn.getAttribute("data-target");
+  const el = document.getElementById(targetId);
+  if(!el) return;
+  const text = el.innerText;
+  try{
+    await navigator.clipboard.writeText(text);
+  }catch(_){
+    const ta = document.createElement("textarea");
+    ta.value = text; document.body.appendChild(ta); ta.select();
+    document.execCommand("copy"); document.body.removeChild(ta);
+  }
+  const original = btn.innerHTML;
+  btn.classList.add("copied");
+  btn.innerHTML = "✅ Copied";
+  setTimeout(()=>{ btn.classList.remove("copied"); btn.innerHTML = original; }, 1600);
+});
+
+/* MCQ Option Handler */
+document.addEventListener("click", e=>{
+  const btn = e.target.closest(".mcq-btn");
+  if(!btn) return;
+  const box = btn.closest(".mcq-box");
+  const expected = box.getAttribute("data-ans");
+  const explain = decodeURIComponent(box.getAttribute("data-exp"));
+  const val = btn.getAttribute("data-val");
+  const fb = box.querySelector(".mcq-feedback");
+
+  box.querySelectorAll(".mcq-btn").forEach(b=>b.classList.remove("correct", "wrong"));
+
+  if(val === expected){
+    btn.classList.add("correct");
+    fb.className = "mcq-feedback show correct";
+    fb.innerHTML = explain;
+  } else {
+    btn.classList.add("wrong");
+    fb.className = "mcq-feedback show wrong";
+    fb.innerHTML = "Not quite! Look closely at the dominant loop term. Try another option!";
+  }
+});
+
+function closeSol(){document.querySelectorAll('.sol.open').forEach(e=>e.classList.remove('open'))}
+function toggleSol(){const el=SL[cur].el.querySelector('.sol');if(el)el.classList.toggle('open')}
+
+let cur=-1,frame=0,t0=0;
+const counter=document.getElementById('counter'),prog=document.getElementById('prog');
+function go(i){
+  i=Math.max(0,Math.min(N-1,i));if(i===cur)return;
+  if(cur>=0){SL[cur].el.classList.remove('active');closeSol()}
+  cur=i;SL[i].el.classList.add('active');
+  vp.className='vp '+SL[i].part;
+  const cs=getComputedStyle(vp);PC=cs.getPropertyValue('--c').trim();PC2=cs.getPropertyValue('--c-2').trim();
+  counter.textContent=(i+1)+' / '+N;prog.style.width=((i+1)/N*100)+'%';t0=frame;
+}
+
+/* Keyboard Listener Supporting Both English and Arabic Layouts */
+document.addEventListener('keydown', e=>{
+  if(e.metaKey||e.ctrlKey||e.altKey) return;
+  const k = e.key;
+  const code = e.code;
+
+  if(['ArrowRight','ArrowDown','PageDown',' '].includes(k) || code === 'Space' || code === 'Enter'){
+    e.preventDefault(); go(cur+1);
+  }
+  else if(['ArrowLeft','ArrowUp','PageUp','Backspace'].includes(k)){
+    e.preventDefault(); go(cur-1);
+  }
+  else if(code === 'Home') go(0);
+  else if(code === 'End') go(N-1);
+  // S / s / س
+  else if(code === 'KeyS' || k === 's' || k === 'S' || k === 'س'){
+    toggleSol();
+  }
+  // F / f / ب
+  else if(code === 'KeyF' || k === 'f' || k === 'F' || k === 'ب'){
+    try{ document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen(); }catch(_){}
+  }
+  else if(code === 'Escape') closeSol();
+});
+
+document.getElementById('next').onclick=e=>{go(cur+1);e.target.blur()};
+document.getElementById('prev').onclick=e=>{go(cur-1);e.target.blur()};
+document.addEventListener('click',e=>{
+  if(e.target.closest('[data-sol]')){toggleSol();e.target.blur()}
+});
+
+/* Theme Toggle Listener */
+const themeBtn = document.getElementById('themeToggle');
+const themeIcon = document.getElementById('themeIcon');
+const sunSvg = '<circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>';
+const moonSvg = '<path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>';
+
+function setTheme(light){
+  document.body.classList.toggle('light-mode', light);
+  themeIcon.innerHTML = light ? sunSvg : moonSvg;
+  updateThemeTokens();
+  localStorage.setItem('deck_theme', light ? 'light' : 'dark');
+}
+
+themeBtn.onclick = () => setTheme(!document.body.classList.contains('light-mode'));
+if(localStorage.getItem('deck_theme') === 'light'){ setTheme(true); } else { updateThemeTokens(); }
+
+const fitbox=document.getElementById('fitbox'),deck=document.getElementById('deck');
+function layout(){
+  const cs=getComputedStyle(document.body);
+  const W=innerWidth-parseFloat(cs.paddingLeft)-parseFloat(cs.paddingRight);
+  const H=innerHeight-parseFloat(cs.paddingTop)-parseFloat(cs.paddingBottom);
+  const small=Math.min(W,H)<640,rot=small&&H>W;
+  document.body.classList.toggle('small',small);document.body.classList.toggle('rot90',rot);
+  let s;
+  if(small){
+    const aw=rot?H:W,ah=rot?W:H,dh=619,s0=ah/dh,dw=Math.min(1500,Math.max(1100,aw/s0));
+    s=Math.min(s0,aw/dw);
+    vp.style.width=dw+'px';deck.style.width=dw+'px';deck.style.height=dh+'px';
+    fitbox.style.width=(rot?dh*s:dw*s)+'px';fitbox.style.height=(rot?dw*s:dh*s)+'px';
+    deck.style.transform=rot?`translate(${dh*s}px,0) rotate(90deg) scale(${s})`:`scale(${s})`;
+  }else{
+    s=Math.min((W-12)/1100,(H-12)/707);
+    vp.style.width='1100px';deck.style.width='1100px';deck.style.height='707px';
+    fitbox.style.width=1100*s+'px';fitbox.style.height=707*s+'px';deck.style.transform=`scale(${s})`;
+  }
+  SC=Math.max(.2,s);
+}
+addEventListener('resize',layout);layout();
+
+const amb=fit(document.getElementById('amb'));
+const blobs=[[.2,.3,'#6366f1'],[.75,.25,'#a855f7'],[.55,.75,'#ec4899'],[.15,.8,'#6366f1']];
+const specks=Array.from({length:46},(_,i)=>[(i*.6180339)%1,(i*.3819661+.17)%1,i*1.7]);
+function aurora(f){
+  amb.rs();const{ctx,W,H}=amb;if(!W)return;
+  ctx.fillStyle=isLight?'#ebe9f5':'#07070d';ctx.fillRect(0,0,W,H);ctx.globalCompositeOperation='lighter';
+  blobs.forEach(([bx,by,col],i)=>{
+    const x=W*bx+Math.sin(f*.004+i)*70,y=H*by+Math.cos(f*.003+i*1.7)*50,r=Math.min(W,H)*(.42+.05*Math.sin(f*.006+i));
+    const g=ctx.createRadialGradient(x,y,0,x,y,r);
+    g.addColorStop(0,col+(isLight?'15':'22'));
+    g.addColorStop(1,col+'00');
+    ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y,r,0,7);ctx.fill();
+  });
+  ctx.globalCompositeOperation='source-over';
+  specks.forEach(([dx,dy,ph])=>{
+    ctx.fillStyle=isLight?`rgba(90,80,140,${.12+.1*Math.sin(f*.02+ph)})`:`rgba(200,190,255,${.18+.18*Math.sin(f*.02+ph)})`;
+    ctx.beginPath();ctx.arc(dx*W,dy*H,1.1,0,7);ctx.fill()
+  });
+  const v=ctx.createRadialGradient(W/2,H/2,Math.min(W,H)*.3,W/2,H/2,Math.max(W,H)*.75);
+  v.addColorStop(0,'rgba(5,5,9,0)');
+  v.addColorStop(1,isLight?'rgba(235,233,245,.65)':'rgba(5,5,9,.7)');
+  ctx.fillStyle=v;ctx.fillRect(0,0,W,H);
+}
+function tick(){
+  frame++;aurora(frame);
+  for(const o of live){
+    if(o.slide!==cur)continue;
+    o.s.rs();const{ctx,W,H}=o.s;if(!W)continue;
+    ctx.clearRect(0,0,W,H);CW=W;
+    o.def.draw(ctx,W,H,(frame-t0)%o.def.cycle,frame,o);
+  }
+  requestAnimationFrame(tick);
+}
+go(0);tick();
+</script>
+</body>
+</html>

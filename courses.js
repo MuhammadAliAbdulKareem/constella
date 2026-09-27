@@ -60,8 +60,16 @@ window.SITE = {
           file: "decks/data-structures/Week ⇔ 01/Session ⇔ 01.html",
           date: "2026-09-22",
           duration: "75 min"
+        },
+        {
+          week: 2,
+          title: "Time Complexity & Growth Rates",
+          topics: ["Big-O notation", "8 complexity classes", "nested loops", "trace tables", "references", "capstone task"],
+          file: "decks/data-structures/Week ⇔ 02/Session ⇔ 02.html",
+          date: "2026-09-29",
+          duration: "75 min"
         }
-        // ,{ week: 2, title: "…", topics: ["…"], file: "decks/data-structures/Week ⇔ 02/Session ⇔ 02.html", date: "2026-09-29" }
+        // ,{ week: 3, title: "…", topics: ["…"], file: "decks/data-structures/Week ⇔ 03/Session ⇔ 03.html", date: "2026-10-06" }
       ]
     }
   ]
