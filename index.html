@@ -1452,20 +1452,66 @@ html[data-theme="light"] .update-toast{background:rgba(255,255,255,.96);border-c
   var updateReloadBtn = $('#updateReloadBtn');
   var checkUpdateBtn = $('#checkUpdateBtn');
   var newWorkerWaiting = null;
+  var swRegistration = null;
 
   function promptUserForUpdate(worker) {
     newWorkerWaiting = worker;
-    if (updateToast) updateToast.hidden = false;
+    if (updateToast) {
+      updateToast.hidden = false;
+      if (updateReloadBtn) {
+        updateReloadBtn.disabled = false;
+        updateReloadBtn.textContent = 'Update Now';
+      }
+    }
+  }
+
+  function triggerUpdateReload() {
+    if (updateReloadBtn) {
+      updateReloadBtn.disabled = true;
+      updateReloadBtn.textContent = 'Updating...';
+    }
+
+    var reloaded = false;
+    function doReload() {
+      if (reloaded) return;
+      reloaded = true;
+      window.location.reload();
+    }
+
+    // 1. Tell new waiting worker to activate immediately
+    if (newWorkerWaiting) {
+      try {
+        newWorkerWaiting.postMessage({ type: 'SKIP_WAITING' });
+      } catch (e) {}
+    }
+
+    if (swRegistration && swRegistration.waiting) {
+      try {
+        swRegistration.waiting.postMessage({ type: 'SKIP_WAITING' });
+      } catch (e) {}
+    }
+
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistration().then(function (reg) {
+        if (reg && reg.waiting) {
+          try {
+            reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+          } catch (e) {}
+        }
+      }).catch(function () {});
+
+      // 2. When controller changes, reload
+      navigator.serviceWorker.addEventListener('controllerchange', function () {
+        doReload();
+      }, { once: true });
+    }
+
+    // 3. Fallback: if controllerchange doesn't fire within 350ms, reload anyway
+    setTimeout(doReload, 350);
   }
 
   if (updateReloadBtn) {
-    updateReloadBtn.addEventListener('click', function () {
-      if (newWorkerWaiting) {
-        newWorkerWaiting.postMessage({ type: 'SKIP_WAITING' });
-      } else {
-        window.location.reload();
-      }
-    });
+    updateReloadBtn.addEventListener('click', triggerUpdateReload);
   }
 
   if ('serviceWorker' in navigator) {
@@ -1478,6 +1524,7 @@ html[data-theme="light"] .update-toast{background:rgba(255,255,255,.96);border-c
 
     window.addEventListener('load', function () {
       navigator.serviceWorker.register('./sw.js').then(function (reg) {
+        swRegistration = reg;
         console.log('[PWA] Service Worker registered:', reg.scope);
 
         // 1. Force immediate update check on initial page load
@@ -1496,7 +1543,7 @@ html[data-theme="light"] .update-toast{background:rgba(255,255,255,.96);border-c
         }, 2 * 60 * 1000);
 
         // 4. If a worker is already waiting in background
-        if (reg.waiting) {
+        if (reg.waiting && navigator.serviceWorker.controller) {
           promptUserForUpdate(reg.waiting);
         }
 
@@ -1518,11 +1565,15 @@ html[data-theme="light"] .update-toast{background:rgba(255,255,255,.96);border-c
             checkUpdateBtn.textContent = 'Checking...';
             reg.update().then(function () {
               setTimeout(function () {
-                if (!reg.waiting) {
+                if (reg.waiting) {
+                  promptUserForUpdate(reg.waiting);
+                  checkUpdateBtn.textContent = 'Update available!';
+                  setTimeout(function () { checkUpdateBtn.textContent = 'Check for updates'; }, 3000);
+                } else {
                   checkUpdateBtn.textContent = 'Up to date ✓';
                   setTimeout(function () { checkUpdateBtn.textContent = 'Check for updates'; }, 2500);
                 }
-              }, 1000);
+              }, 1200);
             }).catch(function () {
               checkUpdateBtn.textContent = 'Check for updates';
             });

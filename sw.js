@@ -2,7 +2,7 @@
    Constella Service Worker — Offline Course Portal & PWA Engine
    ===================================================================== */
 
-const CACHE_NAME = 'constella-v1.7.0';
+const CACHE_NAME = 'constella-v1.7.2';
 
 // Core application shell assets to pre-cache on install
 const CORE_ASSETS = [
@@ -19,7 +19,6 @@ const CORE_ASSETS = [
 
 // Pre-cache core assets
 self.addEventListener('install', (event) => {
-  self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       return cache.addAll(CORE_ASSETS).catch((err) => {
@@ -133,7 +132,7 @@ self.addEventListener('fetch', (event) => {
 
 // Listen for message events (e.g. SKIP_WAITING from client)
 self.addEventListener('message', (event) => {
-  if (event.data && event.data.type === 'SKIP_WAITING') {
+  if (event.data && (event.data.type === 'SKIP_WAITING' || event.data === 'SKIP_WAITING')) {
     self.skipWaiting();
   }
 });
