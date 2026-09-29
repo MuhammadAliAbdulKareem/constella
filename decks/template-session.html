@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Course Session · Template</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700&family=Syne:wght@700;800;900&display=swap" rel="stylesheet">
+<script>
+  /* Zero-FOUC Theme Init */
+  try {
+    var savedTheme = (localStorage.getItem('cs:theme') || localStorage.getItem('deck_theme')) === 'light' ? 'light' : 'dark';
+    if (savedTheme === 'light') document.documentElement.classList.add('light-mode');
+  } catch(e) {}
+</script>
+<style>
+:root{
+  --vp-w:1200px;
+  --vp-h:675px;
+  --c:#6366f1;
+  --c-2:#a855f7;
+  --c-grad:linear-gradient(90deg,var(--c),var(--c-2));
+
+  /* Dark Theme Tokens */
+  --bg:#07070d;
+  --stage-bg:#090912;
+  --card:rgba(18,18,28,.82);
+  --card-border:rgba(255,255,255,.08);
+  --border:rgba(255,255,255,.08);
+  --tp:#f0eeff;
+  --ts:#9a9ab5;
+  --tm:#6b6b85;
+  --warn:#fb7185;
+  --syntax-grad:linear-gradient(135deg,#6366f1,#a855f7,#ec4899);
+  --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+  --shadow-vp:0 32px 70px rgba(0,0,0,.8);
+}
+
+/* Light Theme Tokens */
+html.light-mode, body.light-mode{
+  color-scheme: light;
+  --bg:#ebe9f5;
+  --stage-bg:#ffffff;
+  --card:#ffffff;
+  --card-border:rgba(120,110,160,.16);
+  --border:rgba(120,110,160,.16);
+  --tp:#181528;
+  --ts:#524d70;
+  --tm:#7f789e;
+  --warn:#e11d48;
+  --syntax-grad:linear-gradient(135deg,#4f46e5,#9333ea,#db2777);
+  --shadow-vp:0 24px 60px rgba(100,90,140,.14);
+}
+body.light-mode .slide-counter{background:rgba(255,255,255,.88);border-color:var(--card-border);color:var(--ts);backdrop-filter:blur(8px)}
+body.light-mode .brand-left a{background:rgba(255,255,255,.8)!important;color:var(--tp)!important;border-color:var(--card-border)!important;}
+body.light-mode .brand-left a:hover{background:#ffffff!important;border-color:var(--c)!important;}
+body.light-mode .vp-progress{background:rgba(120,110,160,.12)}
+
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;width:100%;height:100%;height:100dvh;background:var(--bg);color:var(--tp);font-family:Inter,system-ui,"Segoe UI",Roboto,Arial,sans-serif;overflow:hidden;transition:background .3s ease, color .3s ease;}
+body{display:flex;align-items:center;justify-content:center}
+body.small{padding:0!important}
+#fitbox{position:relative;flex:none;overflow:hidden;width:100%;height:100%;}
+#deck{position:absolute;left:0;top:0;transform-origin:top left}
+
+/* Brand Bar */
+.brand-bar{height:44px;display:flex;justify-content:space-between;align-items:center;padding:0 20px;}
+.brand-left{display:flex;align-items:center;gap:11px}
+.brand-name{font-size:15px;font-weight:900;background:var(--syntax-grad);-webkit-background-clip:text;background-clip:text;color:transparent;line-height:1.2}
+.brand-sub{font-size:11px;color:var(--tm);font-weight:600}
+.brand-right{display:flex;align-items:center;gap:14px;font-size:11.5px;color:var(--ts);font-weight:700}
+
+/* Theme Toggle Button */
+.theme-btn{
+  width:32px;height:32px;border-radius:8px;border:1px solid var(--card-border);background:var(--card);
+  display:grid;place-items:center;cursor:pointer;color:var(--tp);transition:.2s;padding:0;
+}
+.theme-btn:hover{border-color:var(--c);transform:scale(1.05);}
+.theme-btn svg{width:16px;height:16px;stroke-width:2;}
+
+/* Viewport Stage */
+.vp{
+  position:relative;width:var(--vp-w);height:var(--vp-h);border-radius:18px;overflow:hidden;
+  background:var(--stage-bg);box-shadow:0 0 0 1px rgba(255,255,255,.05),var(--shadow-vp);
+  transition:background .3s ease, box-shadow .3s ease;
+}
+.vp-bg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.vp-progress{position:absolute;top:0;left:0;right:0;height:3px;background:rgba(255,255,255,.06);z-index:20}
+.vp-progress span{display:block;height:100%;width:0%;background:var(--c-grad);transition:width .25s ease}
+.slide-counter{
+  position:absolute;top:14px;right:18px;z-index:20;font:700 11px var(--mono);
+  color:var(--ts);background:rgba(10,10,18,.75);padding:4px 9px;border-radius:999px;
+  border:1px solid var(--border);
+}
+
+/* Slides */
+.slide{position:absolute;inset:0;padding:48px 56px;display:none;flex-direction:column;z-index:10}
+.slide.active{display:flex}
+.s-title{font-family:Syne,sans-serif;font-size:38px;font-weight:900;margin:0 0 8px;letter-spacing:-.02em}
+.s-sub{font-size:16px;color:var(--ts);margin:0 0 24px}
+
+/* Controls */
+.controls{height:36px;display:flex;justify-content:space-between;align-items:center;padding:0 20px;font-size:11.5px;color:var(--tm);font-weight:600}
+.controls button{
+  cursor:pointer;background:transparent;border:1px solid var(--border);color:var(--tp);
+  padding:5px 14px;border-radius:999px;font:700 12px Inter,sans-serif;transition:.18s;
+}
+.controls button:hover{background:rgba(255,255,255,.08);border-color:var(--c)}
+kbd{padding:2px 6px;border-radius:4px;background:rgba(255,255,255,.08);font:700 10.5px var(--mono);color:var(--tp)}
+
+/* Mobile touch navigation */
+.mnav{display:none;position:absolute;top:50%;z-index:25;width:42px;height:42px;margin-top:-21px;border-radius:50%;border:1px solid var(--border);background:rgba(12,12,20,.65);color:var(--tp);font:800 22px/1 Inter,sans-serif;cursor:pointer;place-items:center;padding:0;opacity:.7}
+.mnav.mp{left:8px}.mnav.mn{right:8px}
+.small .mnav{display:grid}
+.small .brand-bar,.small .controls{display:none}
+</style>
+</head>
+<body>
+<div id="fitbox"><div id="deck">
+  <div class="brand-bar">
+    <div class="brand-left">
+      <a href="../../../index.html" style="padding:6px 13px;border-radius:999px;background:rgba(255,255,255,.07);color:#e9edff;font:600 12px/1 system-ui,sans-serif;text-decoration:none;border:1px solid rgba(255,255,255,.2);display:inline-flex;align-items:center;gap:6px;transition:background .2s,border-color .2s;flex-shrink:0">← Back to sessions</a>
+      <div>
+        <div class="brand-name">Course Name</div>
+        <div class="brand-sub">Week XX · Session Topic Title</div>
+      </div>
+    </div>
+    <div class="brand-right">
+      <span>Instructor · Muhammad Ali Abdul Kareem</span>
+      <button class="theme-btn" id="themeToggle" title="Switch to light theme" aria-label="Toggle theme">
+        <svg id="themeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="vp" id="vp">
+    <canvas class="vp-bg" id="amb"></canvas>
+    <div class="vp-progress"><span id="prog"></span></div>
+    <div class="slide-counter" id="counter">1 / 2</div>
+    <button class="mnav mp" id="mprev" aria-label="Previous slide">‹</button>
+    <button class="mnav mn" id="mnext" aria-label="Next slide">›</button>
+
+    <!-- Slide 1: Welcome -->
+    <div class="slide active">
+      <h1 class="s-title">Welcome to Session XX</h1>
+      <p class="s-sub">Core objectives, lecture breakdown, and hands-on overview.</p>
+    </div>
+
+    <!-- Slide 2: Concepts -->
+    <div class="slide">
+      <h2 class="s-title">Key Concepts</h2>
+      <p class="s-sub">Detailed explanation and visual breakdown.</p>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button id="prev" tabindex="-1">‹ Prev</button>
+    <span><kbd>→</kbd> next &nbsp;·&nbsp; <kbd>←</kbd> back &nbsp;·&nbsp; <kbd>F</kbd> fullscreen</span>
+    <button id="next" tabindex="-1">Next ›</button>
+  </div>
+</div></div>
+
+<script>
+/* ═══════════════ Canvas Fit & Theme ═══════════════ */
+function fit(c){const dpr=Math.min(window.devicePixelRatio||1,2);let w=0,h=0;return{c,ctx:c.getContext('2d'),rs(){const r=c.getBoundingClientRect();if(r.width===w&&r.height===h)return;w=r.width;h=r.height;c.width=Math.round(w*dpr);c.height=Math.round(h*dpr);this.ctx.setTransform(dpr,0,0,dpr,0,0);this.W=w;this.H=h}}}
+
+let isLight = document.documentElement.classList.contains('light-mode');
+const themeBtn = document.getElementById('themeToggle');
+const themeIcon = document.getElementById('themeIcon');
+
+function setTheme(light){
+  isLight = !!light;
+  document.documentElement.classList.toggle('light-mode', isLight);
+  document.body.classList.toggle('light-mode', isLight);
+  if(themeBtn) themeBtn.title = isLight ? 'Switch to dark theme' : 'Switch to light theme';
+  if(themeIcon){
+    themeIcon.innerHTML = isLight
+      ? '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>'
+      : '<circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>';
+  }
+  try {
+    localStorage.setItem('deck_theme', isLight ? 'light' : 'dark');
+    localStorage.setItem('cs:theme', isLight ? 'light' : 'dark');
+  } catch(e){}
+}
+if(themeBtn) themeBtn.addEventListener('click', ()=>setTheme(!isLight));
+window.addEventListener('storage', e=>{
+  if(e.key==='deck_theme'||e.key==='cs:theme'){
+    const shouldLight = e.newValue === 'light';
+    if(shouldLight !== isLight) setTheme(shouldLight);
+  }
+});
+setTheme(isLight);
+
+/* ═══════════════ Slides Navigation ═══════════════ */
+const slides = Array.from(document.querySelectorAll('.slide'));
+const N = slides.length;
+let cur = 0;
+const counter = document.getElementById('counter');
+const prog = document.getElementById('prog');
+
+function go(i){
+  i = Math.max(0, Math.min(N - 1, i));
+  if (cur >= 0 && slides[cur]) slides[cur].classList.remove('active');
+  cur = i;
+  slides[cur].classList.add('active');
+  if(counter) counter.textContent = (cur + 1) + ' / ' + N;
+  if(prog) prog.style.width = ((cur + 1) / N * 100) + '%';
+}
+
+document.getElementById('prev').onclick = () => go(cur - 1);
+document.getElementById('next').onclick = () => go(cur + 1);
+document.getElementById('mprev').onclick = () => go(cur - 1);
+document.getElementById('mnext').onclick = () => go(cur + 1);
+
+document.addEventListener('keydown', e=>{
+  if(e.key==='ArrowRight'||e.key===' '||e.key==='PageDown') { e.preventDefault(); go(cur + 1); }
+  else if(e.key==='ArrowLeft'||e.key==='PageUp') { e.preventDefault(); go(cur - 1); }
+  else if(e.key==='Home') { e.preventDefault(); go(0); }
+  else if(e.key==='End') { e.preventDefault(); go(N - 1); }
+  else if(e.key==='f'||e.key==='F') {
+    if(!document.fullscreenElement) document.documentElement.requestFullscreen().catch(()=>{});
+    else document.exitFullscreen().catch(()=>{});
+  }
+});
+
+/* ═══════════════ Responsive Scaler ═══════════════ */
+const deck = document.getElementById('deck'), fitbox = document.getElementById('fitbox'), vp = document.getElementById('vp');
+function layout(){
+  const ww = window.innerWidth, wh = window.innerHeight;
+  const isSmall = ww < 700 || wh < 500;
+  document.body.classList.toggle('small', isSmall);
+  const dw = 1200, dh = 675;
+  const totalH = isSmall ? dh : dh + 44 + 36;
+  const s = Math.min(ww / dw, wh / totalH);
+  deck.style.width = dw + 'px';
+  deck.style.height = totalH + 'px';
+  fitbox.style.width = Math.round(dw * s) + 'px';
+  fitbox.style.height = Math.round(totalH * s) + 'px';
+  deck.style.transform = `scale(${s})`;
+}
+window.addEventListener('resize', layout);
+layout();
+
+/* ═══════════════ Ambient Aurora ═══════════════ */
+const amb = fit(document.getElementById('amb'));
+const blobs = [[.2,.3,'#6366f1'],[.75,.25,'#a855f7'],[.55,.75,'#ec4899'],[.15,.8,'#6366f1']];
+let frame = 0;
+function tick(){
+  frame++;
+  amb.rs(); const {ctx, W, H} = amb;
+  if(W){
+    ctx.fillStyle = isLight ? '#ebe9f5' : '#07070d';
+    ctx.fillRect(0,0,W,H);
+    ctx.globalCompositeOperation = 'lighter';
+    blobs.forEach(([bx,by,col],i)=>{
+      const x = W*bx + Math.sin(frame*.004+i)*60;
+      const y = H*by + Math.cos(frame*.003+i*1.7)*40;
+      const r = Math.min(W,H)*(.4 + .05*Math.sin(frame*.006+i));
+      const g = ctx.createRadialGradient(x,y,0,x,y,r);
+      g.addColorStop(0, col + (isLight ? '15' : '22'));
+      g.addColorStop(1, col + '00');
+      ctx.fillStyle = g;
+      ctx.beginPath(); ctx.arc(x,y,r,0,7); ctx.fill();
+    });
+    ctx.globalCompositeOperation = 'source-over';
+    const v = ctx.createRadialGradient(W/2,H/2,Math.min(W,H)*.3,W/2,H/2,Math.max(W,H)*.75);
+    v.addColorStop(0,'rgba(5,5,9,0)');
+    v.addColorStop(1, isLight ? 'rgba(235,233,245,.65)' : 'rgba(5,5,9,.7)');
+    ctx.fillStyle = v; ctx.fillRect(0,0,W,H);
+  }
+  requestAnimationFrame(tick);
+}
+go(0);
+tick();
+</script>
+</body>
+</html>

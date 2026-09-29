@@ -7,6 +7,12 @@
 <meta name="description" content="Multimedia Course — Session 01: Introduction to Python by Eng. Muhammad Ali Abdul Kareem, Sinai University.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<script>
+  try {
+    var t = localStorage.getItem('cs:theme') || localStorage.getItem('deck_theme');
+    if (t === 'light') document.documentElement.classList.add('light-mode');
+  } catch(e){}
+</script>
 <style>
 :root{
   color-scheme:dark;
@@ -14,13 +20,81 @@
   --c:#ec4899; --c-2:#a855f7;
   --c-grad:linear-gradient(90deg,var(--c),var(--c-2));
   /* identity constants */
-  --bg:#07070d; --card:rgba(18,18,28,.82); --border:rgba(255,255,255,.07);
+  --bg:#07070d; --stage-bg:#090912; --card:rgba(18,18,28,.82); --border:rgba(255,255,255,.07); --card-border:rgba(255,255,255,.08);
   --tp:#f0eeff; --ts:#9a9ab5; --tm:#6b6b85; --warn:#fb7185;
   --syntax-grad:linear-gradient(135deg,#6366f1,#a855f7,#ec4899);
   --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
 }
+
+/* Light Theme Tokens */
+html.light-mode, body.light-mode, html.light-mode body{
+  color-scheme: light;
+  --bg:#ebe9f5;
+  --stage-bg:#ffffff;
+  --card:#ffffff;
+  --card-border:rgba(120,110,160,.16);
+  --border:rgba(120,110,160,.16);
+  --tp:#181528;
+  --ts:#524d70;
+  --tm:#7f789e;
+  --warn:#e11d48;
+  --syntax-grad:linear-gradient(135deg,#4f46e5,#9333ea,#db2777);
+  --shadow-vp:0 24px 60px rgba(100,90,140,.14);
+}
+
+body.light-mode .vp.part-intro, html.light-mode body .vp.part-intro{--c:#db2777;--c-2:#9333ea}
+body.light-mode .vp.part-seq, html.light-mode body .vp.part-seq{--c:#4f46e5;--c-2:#7c3aed}
+body.light-mode .vp.part-sel, html.light-mode body .vp.part-sel{--c:#d97706;--c-2:#b45309}
+body.light-mode .vp.part-rep, html.light-mode body .vp.part-rep{--c:#0891b2;--c-2:#0284c7}
+body.light-mode .vp.part-fn, html.light-mode body .vp.part-fn{--c:#059669;--c-2:#10b981}
+body.light-mode .vp.part-col, html.light-mode body .vp.part-col{--c:#9333ea;--c-2:#a855f7}
+
+body.light-mode .vp, html.light-mode body .vp{
+  background:var(--stage-bg);
+  box-shadow:0 0 0 1px rgba(168,85,247,.12),0 24px 60px rgba(100,90,140,.14);
+}
+body.light-mode .slide-counter{background:rgba(255,255,255,.88);border-color:var(--border);color:var(--ts);backdrop-filter:blur(8px)}
+body.light-mode .vp-progress{background:rgba(120,110,160,.12)}
+body.light-mode .dot{background:rgba(120,110,160,.25)}
+body.light-mode code{color:#6b21a8;background:rgba(120,110,160,.12)}
+body.light-mode .chips span{background:rgba(255,255,255,.75);border-color:var(--border);color:var(--ts)}
+body.light-mode .chip{background:rgba(255,255,255,.85);border-color:var(--border);color:var(--c)}
+body.light-mode .trap{background:rgba(225,29,72,.07);border-color:rgba(225,29,72,.28);color:var(--tp)}
+body.light-mode .q{background:#ffffff;border-color:var(--c);box-shadow:0 8px 24px rgba(100,90,140,.08)}
+body.light-mode .solbtn{background:rgba(255,255,255,.9);color:var(--tp)}
+body.light-mode .solbtn:hover{background:var(--c);color:#ffffff}
+body.light-mode .sol{background:rgba(245,244,252,.98);backdrop-filter:blur(12px)}
+body.light-mode .sol .note{background:#ffffff;border-color:var(--border);border-left-color:var(--c);color:var(--tp);box-shadow:0 4px 14px rgba(100,90,140,.06)}
+body.light-mode .codecard{background:#13111f;border-color:rgba(120,110,160,.2);box-shadow:0 14px 34px rgba(50,40,90,.15)}
+body.light-mode .stp{background:rgba(255,255,255,.65);border-color:var(--border)}
+body.light-mode .stp.on{background:#ffffff;border-color:var(--c);box-shadow:0 4px 16px rgba(100,90,140,.1)}
+body.light-mode .stp i{color:#ffffff}
+body.light-mode .ansbtn{background:rgba(255,255,255,.9);color:var(--tp)}
+body.light-mode .ansbtn:hover{background:var(--c);color:#ffffff}
+body.light-mode .ansmodal{background:rgba(15,12,30,.45);backdrop-filter:blur(4px)}
+body.light-mode .ans-card{background:#ffffff;border-color:rgba(168,85,247,.4);color:#181528;box-shadow:0 20px 60px rgba(50,40,90,.2)}
+body.light-mode .ans-row{background:#f4f2fb;border-color:rgba(120,110,160,.2)}
+body.light-mode .ans-row span{color:#524d70}
+body.light-mode .ans-row input{color:#059669}
+body.light-mode .ans-btns button.ghost{color:#524d70;border-color:rgba(120,110,160,.25)}
+body.light-mode .controls button{background:rgba(255,255,255,.85);border-color:var(--border);color:var(--ts)}
+body.light-mode .controls button:hover{background:#ffffff;color:var(--tp);border-color:var(--c)}
+body.light-mode .controls kbd{background:rgba(120,110,160,.14);color:var(--ts)}
+body.light-mode .mnav{background:rgba(255,255,255,.88);border-color:var(--border);color:var(--tp);box-shadow:0 4px 16px rgba(100,90,140,.18)}
+body.light-mode .brand-left a{background:rgba(255,255,255,.8)!important;color:var(--tp)!important;border-color:var(--border)!important;}
+body.light-mode .brand-left a:hover{background:#ffffff!important;border-color:var(--c)!important;}
+
+/* Theme Toggle Button */
+.theme-btn{
+  width:32px;height:32px;border-radius:8px;border:1px solid var(--border);background:var(--card);
+  display:grid;place-items:center;cursor:pointer;color:var(--tp);transition:.2s;padding:0;
+}
+.theme-btn:hover{border-color:var(--c);transform:scale(1.05);}
+.theme-btn svg{width:16px;height:16px;stroke-width:2;}
+.brand-right{display:flex;align-items:center;gap:14px;font-size:11.5px;color:var(--ts);font-weight:700}
+
 *{box-sizing:border-box}
-html,body{margin:0;height:100%;height:100dvh;background:var(--bg);color:var(--tp);font-family:Inter,system-ui,"Segoe UI",Roboto,Arial,sans-serif;overflow:hidden}
+html,body{margin:0;height:100%;height:100dvh;background:var(--bg);color:var(--tp);font-family:Inter,system-ui,"Segoe UI",Roboto,Arial,sans-serif;overflow:hidden;transition:background .3s ease, color .3s ease;}
 body{padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px);display:flex;align-items:center;justify-content:center}
 body.small{padding:0!important}
 #fitbox{position:relative;flex:none}
@@ -256,7 +330,14 @@ pre.code .ln::before{content:counter(ln);display:inline-block;width:2ch;margin-r
         <div class="brand-sub">Session ⇔ 01 · Introduction to Python · Sinai University</div>
       </div>
     </div>
-    <div class="brand-right">Instructor · Muhammad Ali Abdul Kareem</div>
+    <div class="brand-right">
+      <span>Instructor · Muhammad Ali Abdul Kareem</span>
+      <button class="theme-btn" id="themeToggle" title="Switch to light theme" aria-label="Toggle theme">
+        <svg id="themeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+        </svg>
+      </button>
+    </div>
   </div>
   <div class="vp part-intro" id="vp">
     <canvas class="vp-bg" id="amb"></canvas>
@@ -295,7 +376,26 @@ window.addEventListener('error',function(e){
 })();
 'use strict';
 /* ═══════════════ Core helpers (canvas whiteboard toolkit) ═══════════════ */
-const CL={indigo:'#6366f1',violet:'#a855f7',pink:'#ec4899',cyan:'#67e8f9',green:'#34d399',amber:'#fbbf24',chalk:'#eef0ff',dim:'#8a8aa3',board:'#0a0a13'};
+let isLight = false;
+let CL = {
+  indigo:'#6366f1', violet:'#a855f7', pink:'#ec4899', cyan:'#67e8f9', green:'#34d399', amber:'#fbbf24',
+  chalk:'#eef0ff', dim:'#8a8aa3', board:'#0a0a13'
+};
+
+function updateThemeTokens(){
+  isLight = document.body ? document.body.classList.contains('light-mode') : document.documentElement.classList.contains('light-mode');
+  if(isLight){
+    CL = {
+      indigo:'#4f46e5', violet:'#9333ea', pink:'#db2777', cyan:'#0284c7', green:'#059669', amber:'#d97706',
+      chalk:'#181528', dim:'#6d678a', board:'#ffffff', grid:'rgba(99,102,241,.06)', axis:'rgba(24,21,40,.2)'
+    };
+  } else {
+    CL = {
+      indigo:'#6366f1', violet:'#a855f7', pink:'#ec4899', cyan:'#67e8f9', green:'#34d399', amber:'#fbbf24',
+      chalk:'#eef0ff', dim:'#8a8aa3', board:'#0a0a13', grid:'rgba(168,85,247,.055)', axis:'rgba(255,255,255,.25)'
+    };
+  }
+}
 const FONTS={ui:'Inter, system-ui, sans-serif',marker:'Lemonada, Inter, sans-serif',mono:'"JetBrains Mono", ui-monospace, Menlo, monospace'};
 let PC='#ec4899',PC2='#a855f7',SC=1;               // chapter colours + deck scale
 const at=(f,a,b)=>Math.min(1,Math.max(0,(f-a)/(b-a)));
@@ -378,7 +478,7 @@ function txt(c,s,x,y,o={}){
 function board(c,W,H,o={}){
   const p=6,x=p,y=p,w=W-p*2,h=H-p*2;
   rr(c,x,y,w,h,16);c.fillStyle=CL.board;c.fill();
-  c.save();rr(c,x,y,w,h,16);c.clip();c.fillStyle='rgba(168,85,247,.055)';
+  c.save();rr(c,x,y,w,h,16);c.clip();c.fillStyle=isLight?'rgba(99,102,241,.06)':'rgba(168,85,247,.055)';
   for(let gx=x+22;gx<x+w;gx+=26)for(let gy=y+22;gy<y+h;gy+=26){c.beginPath();c.arc(gx,gy,1,0,7);c.fill()}
   c.restore();
   const g=c.createLinearGradient(x,y,x+w,y+h);
@@ -423,7 +523,7 @@ function terminal(c,x,y,w,h,f,lines,o={}){
   const{start=26,speed=.5,pause=18,title='Expected output'}=o;
   const p=ease(at(f,0,30));
   c.save();c.globalAlpha=p;
-  rr(c,x,y,w,h,14);c.fillStyle='#0b0b14';c.fill();
+  rr(c,x,y,w,h,14);c.fillStyle=isLight?'#13111f':'#0b0b14';c.fill();
   c.save();rr(c,x,y,w,h,14);c.clip();c.fillStyle='rgba(255,255,255,.05)';c.fillRect(x,y,w,36);c.restore();
   c.strokeStyle=rgba(PC,.6);c.lineWidth=1.6;rr(c,x,y,w,h,14);c.stroke();
   ['#fb7185','#fbbf24','#34d399'].forEach((k,i)=>{c.fillStyle=k;c.beginPath();c.arc(x+22+i*18,y+18,5,0,7);c.fill()});
@@ -437,7 +537,7 @@ function terminal(c,x,y,w,h,f,lines,o={}){
       let budget=Math.min(len,Math.floor(t)),cx=x+22;
       seg.forEach(([tx,ck])=>{
         const part=tx.slice(0,Math.max(0,budget));budget-=tx.length;
-        if(part){c.save();c.font=`500 15px ${FONTS.mono}`;if('letterSpacing' in c)c.letterSpacing='.3px';c.fillStyle=CL[ck]||CL.chalk;c.textAlign='left';c.textBaseline='middle';c.fillText(part,cx,ly);cx+=c.measureText(part).width;c.restore()}
+        if(part){c.save();c.font=`500 15px ${FONTS.mono}`;if('letterSpacing' in c)c.letterSpacing='.3px';c.fillStyle=(ck&&CL[ck]&&ck!=='chalk')?CL[ck]:'#f0eeff';c.textAlign='left';c.textBaseline='middle';c.fillText(part,cx,ly);cx+=c.measureText(part).width;c.restore()}
       });
       last=[cx,ly];
       if(t<len+pause*speed)cur=[cx,ly];
@@ -1273,6 +1373,7 @@ function go(i){
 const isKey=(e,latin,arabic)=>e.code==='Key'+latin||e.key===latin.toLowerCase()||e.key===latin||e.key===arabic;
 document.addEventListener('keydown',e=>{
   if(!modal.hidden)return;
+  if(e.target && e.target.closest && e.target.closest('button, .solbtn, .theme-btn, .ansbtn, a, input')) return;
   if(e.metaKey||e.ctrlKey||e.altKey)return;const k=e.key;
   if(['ArrowRight','ArrowDown','PageDown',' ','Enter'].includes(k)){e.preventDefault();go(cur+1)}
   else if(['ArrowLeft','ArrowUp','PageUp','Backspace'].includes(k)){e.preventDefault();go(cur-1)}
@@ -1308,6 +1409,44 @@ document.addEventListener('touchend',e=>{
 document.getElementById('mnext').onclick=e=>{go(cur+1);e.target.blur()};
 document.getElementById('mprev').onclick=e=>{go(cur-1);e.target.blur()};
 
+/* Theme Toggle Listener */
+const themeBtn = document.getElementById('themeToggle');
+const themeIcon = document.getElementById('themeIcon');
+const sunSvg = '<circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>';
+const moonSvg = '<path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>';
+
+function setTheme(light){
+  document.documentElement.classList.toggle('light-mode', light);
+  document.body.classList.toggle('light-mode', light);
+  if(themeIcon) themeIcon.innerHTML = light ? moonSvg : sunSvg;
+  if(themeBtn) themeBtn.title = light ? 'Switch to dark theme' : 'Switch to light theme';
+  updateThemeTokens();
+  try {
+    localStorage.setItem('cs:theme', light ? 'light' : 'dark');
+    localStorage.setItem('deck_theme', light ? 'light' : 'dark');
+  } catch(_){}
+}
+
+if(themeBtn){
+  themeBtn.onclick = () => setTheme(!document.body.classList.contains('light-mode'));
+}
+
+window.addEventListener('storage', e => {
+  if (e.key === 'cs:theme' || e.key === 'deck_theme') {
+    setTheme(e.newValue === 'light');
+  }
+});
+
+const initialTheme = (function(){
+  try { return localStorage.getItem('cs:theme') || localStorage.getItem('deck_theme'); }
+  catch(_) { return null; }
+})();
+if(initialTheme === 'light' || document.documentElement.classList.contains('light-mode')){
+  setTheme(true);
+} else {
+  updateThemeTokens();
+}
+
 /* ═══════════════ Fit the deck to the window (phones fill the screen) ═══════════════ */
 const fitbox=document.getElementById('fitbox'),deck=document.getElementById('deck');
 function layout(){
@@ -1342,16 +1481,16 @@ const blobs=[[.2,.3,'#6366f1'],[.75,.25,'#a855f7'],[.55,.75,'#ec4899'],[.15,.8,'
 const specks=Array.from({length:46},(_,i)=>[(i*.6180339)%1,(i*.3819661+.17)%1,i*1.7]);
 function aurora(f){
   amb.rs();const{ctx,W,H}=amb;if(!W)return;
-  ctx.fillStyle='#07070d';ctx.fillRect(0,0,W,H);ctx.globalCompositeOperation='lighter';
+  ctx.fillStyle=isLight?'#ebe9f5':'#07070d';ctx.fillRect(0,0,W,H);ctx.globalCompositeOperation='lighter';
   blobs.forEach(([bx,by,col],i)=>{
     const x=W*bx+Math.sin(f*.004+i)*70,y=H*by+Math.cos(f*.003+i*1.7)*50,r=Math.min(W,H)*(.42+.05*Math.sin(f*.006+i));
-    const g=ctx.createRadialGradient(x,y,0,x,y,r);g.addColorStop(0,col+'22');g.addColorStop(1,col+'00');
+    const g=ctx.createRadialGradient(x,y,0,x,y,r);g.addColorStop(0,col+(isLight?'15':'22'));g.addColorStop(1,col+'00');
     ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y,r,0,7);ctx.fill();
   });
   ctx.globalCompositeOperation='source-over';
-  specks.forEach(([dx,dy,ph])=>{ctx.fillStyle=`rgba(200,190,255,${.18+.18*Math.sin(f*.02+ph)})`;ctx.beginPath();ctx.arc(dx*W,dy*H,1.1,0,7);ctx.fill()});
+  specks.forEach(([dx,dy,ph])=>{ctx.fillStyle=isLight?`rgba(90,80,140,${.12+.1*Math.sin(f*.02+ph)})`:`rgba(200,190,255,${.18+.18*Math.sin(f*.02+ph)})`;ctx.beginPath();ctx.arc(dx*W,dy*H,1.1,0,7);ctx.fill()});
   const v=ctx.createRadialGradient(W/2,H/2,Math.min(W,H)*.3,W/2,H/2,Math.max(W,H)*.75);
-  v.addColorStop(0,'rgba(5,5,9,0)');v.addColorStop(1,'rgba(5,5,9,.7)');ctx.fillStyle=v;ctx.fillRect(0,0,W,H);
+  v.addColorStop(0,'rgba(5,5,9,0)');v.addColorStop(1,isLight?'rgba(235,233,245,.65)':'rgba(5,5,9,.7)');ctx.fillStyle=v;ctx.fillRect(0,0,W,H);
 }
 function tick(){
   frame++;aurora(frame);

@@ -7,6 +7,12 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&family=Lemonada:wght@400;600;700&display=swap" rel="stylesheet">
+<script>
+  try {
+    var t = localStorage.getItem('cs:theme') || localStorage.getItem('deck_theme');
+    if (t === 'light') document.documentElement.classList.add('light-mode');
+  } catch(e){}
+</script>
 <style>
 :root{
   color-scheme: dark;
@@ -18,6 +24,7 @@
   --stage-bg:#090912;
   --card:rgba(18,18,28,.82);
   --card-border:rgba(255,255,255,.08);
+  --border:rgba(255,255,255,.08);
   --tp:#f0eeff;
   --ts:#9a9ab5;
   --tm:#6b6b85;
@@ -34,12 +41,13 @@
 }
 
 /* Light Theme Tokens */
-body.light-mode{
+html.light-mode, body.light-mode, html.light-mode body{
   color-scheme: light;
   --bg:#ebe9f5;
   --stage-bg:#ffffff;
   --card:#ffffff;
   --card-border:rgba(120,110,160,.16);
+  --border:rgba(120,110,160,.16);
   --tp:#181528;
   --ts:#524d70;
   --tm:#7f789e;
@@ -53,6 +61,10 @@ body.light-mode{
   --cv-text-main:#181528;
   --shadow-vp:0 24px 60px rgba(100,90,140,.14);
 }
+body.light-mode .slide-counter{background:rgba(255,255,255,.88);border-color:var(--card-border);color:var(--ts);backdrop-filter:blur(8px)}
+body.light-mode .brand-left a{background:rgba(255,255,255,.8)!important;color:var(--tp)!important;border-color:var(--card-border)!important;}
+body.light-mode .brand-left a:hover{background:#ffffff!important;border-color:var(--c)!important;}
+body.light-mode .vp-progress{background:rgba(120,110,160,.12)}
 
 *{box-sizing:border-box}
 html,body{margin:0;padding:0;width:100%;height:100%;height:100dvh;background:var(--bg);color:var(--tp);font-family:Inter,system-ui,"Segoe UI",Roboto,Arial,sans-serif;overflow:hidden;transition:background .3s ease, color .3s ease;}
@@ -296,8 +308,8 @@ body.small{padding:0!important}
     </div>
     <div class="brand-right">
       <span>Instructor · Muhammad Ali Abdul Kareem</span>
-      <button class="theme-btn" id="themeToggle" title="Toggle Light / Dark mode" aria-label="Toggle theme">
-        <svg id="themeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+      <button class="theme-btn" id="themeToggle" title="Switch to light theme" aria-label="Toggle theme">
+        <svg id="themeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
       </button>
     </div>
   </div>
@@ -1165,14 +1177,36 @@ const sunSvg = '<circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.2
 const moonSvg = '<path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>';
 
 function setTheme(light){
+  document.documentElement.classList.toggle('light-mode', light);
   document.body.classList.toggle('light-mode', light);
-  themeIcon.innerHTML = light ? sunSvg : moonSvg;
+  if(themeIcon) themeIcon.innerHTML = light ? moonSvg : sunSvg;
+  if(themeBtn) themeBtn.title = light ? 'Switch to dark theme' : 'Switch to light theme';
   updateThemeTokens();
-  localStorage.setItem('deck_theme', light ? 'light' : 'dark');
+  try {
+    localStorage.setItem('cs:theme', light ? 'light' : 'dark');
+    localStorage.setItem('deck_theme', light ? 'light' : 'dark');
+  } catch(_){}
 }
 
-themeBtn.onclick = () => setTheme(!document.body.classList.contains('light-mode'));
-if(localStorage.getItem('deck_theme') === 'light'){ setTheme(true); } else { updateThemeTokens(); }
+if(themeBtn){
+  themeBtn.onclick = () => setTheme(!document.body.classList.contains('light-mode'));
+}
+
+window.addEventListener('storage', e => {
+  if (e.key === 'cs:theme' || e.key === 'deck_theme') {
+    setTheme(e.newValue === 'light');
+  }
+});
+
+const initialTheme = (function(){
+  try { return localStorage.getItem('cs:theme') || localStorage.getItem('deck_theme'); }
+  catch(_) { return null; }
+})();
+if(initialTheme === 'light' || document.documentElement.classList.contains('light-mode')){
+  setTheme(true);
+} else {
+  updateThemeTokens();
+}
 
 const fitbox = document.getElementById('fitbox'), deck = document.getElementById('deck');
 function layout(){
