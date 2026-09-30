@@ -528,7 +528,7 @@ function terminal(c,x,y,w,h,f,lines,o={}){
   c.strokeStyle=rgba(PC,.6);c.lineWidth=1.6;rr(c,x,y,w,h,14);c.stroke();
   ['#fb7185','#fbbf24','#34d399'].forEach((k,i)=>{c.fillStyle=k;c.beginPath();c.arc(x+22+i*18,y+18,5,0,7);c.fill()});
   c.restore();
-  txt(c,title,x+w-18,y+18,{size:11.5,col:CL.dim,align:'right',a:p});
+  txt(c,title,x+w-18,y+18,{size:11.5,col:'#9a9ab5',align:'right',a:p});
   const lh=Math.min(32,(h-76)/lines.length);
   let t=(f-start)*speed,ly=y+34+lh*.9+12,last=null,cur=null;
   lines.forEach(seg=>{
@@ -537,7 +537,7 @@ function terminal(c,x,y,w,h,f,lines,o={}){
       let budget=Math.min(len,Math.floor(t)),cx=x+22;
       seg.forEach(([tx,ck])=>{
         const part=tx.slice(0,Math.max(0,budget));budget-=tx.length;
-        if(part){c.save();c.font=`500 15px ${FONTS.mono}`;if('letterSpacing' in c)c.letterSpacing='.3px';c.fillStyle=(ck&&CL[ck]&&ck!=='chalk')?CL[ck]:'#f0eeff';c.textAlign='left';c.textBaseline='middle';c.fillText(part,cx,ly);cx+=c.measureText(part).width;c.restore()}
+        if(part){c.save();c.font=`500 15px ${FONTS.mono}`;if('letterSpacing' in c)c.letterSpacing='.3px';c.fillStyle=(ck==='dim')?'#9a9ab5':(ck&&CL[ck]&&ck!=='chalk')?CL[ck]:'#f0eeff';c.textAlign='left';c.textBaseline='middle';c.fillText(part,cx,ly);cx+=c.measureText(part).width;c.restore()}
       });
       last=[cx,ly];
       if(t<len+pause*speed)cur=[cx,ly];

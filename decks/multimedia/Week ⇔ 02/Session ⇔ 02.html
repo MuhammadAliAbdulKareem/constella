@@ -334,7 +334,8 @@ window.addEventListener('error',function(e){
 let isLight = false;
 let CL = {
   indigo:'#6366f1', violet:'#a855f7', pink:'#ec4899', cyan:'#67e8f9', green:'#34d399', amber:'#fbbf24',
-  chalk:'#eef0ff', dim:'#8a8aa3', board:'#0a0a13'
+  chalk:'#eef0ff', dim:'#8a8aa3', board:'#0a0a13',
+  edChalk:'#eef0ff', edDim:'#9a9ab5'
 };
 
 function updateThemeTokens(){
@@ -342,12 +343,14 @@ function updateThemeTokens(){
   if(isLight){
     CL = {
       indigo:'#4f46e5', violet:'#9333ea', pink:'#db2777', cyan:'#0284c7', green:'#059669', amber:'#d97706',
-      chalk:'#181528', dim:'#6d678a', board:'#ffffff', grid:'rgba(99,102,241,.06)', axis:'rgba(24,21,40,.2)'
+      chalk:'#181528', dim:'#6d678a', board:'#ffffff', grid:'rgba(99,102,241,.06)', axis:'rgba(24,21,40,.2)',
+      edChalk:'#eef0ff', edDim:'#9a9ab5'
     };
   } else {
     CL = {
       indigo:'#6366f1', violet:'#a855f7', pink:'#ec4899', cyan:'#67e8f9', green:'#34d399', amber:'#fbbf24',
-      chalk:'#eef0ff', dim:'#8a8aa3', board:'#0a0a13', grid:'rgba(168,85,247,.055)', axis:'rgba(255,255,255,.25)'
+      chalk:'#eef0ff', dim:'#8a8aa3', board:'#0a0a13', grid:'rgba(168,85,247,.055)', axis:'rgba(255,255,255,.25)',
+      edChalk:'#eef0ff', edDim:'#9a9ab5'
     };
   }
 }
@@ -433,7 +436,7 @@ function edPanel(c,x,y,w,h,name,p=1,o={}){
   c.strokeStyle='rgba(255,255,255,.13)';c.lineWidth=1.2;rr(c,x,y,w,h,12);c.stroke();
   ['#fb7185','#fbbf24','#34d399'].forEach((k,i)=>{c.fillStyle=k;c.beginPath();c.arc(x+16+i*14,y+15,4,0,7);c.fill()});
   c.restore();
-  txt(c,name,x+w-16,y+15,{size:11,font:'mono',col:CL.dim,align:'right',a,weight:600});
+  txt(c,name,x+w-16,y+15,{size:11,font:'mono',col:CL.edDim,align:'right',a,weight:600});
 }
 
 /* Syntax Tokenizer */
@@ -474,7 +477,7 @@ function terminal(c,x,y,w,h,f,lines,o={}){
   c.strokeStyle=rgba(PC,.6);c.lineWidth=1.6;rr(c,x,y,w,h,14);c.stroke();
   ['#fb7185','#fbbf24','#34d399'].forEach((k,i)=>{c.fillStyle=k;c.beginPath();c.arc(x+22+i*18,y+18,5,0,7);c.fill()});
   c.restore();
-  txt(c,title,x+w-18,y+18,{size:11.5,col:CL.dim,align:'right',a:p});
+  txt(c,title,x+w-18,y+18,{size:11.5,col:CL.edDim,align:'right',a:p});
   const lh=Math.min(32,(h-76)/lines.length);
   let t=(f-start)*speed,ly=y+34+lh*.9+12,last=null,cur=null;
   lines.forEach(seg=>{
@@ -483,7 +486,7 @@ function terminal(c,x,y,w,h,f,lines,o={}){
       let budget=Math.min(len,Math.floor(t)),cx=x+22;
       seg.forEach(([tx,ck])=>{
         const part=tx.slice(0,Math.max(0,budget));budget-=tx.length;
-        if(part){c.save();c.font=`500 15px ${FONTS.mono}`;if('letterSpacing' in c)c.letterSpacing='.3px';c.fillStyle=(ck&&CL[ck]&&ck!=='chalk')?CL[ck]:'#f0eeff';c.textAlign='left';c.textBaseline='middle';c.fillText(part,cx,ly);cx+=c.measureText(part).width;c.restore()}
+        if(part){c.save();c.font=`500 15px ${FONTS.mono}`;if('letterSpacing' in c)c.letterSpacing='.3px';c.fillStyle=(ck==='dim')?CL.edDim:(ck&&CL[ck]&&ck!=='chalk')?CL[ck]:CL.edChalk;c.textAlign='left';c.textBaseline='middle';c.fillText(part,cx,ly);cx+=c.measureText(part).width;c.restore()}
       });
       last=[cx,ly];
       if(t<len+pause*speed)cur=[cx,ly];
@@ -601,14 +604,14 @@ VIZ.delanim={cycle:760,draw(c,W,H,f,frame){
   const rx=cx+cw+24,rw=b.x+b.w-rx-30;
   edPanel(c,rx,cy,rw,ch,'exceptions_log',at(f,20,60),{acc:CL.pink});
   if(f>=300){
-    txt(c,'print(p1.age)',rx+20,cy+52,{size:11.5,font:'mono',col:CL.chalk,align:'left'});
-    txt(c,'AttributeError:',rx+20,cy+72,{size:12,font:'mono',col:CL.pink,align:'left',weight:700});
-    txt(c,"'Person' object has no 'age'",rx+20,cy+92,{size:10.5,font:'mono',col:CL.dim,align:'left'});
+    txt(c,'print(p1.age)',rx+20,cy+52,{size:11.5,font:'mono',col:CL.edChalk,align:'left'});
+    txt(c,'AttributeError:',rx+20,cy+72,{size:12,font:'mono',col:'#fb7185',align:'left',weight:700});
+    txt(c,"'Person' object has no 'age'",rx+20,cy+92,{size:10.5,font:'mono',col:CL.edDim,align:'left'});
   }
   if(f>=500){
-    txt(c,'print(p1)',rx+20,cy+128,{size:11.5,font:'mono',col:CL.chalk,align:'left'});
-    txt(c,'NameError:',rx+20,cy+148,{size:12,font:'mono',col:CL.pink,align:'left',weight:700});
-    txt(c,"name 'p1' is not defined",rx+20,cy+168,{size:10.5,font:'mono',col:CL.dim,align:'left'});
+    txt(c,'print(p1)',rx+20,cy+128,{size:11.5,font:'mono',col:CL.edChalk,align:'left'});
+    txt(c,'NameError:',rx+20,cy+148,{size:12,font:'mono',col:'#fb7185',align:'left',weight:700});
+    txt(c,"name 'p1' is not defined",rx+20,cy+168,{size:10.5,font:'mono',col:CL.edDim,align:'left'});
   }
   txt(c,'Deleting an attribute leaves the instance intact; deleting the instance clears the reference.',b.x+b.w/2,b.y+b.h-26,{size:13.5,col:PC,font:'marker',a:ease(at(f,560,620))});
 }};
@@ -666,9 +669,9 @@ VIZ.polydisp={cycle:760,draw(c,W,H,f,frame){
   const codeLines=['for bird in [sparrow(), ostrich()]:', '    bird.flight()'];
   drawCode(c, rx + 18, ry + 56, codeLines, {f, start:210, per:40, size:12, lh:24});
   if(f >= 340){
-    txt(c, 'Output:', rx + 18, ry + 120, {size:11, font:'mono', col:CL.dim, align:'left'});
-    txt(c, 'Sparrows can fly.', rx + 18, ry + 140, {size:11.5, font:'mono', col:CL.green, align:'left'});
-    txt(c, 'Ostriches cannot fly.', rx + 18, ry + 158, {size:11.5, font:'mono', col:CL.pink, align:'left'});
+    txt(c, 'Output:', rx + 18, ry + 120, {size:11, font:'mono', col:CL.edDim, align:'left'});
+    txt(c, 'Sparrows can fly.', rx + 18, ry + 140, {size:11.5, font:'mono', col:'#34d399', align:'left'});
+    txt(c, 'Ostriches cannot fly.', rx + 18, ry + 158, {size:11.5, font:'mono', col:'#fb7185', align:'left'});
   }
   txt(c, 'Same method name across different classes produces specialized subtype behaviors.', b.x + b.w/2, b.y + b.h - 22, {size:13, col:PC, font:'marker', a:ease(at(f,380,440))});
 }};
@@ -703,15 +706,15 @@ VIZ.encapanim = {
 
     if (f >= 140) {
       const pCode = ease(at(f, 140, 180));
-      txt(c, 'obj = Base()', rx + 20, cy + 48, { size: 12, font: 'mono', col: CL.chalk, align: 'left', a: pCode });
-      txt(c, 'print(obj.a)   # OK', rx + 20, cy + 74, { size: 12, font: 'mono', col: CL.green, align: 'left', a: pCode });
-      txt(c, 'print(obj.__c) # ERROR!', rx + 20, cy + 104, { size: 12, font: 'mono', col: CL.pink, align: 'left', weight: 700, a: pCode });
+      txt(c, 'obj = Base()', rx + 20, cy + 48, { size: 12, font: 'mono', col: CL.edChalk, align: 'left', a: pCode });
+      txt(c, 'print(obj.a)   # OK', rx + 20, cy + 74, { size: 12, font: 'mono', col: '#34d399', align: 'left', a: pCode });
+      txt(c, 'print(obj.__c) # ERROR!', rx + 20, cy + 104, { size: 12, font: 'mono', col: '#fb7185', align: 'left', weight: 700, a: pCode });
     }
 
     if (f >= 220) {
       const pErr = ease(at(f, 220, 250));
-      txt(c, 'AttributeError:', rx + 20, cy + 138, { size: 12, font: 'mono', col: CL.pink, align: 'left', weight: 800, a: pErr });
-      txt(c, "'Base' has no attribute '__c'", rx + 20, cy + 160, { size: 11, font: 'mono', col: CL.dim, align: 'left', a: pErr });
+      txt(c, 'AttributeError:', rx + 20, cy + 138, { size: 12, font: 'mono', col: '#fb7185', align: 'left', weight: 800, a: pErr });
+      txt(c, "'Base' has no attribute '__c'", rx + 20, cy + 160, { size: 11, font: 'mono', col: CL.edDim, align: 'left', a: pErr });
     }
 
     txt(c, 'Name mangling prevents direct outside modification. Data is guarded inside the class!', b.x + b.w / 2, b.y + b.h - 26, {
