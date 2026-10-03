@@ -183,9 +183,22 @@
       '<ol class="rows">' + rows + '</ol></div>';
     root.appendChild(el);
 
-    var live = $('.path-live', el), len = 0;
-    if (live) { len = live.getTotalLength(); live.style.setProperty('--len', len.toFixed(1)); }
-    return { el: el, course: course, path: live, len: len, comet: $$('.comet circle', el), cometAt: 0, cometOn: false };
+    var live = $('.path-live', el), len = 0, samples = null;
+    if (live) {
+      len = live.getTotalLength();
+      live.style.setProperty('--len', len.toFixed(1));
+      try {
+        samples = [];
+        var sampleCount = 180;
+        for (var si = 0; si <= sampleCount; si++) {
+          var spt = live.getPointAtLength((si / sampleCount) * len);
+          samples.push({ x: spt.x.toFixed(1), y: spt.y.toFixed(1) });
+        }
+      } catch (e) {
+        samples = null;
+      }
+    }
+    return { el: el, course: course, path: live, len: len, samples: samples, comet: $$('.comet circle', el), cometAt: 0, cometOn: false };
   });
 
   /* ---------- constellation scroll fade update ---------- */
@@ -306,8 +319,11 @@
     $$('.hl').forEach(function (n) { n.classList.remove('hl'); });
     if (key) $$('.row[data-key="' + key + '"], .star[data-key="' + key + '"]').forEach(function (n) { n.classList.add('hl'); });
   }
+  var hasActiveTip = false;
   function hideTips() {
+    if (!hasActiveTip) return;
     $$('.tip.on').forEach(function (t) { t.classList.remove('on'); });
+    hasActiveTip = false;
   }
 
   function showTip(star) {
@@ -390,6 +406,7 @@
       tip.style.top = (starTopY - 12) + 'px';
     }
 
+    hasActiveTip = true;
     tip.classList.add('on');
   }
 
@@ -525,9 +542,17 @@
 
   /* ---------- scroll progress bar ---------- */
   var bar = $('#bar');
-  function onScroll() {
+  var scrollScheduled = false;
+  function updateScroll() {
     var max = document.documentElement.scrollHeight - innerHeight;
     bar.style.transform = 'scaleX(' + (max > 0 ? Math.min(1, scrollY / max) : 0).toFixed(4) + ')';
+    scrollScheduled = false;
+  }
+  function onScroll() {
+    if (!scrollScheduled) {
+      scrollScheduled = true;
+      requestAnimationFrame(updateScroll);
+    }
   }
   window.addEventListener('scroll', onScroll, { passive: true }); onScroll();
 
@@ -551,13 +576,18 @@
   var cv = $('#stars'), ctx = cv.getContext('2d');
   var vw = 0, vh = 0, sky = [], mx = -999, my = -999, shoot = null, nextShoot = 0, last = 0;
   var isPageVisible = true;
+  var isTouch = !window.matchMedia('(hover: hover)').matches || (innerWidth < 768);
 
   function initSky() {
-    var dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+    isTouch = !window.matchMedia('(hover: hover)').matches || (innerWidth < 768);
+    var dpr = Math.min(window.devicePixelRatio || 1, isTouch ? 1.25 : 1.5);
     vw = innerWidth; vh = innerHeight;
     cv.width = vw * dpr; cv.height = vh * dpr;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    var r = mulberry(20260922), n = Math.min(vw < 640 ? 110 : (vw < 900 ? 180 : 300), Math.round(vw * vh / 5200));
+    var r = mulberry(20260922);
+    var n = isTouch
+      ? Math.min(52, Math.round(vw * vh / 11000))
+      : Math.min(vw < 640 ? 110 : (vw < 900 ? 180 : 300), Math.round(vw * vh / 5200));
     sky = [];
     for (var i = 0; i < n; i++) {
       var z = 0.2 + r() * 0.8;
@@ -637,16 +667,33 @@
       ce.cometOn = true;
       var t = ph / run, e = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
       var fade = t > 0.93 ? (1 - t) / 0.07 : 1;
+      var samples = ce.samples, sMax = samples ? samples.length - 1 : 0;
       for (var k = 0; k < els.length; k++) {
-        var pt = ce.path.getPointAtLength(Math.max(0, e - k * 0.011) * ce.len);
+        var prog = Math.max(0, e - k * 0.011);
+        var pt;
+        if (samples && sMax > 0) {
+          var sIdx = Math.round(prog * sMax);
+          pt = samples[sIdx] || samples[0];
+        } else {
+          pt = ce.path.getPointAtLength(prog * ce.len);
+        }
         els[k].setAttribute('cx', pt.x); els[k].setAttribute('cy', pt.y);
         els[k].setAttribute('opacity', ((1 - k / els.length) * 0.95 * fade).toFixed(3));
       }
     }
   }
 
+  var lastFrameTime = 0;
   function loop(now) {
     if (!isPageVisible) return;
+    // On touch/mobile devices, throttle rendering to ~30 FPS to eliminate heating & battery drain
+    if (isTouch) {
+      if (now - lastFrameTime < 32) {
+        requestAnimationFrame(loop);
+        return;
+      }
+    }
+    lastFrameTime = now;
     var dt = last ? Math.min(0.05, (now - last) / 1000) : 0.016; last = now;
     draw(now, dt, false);
     requestAnimationFrame(loop);

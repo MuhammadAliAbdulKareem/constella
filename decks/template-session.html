@@ -248,9 +248,20 @@ layout();
 /* ═══════════════ Ambient Aurora ═══════════════ */
 const amb = fit(document.getElementById('amb'));
 const blobs = [[.2,.3,'#6366f1'],[.75,.25,'#a855f7'],[.55,.75,'#ec4899'],[.15,.8,'#6366f1']];
-let frame = 0;
+let isTabVisible = true;
+document.addEventListener('visibilitychange', () => {
+  isTabVisible = !document.hidden;
+  if (isTabVisible) requestAnimationFrame(tick);
+});
+
 function tick(){
+  if (!isTabVisible) return;
   frame++;
+  const isSmall = document.body.classList.contains('small');
+  if (isSmall && frame % 2 !== 0) {
+    requestAnimationFrame(tick);
+    return;
+  }
   amb.rs(); const {ctx, W, H} = amb;
   if(W){
     ctx.fillStyle = isLight ? '#ebe9f5' : '#07070d';

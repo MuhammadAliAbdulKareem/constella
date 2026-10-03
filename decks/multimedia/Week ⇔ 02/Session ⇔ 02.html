@@ -1322,8 +1322,16 @@ function aurora(f){
   v.addColorStop(0,'rgba(5,5,9,0)');v.addColorStop(1,isLight?'rgba(235,233,245,.65)':'rgba(5,5,9,.7)');ctx.fillStyle=v;ctx.fillRect(0,0,W,H);
 }
 
+let isTabVisible=true;
+document.addEventListener('visibilitychange',()=>{
+  isTabVisible=!document.hidden;
+  if(isTabVisible)requestAnimationFrame(tick);
+});
 function tick(){
-  frame++;aurora(frame);
+  if(!isTabVisible)return;
+  frame++;
+  const isSmall=document.body.classList.contains('small');
+  if(!isSmall||frame%2===0){aurora(frame);}
   for(const o of live){
     if(o.slide!==cur)continue;
     o.s.rs();const{ctx,W,H}=o.s;if(!W)continue;
@@ -1332,7 +1340,6 @@ function tick(){
   }
   requestAnimationFrame(tick);
 }
-
 go(0);tick();
 const bt=document.getElementById('boot');if(bt)bt.remove();
 window.__go=go;

@@ -2,7 +2,7 @@
    Constella Service Worker — Offline Course Portal & PWA Engine
    ===================================================================== */
 
-const CACHE_NAME = 'constella-v1.8.1';
+const CACHE_NAME = 'constella-v1.8.2';
 
 // Core application shell assets to pre-cache on install
 const CORE_ASSETS = [
@@ -44,16 +44,29 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// Network-First strategy with Cache Fallback for navigation & dynamic files
+// Network-First with Fast Fallback (Network with 1.2s timeout, fallback to cache, background revalidation)
 async function networkFirst(request) {
   try {
-    // Always request fresh data from server when connected (bypasses stale HTTP cache)
-    const networkResponse = await fetch(request, { cache: 'no-cache' });
-    if (networkResponse && networkResponse.status === 200) {
-      const responseClone = networkResponse.clone();
-      caches.open(CACHE_NAME).then((cache) => cache.put(request, responseClone));
+    const cachedResponse = await caches.match(request);
+    
+    // Always dispatch network fetch to revalidate
+    const networkFetch = fetch(request, { cache: 'no-cache' }).then((networkResponse) => {
+      if (networkResponse && networkResponse.status === 200) {
+        const responseClone = networkResponse.clone();
+        caches.open(CACHE_NAME).then((cache) => cache.put(request, responseClone));
+      }
+      return networkResponse;
+    });
+
+    if (cachedResponse) {
+      // Race: if network responds within 1200ms, use fresh response. If network is slow, instantly return cached version!
+      return await Promise.race([
+        networkFetch,
+        new Promise((resolve) => setTimeout(() => resolve(cachedResponse), 1200))
+      ]);
     }
-    return networkResponse;
+
+    return await networkFetch;
   } catch (error) {
     const cachedResponse = await caches.match(request);
     if (cachedResponse) {
