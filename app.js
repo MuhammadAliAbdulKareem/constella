@@ -727,6 +727,7 @@
 
   function promptUserForUpdate(worker) {
     newWorkerWaiting = worker;
+    if (installPrompt) installPrompt.hidden = true;
     if (updateToast) {
       updateToast.hidden = false;
       if (updateReloadBtn) {
