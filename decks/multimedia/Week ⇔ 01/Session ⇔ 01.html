@@ -315,7 +315,10 @@ pre.code .ln::before{content:counter(ln);display:inline-block;width:2ch;margin-r
 .walk pre.code .ln{opacity:.5}
 .walk pre.code .ln.on{opacity:1;background:rgba(255,255,255,.08);box-shadow:inset 3px 0 0 var(--c)}
 .walk{grid-template-rows:minmax(0,1fr)}
-.walk .codecard{max-height:100%;overflow:hidden}
+.laser-pointer{position:fixed;width:16px;height:16px;border-radius:50%;background:#ff2a55;box-shadow:0 0 14px 5px rgba(255,42,85,.85),0 0 28px 12px rgba(255,42,85,.4);pointer-events:none;z-index:999999;transform:translate(-50%,-50%);display:none}
+.laser-pointer.active{display:block}
+.laser-pointer::after{content:'';position:absolute;inset:4px;border-radius:50%;background:#fff}
+body.laser-active,body.laser-active *{cursor:none!important}
 </style>
 </head>
 <body>
@@ -348,7 +351,7 @@ pre.code .ln::before{content:counter(ln);display:inline-block;width:2ch;margin-r
   </div>
   <div class="controls">
     <button id="prev" tabindex="-1">‹ Prev</button>
-    <span><kbd>→</kbd> next &nbsp;·&nbsp; <kbd>←</kbd> back &nbsp;·&nbsp; <kbd>S</kbd> task solution &nbsp;·&nbsp; <kbd>F</kbd> fullscreen</span>
+    <span><kbd>→</kbd> next &nbsp;·&nbsp; <kbd>←</kbd> back &nbsp;·&nbsp; <kbd>S</kbd> solution &nbsp;·&nbsp; <kbd>L</kbd> laser &nbsp;·&nbsp; <kbd>F</kbd> fullscreen</span>
     <button id="next" tabindex="-1">Next ›</button>
   </div>
 </div></div>
@@ -1380,8 +1383,9 @@ document.addEventListener('keydown',e=>{
   else if(k==='Home')go(0);else if(k==='End')go(N-1);
   else if(isKey(e,'S','س'))toggleSol();
   else if(isKey(e,'A','ش')&&SL[cur].chal)openAns();
-  else if(k==='Escape')closeSol();
   else if(isKey(e,'F','ب')){try{document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen()}catch(_){}}
+  else if(isKey(e,'L','م')){toggleLaser()}
+  else if(k==='Escape'){if(laserActive)toggleLaser();closeSol()}
 });
 document.getElementById('next').onclick=e=>{go(cur+1);e.target.blur()};
 document.getElementById('prev').onclick=e=>{go(cur-1);e.target.blur()};
@@ -1408,6 +1412,25 @@ document.addEventListener('touchend',e=>{
 },{passive:true});
 document.getElementById('mnext').onclick=e=>{go(cur+1);e.target.blur()};
 document.getElementById('mprev').onclick=e=>{go(cur-1);e.target.blur()};
+
+/* Laser Pointer Mode */
+let laserActive = false, laserDot = null;
+function toggleLaser(){
+  laserActive = !laserActive;
+  if(!laserDot){
+    laserDot = document.createElement('div');
+    laserDot.className = 'laser-pointer';
+    document.body.appendChild(laserDot);
+  }
+  laserDot.classList.toggle('active', laserActive);
+  document.body.classList.toggle('laser-active', laserActive);
+}
+window.addEventListener('mousemove', e => {
+  if(laserActive && laserDot){
+    laserDot.style.left = e.clientX + 'px';
+    laserDot.style.top = e.clientY + 'px';
+  }
+});
 
 /* Theme Toggle Listener */
 const themeBtn = document.getElementById('themeToggle');

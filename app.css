@@ -469,6 +469,25 @@ html[data-theme="light"] .tip.tip-bottom .tip-arrow{
   color:var(--acc);
 }
 .meta-info{font-size:.88rem;color:var(--dim);display:inline-flex;align-items:center;gap:6px}
+.share-btn{
+  position:relative;z-index:2;display:inline-flex;align-items:center;justify-content:center;
+  width:28px;height:28px;border-radius:8px;border:1px solid var(--line);
+  background:var(--hover);color:var(--dim);cursor:pointer;padding:0;
+  transition:all .2s ease;
+}
+.share-btn:hover{color:var(--ink);border-color:var(--gold);background:rgba(255,212,121,.1)}
+.share-btn svg{width:14px;height:14px}
+.share-tip{
+  position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);
+  background:#090d1c;color:#fff;font:600 .75rem var(--body);padding:3px 8px;
+  border-radius:6px;white-space:nowrap;pointer-events:none;opacity:0;
+  transition:opacity .15s ease,transform .15s ease;box-shadow:0 4px 12px rgba(0,0,0,.35);
+  border:1px solid rgba(255,255,255,.15);z-index:10;
+}
+.share-btn:hover .share-tip,.share-btn.copied .share-tip{opacity:1;transform:translateX(-50%) translateY(-2px)}
+.share-btn.copied{border-color:#10b981;color:#10b981}
+.share-btn.copied .share-tip{background:#064e3b;border-color:#10b981;color:#a7f3d0}
+.title-ar{display:inline-block;margin-left:8px;font-size:.88rem;font-weight:600;color:var(--dim);opacity:.85;direction:rtl}
 .go{
   display:inline-flex;align-items:center;gap:5px;color:var(--acc);font-weight:600;font-size:.9rem;
   margin-left:auto;transition:transform .25s ease;

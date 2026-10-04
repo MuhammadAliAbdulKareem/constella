@@ -10,6 +10,15 @@
   var $$ = function (s, el) { return Array.prototype.slice.call((el || document).querySelectorAll(s)); };
   var esc = function (v) { return String(v == null ? '' : v).replace(/[&<>"']/g, function (c) { return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]; }); };
 
+  /* ---------- Arabic normalization for bilingual search ---------- */
+  function normAr(s) {
+    return String(s || '').toLowerCase()
+      .replace(/[أإآ]/g, 'ا')
+      .replace(/ة/g, 'ه')
+      .replace(/ى/g, 'ي')
+      .replace(/[\u064B-\u065F]/g, '');
+  }
+
   /* ---------- storage (fails quietly if the browser blocks it) ---------- */
   var OPENED_KEY = 'cs:opened';
   var opened = new Set();
@@ -57,7 +66,8 @@
       var label = 'Week ' + wk + ': ' + w.title;
       var delay = (0.3 + (i / Math.max(L.maxWeek - 1, 1)) * 1.6).toFixed(2);
       var when = fmtDate(w.date);
-      var metaStr = [when, w.duration].filter(Boolean).join(' • ');
+      var slideStr = w.slides ? w.slides + ' slides' : '';
+      var metaStr = [when, w.duration, slideStr].filter(Boolean).join(' • ');
       var topicsStr = w.topics && w.topics.length ? w.topics.slice(0, 3).join(', ') + (w.topics.length > 3 ? '…' : '') : '';
 
       return '<a class="star' + (isLatest ? ' latest' : '') + '" href="' + esc(w.file) + '" data-key="' + esc(key) + '" data-label="' + esc(label) + '" aria-label="' + esc(label) + '"' +
@@ -137,20 +147,31 @@
     var weeksAsc = course.weeks.slice().sort(function (a, b) { return a.week - b.week; });
     var rows = weeksAsc.map(function (w, idx) {
       var key = course.id + ':' + w.week;
-      var search = (w.title + ' ' + (w.topics || []).join(' ')).toLowerCase();
+      var searchBase = [
+        w.title,
+        w.titleAr,
+        (w.topics || []).join(' '),
+        (w.keywordsAr || []).join(' '),
+        course.title,
+        course.titleAr,
+        course.subtitle
+      ].filter(Boolean).join(' ');
+      var search = normAr(searchBase);
       var isLatest = w.week === L.maxWeek;
       var when = fmtDate(w.date);
-      var metaStr = [when, w.duration].filter(Boolean).join(' • ');
+      var slideStr = w.slides ? w.slides + ' slides' : '';
+      var metaStr = [when, w.duration, slideStr].filter(Boolean).join(' • ');
 
       return '<li class="row' + (isLatest ? ' is-latest' : '') + '" style="--i:' + idx + '" data-key="' + esc(key) + '" data-search="' + esc(search) + '">' +
         '<div class="num">' + w.week + '<small>Week</small></div>' +
         '<div class="row-content">' +
-          '<h3><a href="' + esc(w.file) + '" data-key="' + esc(key) + '">' + esc(w.title) + '</a></h3>' +
+          '<h3><a href="' + esc(w.file) + '" data-key="' + esc(key) + '">' + esc(w.title) + (w.titleAr ? ' <span class="title-ar" lang="ar">' + esc(w.titleAr) + '</span>' : '') + '</a></h3>' +
           '<p class="topics">' + esc(topicText(w.topics)) + '</p>' +
           '<div class="meta">' +
             (isLatest ? '<span class="badge new">New</span>' : '') +
             '<span class="badge done" data-done hidden>Opened</span>' +
             (metaStr ? '<span class="meta-info">' + esc(metaStr) + '</span>' : '') +
+            '<button class="share-btn" type="button" aria-label="Copy link to this session" title="Copy session link" data-file="' + esc(w.file) + '"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="share-tip">Copy link</span></button>' +
             '<span class="go">Open session <svg class="go-arrow" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg></span>' +
           '</div>' +
         '</div></li>';
@@ -299,6 +320,27 @@
   var touchedKey = null;
 
   document.addEventListener('click', function (e) {
+    var share = e.target.closest && e.target.closest('.share-btn');
+    if (share) {
+      e.preventDefault();
+      e.stopPropagation();
+      var file = share.dataset.file;
+      var url = new URL(file, location.href).href;
+      var tip = $('.share-tip', share);
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(url).then(function () {
+          if (tip) {
+            tip.textContent = 'Copied! ✓';
+            share.classList.add('copied');
+            setTimeout(function () { tip.textContent = 'Copy link'; share.classList.remove('copied'); }, 2000);
+          }
+        }).catch(function () {});
+      } else {
+        prompt('Copy session link:', url);
+      }
+      return;
+    }
+
     var a = e.target.closest && e.target.closest('a[data-key]');
     if (!a) return;
     opened.add(a.dataset.key); saveOpened(); refresh();
@@ -453,14 +495,16 @@
     row.style.setProperty('--my', (e.clientY - r.top) + 'px');
   });
 
-  /* ---------- search with clear button ---------- */
+  /* ---------- search with clear button & bilingual support ---------- */
   var input = $('#q');
   var clearBtn = $('#searchClear');
   function applyFilter() {
-    var q = input.value.trim().toLowerCase(), any = false;
-    if (clearBtn) clearBtn.hidden = !input.value;
+    var raw = input.value.trim();
+    var q = normAr(raw), any = false;
+    if (clearBtn) clearBtn.hidden = !raw;
     courseEls.forEach(function (ce) {
-      var courseMatch = !q || (ce.course.title + ' ' + (ce.course.subtitle || '')).toLowerCase().indexOf(q) > -1;
+      var courseSearch = normAr((ce.course.title || '') + ' ' + (ce.course.titleAr || '') + ' ' + (ce.course.subtitle || ''));
+      var courseMatch = !q || courseSearch.indexOf(q) > -1;
       var shown = 0;
       $$('.row', ce.el).forEach(function (r) {
         var m = courseMatch || r.dataset.search.indexOf(q) > -1;
@@ -473,7 +517,7 @@
     var empty = $('#empty');
     if (courses.length) {
       empty.hidden = any;
-      empty.textContent = 'Nothing matches “' + input.value.trim() + '”. Try a topic like loops or functions.';
+      empty.textContent = 'Nothing matches “' + raw + '”. Try searching for topics like loops, pointers, or هياكل البيانات.';
     }
   }
   input.addEventListener('input', applyFilter);

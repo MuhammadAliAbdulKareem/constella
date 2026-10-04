@@ -28,6 +28,7 @@ window.SITE = {
     {
       id: "multimedia",
       title: "Python Fundamentals",
+      titleAr: "أساسيات البرمجة بلغة بايثون",
       subtitle: "Multimedia course",
       description: "Programming basics for multimedia students, from your first print() to writing your own functions.",
       hue: 172,
@@ -36,18 +37,24 @@ window.SITE = {
         {
           week: 1,
           title: "Introduction to Python",
+          titleAr: "مقدمة إلى لغة بايثون",
           topics: ["output & input", "variables", "operators", "collections", "control flow", "functions"],
+          keywordsAr: ["مقدمة", "بايثون", "طباعة", "مدخلات", "مخرجات", "متغيرات", "عمليات", "قوائم", "شروط", "دوال"],
           file: "decks/multimedia/Week ⇔ 01/Session ⇔ 01.html",
           date: "2026-09-22",
-          duration: "75 min"
+          duration: "75 min",
+          slides: 34
         },
         {
           week: 2,
           title: "Object-Oriented Programming (OOP) in Python",
+          titleAr: "البرمجة كائنية التوجه (OOP) في بايثون",
           topics: ["classes & objects", "__init__() & self", "properties & del", "inheritance & super()", "polymorphism", "encapsulation"],
+          keywordsAr: ["كائنات", "كائنية", "أوب", "فئات", "كلاس", "وراثة", "تعدد الأشكال", "تغليف", "خصائص"],
           file: "decks/multimedia/Week ⇔ 02/Session ⇔ 02.html",
           date: "2026-09-29",
-          duration: "75 min"
+          duration: "75 min",
+          slides: 17
         }
         // ,{ week: 3, title: "…", topics: ["…"], file: "decks/multimedia/Week ⇔ 03/Session ⇔ 03.html", date: "2026-10-06" }
       ]
@@ -56,6 +63,7 @@ window.SITE = {
     {
       id: "data-structures",
       title: "Data Structures with C++",
+      titleAr: "هياكل البيانات بلغة C++",
       subtitle: "Faculty of IT and CS",
       description: "Core data structures built by hand in C++, one hands-on session at a time.",
       hue: 262,
@@ -64,26 +72,35 @@ window.SITE = {
         {
           week: 1,
           title: "From Structured Programming to Functions",
+          titleAr: "من البرمجة الهيكلية إلى الدوال",
           topics: ["sequence", "selection", "repetition", "functions", "5 hands-on tasks"],
+          keywordsAr: ["هياكل بيانات", "برمجة هيكلية", "دوال", "تكرار", "شروط", "سي بلس بلس", "مهام"],
           file: "decks/data-structures/Week ⇔ 01/Session ⇔ 01.html",
           date: "2026-09-22",
-          duration: "75 min"
+          duration: "75 min",
+          slides: 26
         },
         {
           week: 2,
           title: "Time Complexity & Growth Rates",
+          titleAr: "التعقيد الزمني ومعدلات النمو",
           topics: ["Big-O notation", "8 complexity classes", "nested loops", "trace tables", "references", "capstone task"],
+          keywordsAr: ["تعقيد زمني", "بيج أو", "حلقات متداخلة", "جداول التتبع", "مراجع", "تحليل خوارزميات"],
           file: "decks/data-structures/Week ⇔ 02/Session ⇔ 02.html",
           date: "2026-09-29",
-          duration: "75 min"
+          duration: "75 min",
+          slides: 20
         },
         {
           week: 3,
           title: "Arrays with OOP in C++",
+          titleAr: "المصفوفات بالبرمجة كائنية التوجه (OOP)",
           topics: ["pointers & dynamic memory", "class ArrayList", "constructor & destructor", "safe input (readInt)", "insert & delete", "linear search", "grow() dynamic resize", "Rule of Three", "2D arrays", "student tasks"],
+          keywordsAr: ["مصفوفات", "مصفوفة", "مؤشرات", "ذاكرة ديناميكية", "كلاس", "حذف", "إضافة", "بحث خطي", "قاعدة الثلاثة", "مصفوفات ثنائية", "سعة"],
           file: "decks/data-structures/Week ⇔ 03/Session ⇔ 03.html",
           date: "2026-10-06",
-          duration: "75 min"
+          duration: "75 min",
+          slides: 33
         }
         // ,{ week: 4, title: "…", topics: ["…"], file: "decks/data-structures/Week ⇔ 04/Session ⇔ 04.html", date: "2026-10-13" }
       ]
