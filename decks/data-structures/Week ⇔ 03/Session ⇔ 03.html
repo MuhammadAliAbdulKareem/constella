@@ -787,6 +787,33 @@ VIZ.sum={cycle:600,draw(c,W,H,f,frame){const b=board(c,W,H,{title:'Array operati
  ['push(v) / grow()','Write at the end; copy all only when full',{t:'O(1) · O(n)',hl:1}]],f,{rowH:40,start:6,per:46});
  txt(c,'Encapsulation keeps size, capacity and bounds checks inside the class.',b.x+b.w/2,b.y+b.h-26,{size:13,font:'marker',col:CL.green,a:ease(at(f,380,420))})}};
 
+VIZ.recap={cycle:520,draw(c,W,H,f,frame){
+ const b=board(c,W,H,{title:'Session 03 — what we covered, and what comes next',frame});
+ const rows=[
+  ['1. Pointers:','int* stores an address · stack vs heap · new[] and delete[]',CL.cyan],
+  ['2. Data Types:','Primitive vs Non-Primitive · Linear vs Non-Linear',CL.amber],
+  ['3. Array as a class:','ArrayList with private data, size, capacity, constructor, destructor',CL.violet],
+  ['4. Operations:','display · insertAt · deleteAt · search · update (O(1) vs O(n))',CL.green],
+  ['5. Safe growth:','push / grow() by doubling · deep copy (Rule of Three) · 2D arrays',CL.indigo],
+  ['Next Session:','Linked List — nodes chained together by pointers',CL.pink]];
+ const top=b.y+52,avail=b.h-52-54,step=avail/rows.length,bh=Math.min(50,step-12),cx=b.x+b.w/2,full=b.w-56;
+ rows.forEach((r,i)=>{
+  const p=ease(at(f,8+i*20,38+i*20)),w=full*(1-.05*i),x=cx-w/2,y=top+i*step+(1-p)*12,col=r[2],last=i===rows.length-1;
+  c.save();c.globalAlpha=p;
+  if(!isLight){c.shadowColor=col;c.shadowBlur=last?14+6*Math.sin(f/9):8}
+  rr(c,x,y,w,bh,6);c.fillStyle=rgba(col,last?.26:.16);c.fill();c.strokeStyle=col;c.lineWidth=last?3:2.2;c.stroke();c.restore();
+  let size=13.5,wl,wd;
+  c.save();
+  do{c.font=`800 ${size}px ${FONTS.ui}`;wl=c.measureText(r[0]).width;c.font=`600 ${size}px ${FONTS.ui}`;wd=c.measureText(r[1]).width;size-=.5}while(wl+8+wd>w-28&&size>9);
+  c.restore();
+  size+=.5;
+  const sx=cx-(wl+8+wd)/2,ty=y+bh/2;
+  txt(c,r[0],sx,ty,{size,weight:800,col:col,align:'left',a:p});
+  txt(c,r[1],sx+wl+8,ty,{size,weight:600,col:CL.chalk,align:'left',a:p});
+ });
+ txt(c,'Today: from pointers to a safe dynamic array.   Next: pointers build the chain.',cx,b.y+b.h-26,{size:13,font:'marker',col:CL.green,a:ease(at(f,150,190))});
+}};
+
 /* ===== code samples ===== */
 VIZ.classtree={cycle:700,draw(c,W,H,f,frame){
  const b=board(c,W,H,{title:'Family tree',frame});
@@ -1364,7 +1391,8 @@ const SL=[
 {part:'part-rules',lbl:'Interactive Predictor',h2:'Check 5: <em>Searching for a missing value</em>',sub:'Worst case of linear search.',mcq:true,
  q:'<b>How many comparisons run, and what is returned?</b>',options:['1 and -1','8 and -1','8 and 0','0 and -1'],answer:'8 and -1',
  explain:'<b>Correct!</b> The value is absent, so the loop compares all 8 elements and then returns <code>-1</code>. Worst case is <code>O(n)</code>.',hint:'The loop only stops early when it finds the target.',code:'c_q5',next:'Summary'},
-{part:'part-fn',lbl:'Wrap-up',h2:'Key <em>Takeaways</em>',sub:'Access and update are O(1); insert, delete and search are O(n).',viz:'sum',next:'End of Session 03'}
+{part:'part-fn',lbl:'Wrap-up',h2:'Key <em>Takeaways</em>',sub:'Access and update are O(1); insert, delete and search are O(n).',viz:'sum',next:'Recap & next session'},
+{part:'part-intro',lbl:'Recap &amp; Next Session',h2:'Session 03 — <em>What we learned</em>, what is next',sub:'Five things you can now do, and where Session 04 picks up.',viz:'recap',next:'Thank you'}
 ];
 const N=SL.length;
 
