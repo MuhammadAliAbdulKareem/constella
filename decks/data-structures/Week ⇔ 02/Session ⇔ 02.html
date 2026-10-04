@@ -290,37 +290,95 @@ body.small{padding:0!important}
 .laser-pointer::after{content:'';position:absolute;inset:4px;border-radius:50%;background:#fff}
 body.laser-active,body.laser-active *{cursor:none!important}
 
-/* Mobile Persistent Navigation */
-.m-home-btn,.m-theme-btn{display:none}
-.small .m-home-btn{
-  display:inline-flex;align-items:center;gap:6px;
-  position:fixed;top:max(12px,env(safe-area-inset-top));left:max(12px,env(safe-area-inset-left));
-  z-index:999;padding:7px 14px;border-radius:999px;
-  background:var(--card);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
-  border:1px solid var(--card-border);color:var(--tp);
-  font:700 12.5px Inter,system-ui,sans-serif;text-decoration:none;
-  box-shadow:0 6px 20px rgba(0,0,0,.35);transition:transform .15s ease,border-color .2s ease;
+/* Mobile Persistent Navigation Bar (Ultra-sleek HUD) */
+.m-bar{display:none}
+.small .m-bar{
+  display:flex;align-items:center;justify-content:space-between;
+  position:fixed;top:0;left:0;right:0;height:44px;
+  padding:max(6px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) 0 max(12px, env(safe-area-inset-left));
+  z-index:999;pointer-events:none;
 }
-.small .m-theme-btn{
-  display:grid;place-items:center;
-  position:fixed;top:max(12px,env(safe-area-inset-top));right:max(12px,env(safe-area-inset-right));
-  z-index:999;width:34px;height:34px;border-radius:50%;
-  background:var(--card);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
-  border:1px solid var(--card-border);color:var(--tp);
-  box-shadow:0 6px 20px rgba(0,0,0,.35);cursor:pointer;padding:0;
-  transition:transform .15s ease,border-color .2s ease;
+.small .m-bar>*{pointer-events:auto}
+.m-bar-btn{
+  display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px;border-radius:999px;
+  background:rgba(18,16,28,.78);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border:1px solid rgba(255,255,255,.14);color:#f1f0fb;font:700 11.5px Inter,system-ui,sans-serif;
+  text-decoration:none;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.3);
+  transition:transform .15s ease,border-color .2s ease,background .2s ease;
 }
-.small .m-home-btn:active,.small .m-theme-btn:active{transform:scale(0.94);border-color:var(--c)}
+.m-bar-btn:active{transform:scale(0.93);border-color:var(--c)}
+.m-bar-icon-btn{width:32px;padding:0;justify-content:center}
+.m-bar-actions{display:flex;align-items:center;gap:6px}
+.m-bar-counter{
+  display:inline-flex;align-items:center;height:26px;padding:0 10px;border-radius:999px;
+  background:rgba(18,16,28,.65);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border:1px solid rgba(255,255,255,.1);font:700 11px var(--mono);color:var(--ts);
+  box-shadow:0 2px 10px rgba(0,0,0,.2);
+}
+body.light-mode .m-bar-btn{
+  background:rgba(255,255,255,.88);border:1px solid rgba(0,0,0,.1);color:#181528;
+  box-shadow:0 4px 14px rgba(0,0,0,.08);
+}
+body.light-mode .m-bar-counter{
+  background:rgba(255,255,255,.82);border:1px solid rgba(0,0,0,.08);color:#524d70;
+  box-shadow:0 2px 8px rgba(0,0,0,.04);
+}
+
+.small .slide-counter{display:none}
+.small .brand-bar,.small .controls{display:none}
+.small .vp{border-radius:0!important;border:none!important;box-shadow:none!important}
+.small #fitbox{border-radius:0!important}
+.small .slide{padding:46px 34px 18px!important}
+.small .hero-slide{padding:46px 34px 18px!important}
+
+/* Edge navigation chevrons on mobile */
+.small .mnav{
+  display:grid!important;width:28px!important;height:52px!important;margin-top:-26px!important;
+  background:rgba(18,16,28,.42)!important;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  border:1px solid rgba(255,255,255,.12)!important;color:var(--tp)!important;font-size:19px!important;
+  opacity:.35;transition:opacity .2s,background .2s;
+}
+.small .mnav:hover,.small .mnav:active{opacity:.95;background:rgba(18,16,28,.85)!important}
+.small .mnav.mp{left:0!important;border-radius:0 10px 10px 0!important;border-left:none!important}
+.small .mnav.mn{right:0!important;border-radius:10px 0 0 10px!important;border-right:none!important}
+body.light-mode .small .mnav{
+  background:rgba(255,255,255,.58)!important;border-color:rgba(0,0,0,.1)!important;color:#181528!important;
+}
+body.light-mode .small .mnav:hover,body.light-mode .small .mnav:active{
+  background:rgba(255,255,255,.94)!important;
+}
+
+body.small{
+  padding:0!important;margin:0!important;overflow:hidden!important;
+  display:flex;align-items:center;justify-content:center;
+  min-height:100vh;min-height:100dvh;background:#07070d;
+}
+body.small.light-mode{background:#ebe9f5}
 </style>
 </head>
 <body>
-<a href="../../../index.html" class="m-home-btn" aria-label="Back to home">
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
-  <span>Home</span>
-</a>
-<button class="m-theme-btn" id="mThemeToggle" aria-label="Toggle theme">
-  <svg id="mThemeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" width="15" height="15"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
-</button>
+<header class="m-bar" role="navigation" aria-label="Mobile Navigation">
+  <a href="../../../index.html" class="m-bar-btn" aria-label="Back to sessions">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+    <span>Sessions</span>
+  </a>
+
+  <div class="m-bar-center">
+    <span class="m-bar-counter" id="mCounter">1 / 1</span>
+  </div>
+
+  <div class="m-bar-actions">
+    <a href="Complexity_BigO.cpp" download="Complexity_BigO.cpp" class="m-bar-btn m-bar-icon-btn" aria-label="Download code" title="Download code">
+      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+    </a>
+    <button class="m-bar-btn m-bar-icon-btn" id="mThemeToggle" aria-label="Toggle theme" title="Toggle theme">
+      <svg id="mThemeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" width="14" height="14"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+    </button>
+    <button class="m-bar-btn m-bar-icon-btn" id="mFsToggle" aria-label="Fullscreen" title="Toggle fullscreen">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" width="14" height="14" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+    </button>
+  </div>
+</header>
 <div id="fitbox"><div id="deck">
   <div class="brand-bar">
     <div class="brand-left">
@@ -1136,7 +1194,9 @@ function go(i){
   cur=i;SL[i].el.classList.add('active');
   vp.className='vp '+SL[i].part;
   const cs=getComputedStyle(vp);PC=cs.getPropertyValue('--c').trim();PC2=cs.getPropertyValue('--c-2').trim();
-  counter.textContent=(i+1)+' / '+N;prog.style.width=((i+1)/N*100)+'%';t0=frame;
+  counter.textContent=(i+1)+' / '+N;
+  const mc=document.getElementById('mCounter');if(mc)mc.textContent=(i+1)+' / '+N;
+  prog.style.width=((i+1)/N*100)+'%';t0=frame;
 }
 
 /* Keyboard Listener Supporting Both English and Arabic Layouts */
@@ -1194,7 +1254,7 @@ document.addEventListener('touchend', e => {
   tx = null; ty = null;
 
   // Don't swipe when tapping on interactive controls
-  if(e.target && e.target.closest && e.target.closest('button, .mcq-btn, .copy-btn, .solbtn, .theme-btn, .m-theme-btn, .m-home-btn, a, input, textarea')) return;
+  if(e.target && e.target.closest && e.target.closest('button, .mcq-btn, .copy-btn, .solbtn, .theme-btn, .m-theme-btn, .m-home-btn, .m-bar, .m-bar-btn, a, input, textarea')) return;
 
   if(Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy)) {
     go(cur + (dx < 0 ? 1 : -1));
@@ -1229,6 +1289,7 @@ const themeBtn = document.getElementById('themeToggle');
 const themeIcon = document.getElementById('themeIcon');
 const mThemeBtn = document.getElementById('mThemeToggle');
 const mThemeIcon = document.getElementById('mThemeIcon');
+const mFsBtn = document.getElementById('mFsToggle');
 const sunSvg = '<circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>';
 const moonSvg = '<path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>';
 
@@ -1251,6 +1312,18 @@ if(themeBtn){
 if(mThemeBtn){
   mThemeBtn.onclick = () => setTheme(!document.body.classList.contains('light-mode'));
 }
+if(mFsBtn){
+  mFsBtn.onclick = () => {
+    try {
+      if(document.fullscreenElement || document.webkitFullscreenElement) {
+        (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+      } else {
+        const el = document.documentElement;
+        (el.requestFullscreen || el.webkitRequestFullscreen).call(el);
+      }
+    } catch(_){}
+  };
+}
 
 window.addEventListener('storage', e => {
   if (e.key === 'cs:theme' || e.key === 'deck_theme') {
@@ -1270,26 +1343,40 @@ if(initialTheme === 'light' || document.documentElement.classList.contains('ligh
 
 const fitbox = document.getElementById('fitbox'), deck = document.getElementById('deck');
 function layout(){
-  const cs = getComputedStyle(document.body);
-  const W = innerWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
-  const H = innerHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
-  const small = Math.min(W, H) < 680 || W < 768;
+  const W = window.innerWidth, H = window.innerHeight;
+  const small = Math.min(W, H) < 768 || W < 992;
   document.body.classList.toggle('small', small);
-  const dw = 1100;
-  const dh = small ? 619 : 707;
-  const s = Math.min((W - 12) / dw, (H - 12) / dh);
-  vp.style.width = dw + 'px';
-  vp.style.height = '619px';
-  deck.style.width = dw + 'px';
-  deck.style.height = dh + 'px';
-  fitbox.style.width = Math.round(dw * s) + 'px';
-  fitbox.style.height = Math.round(dh * s) + 'px';
+  if(!small){
+    const s = Math.min((W - 20) / 1100, (H - 24) / 707);
+    vp.style.width = '1100px'; vp.style.height = '619px';
+    deck.style.width = '1100px'; deck.style.height = '707px';
+    fitbox.style.width = Math.round(1100 * s) + 'px';
+    fitbox.style.height = Math.round(707 * s) + 'px';
+    deck.style.transformOrigin = 'top left'; deck.style.transform = `scale(${s})`;
+    SC = Math.max(.2, s); return;
+  }
+  const isLandscape = W >= H;
+  let s, dw, dh;
+  if(isLandscape){
+    s = H / 619;
+    if(W / s < 1100){ s = W / 1100; dw = 1100; dh = Math.round(H / s); }
+    else { dw = Math.round(W / s); dh = 619; }
+  } else {
+    s = W / 1100; dw = 1100; dh = 619;
+  }
+  vp.style.width = dw + 'px'; vp.style.height = dh + 'px';
+  deck.style.width = dw + 'px'; deck.style.height = dh + 'px';
+  fitbox.style.width = (isLandscape ? W : Math.round(dw * s)) + 'px';
+  fitbox.style.height = (isLandscape ? H : Math.round(dh * s)) + 'px';
   deck.style.transformOrigin = 'top left';
   deck.style.transform = `scale(${s})`;
   SC = Math.max(.2, s);
 }
 addEventListener('resize', layout);
-addEventListener('orientationchange', () => setTimeout(layout, 100));
+addEventListener('orientationchange', () => setTimeout(layout, 120));
+if(window.screen && window.screen.orientation){
+  window.screen.orientation.addEventListener('change', () => setTimeout(layout, 120));
+}
 layout();
 
 const amb=fit(document.getElementById('amb'));
