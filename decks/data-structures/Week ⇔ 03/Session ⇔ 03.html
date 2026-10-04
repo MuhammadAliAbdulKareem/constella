@@ -625,18 +625,23 @@ VIZ.arr={cycle:1e9,draw(c,W,H,f,frame,o){
 }};
 
 /* ===== operations (generate frames from real state) ===== */
-OPS.fill={title:'fillFromUser()',btn:'Enter ↵',clear:1,lbl:st=>`cin >> data[${Math.min(st.n,st.a.length-1)}] =`,
- idle:'Manual mode: type a value and press Enter (like cin). Several values separated by spaces also work.',
- fields:[{k:'vals',l:'cin >> data[0] =',str:1,d:'',ph:'e.g. 12',cls:'wide'}],
- init:()=>({a:blank(8),n:0,base:4096}),demos:[{vals:'12 45 7 23 9'}],
+OPS.fill={title:'fillFromUser()',btn:'Enter ↵',clear:1,lbl:st=>`readInt → data[${Math.min(st.n,st.a.length-1)}] =`,
+ idle:'Manual mode: type values separated by spaces. Try a non-number such as abc, or more values than free slots.',
+ fields:[{k:'vals',l:'readInt → data[0] =',str:1,d:'',ph:'e.g. 12 45 7',cls:'wide'}],
+ init:()=>({a:blank(8),n:0,base:4096}),demos:[{vals:'12 45 7 23 9'},{vals:'12 abc 45 7'},{vals:'1 2 3 4 5 6 7 8 9'}],
  run(st,p){const s=cp(st),T=this.title,fr=[];
-  const vs=String(p.vals||'').split(/[\s,]+/).filter(x=>x!==''&&!isNaN(x)).map(Number);
-  if(!vs.length)return{st:s,frames:[mk(s.a,s.n,{},'Type at least one number, for example: 12',T,{err:1,ln:[3]})]};
-  const room=s.a.length-s.n,use=vs.slice(0,room);
-  fr.push(mk(s.a,s.n,{},`fillFromUser(${vs.length}): capacity ${s.a.length}, size ${s.n}`,T,{ln:[0]}));
-  use.forEach(v=>{const i=s.n;s.a[i]=v;s.n++;fr.push(mk(s.a,s.n,{[i]:'w'},`cin >> data[${i}]  reads ${v};  size++ → ${s.n}`,T,{ln:[2,3,4],i}))});
-  if(vs.length>room)fr.push(mk(s.a,s.n,{},`Array is full (capacity ${s.a.length}): the guard i < capacity ignores ${vs.length-room} value(s).`,T,{err:1,ln:[1]}));
-  else fr.push(mk(s.a,s.n,{},`Done. size = ${s.n}.`,T,{ln:[5]}));
+  const isInt=t=>t!==''&&Number.isInteger(Number(t));
+  const toks=String(p.vals||'').split(/[\s,]+/).filter(x=>x!==''),n=toks.filter(isInt).length;
+  if(!n)return{st:s,frames:[mk(s.a,s.n,{},'Type at least one whole number, for example: 12',T,{err:1,ln:[7]})]};
+  const room=s.a.length-s.n;
+  fr.push(mk(s.a,s.n,{},`fillFromUser(${n}): capacity ${s.a.length}, size ${s.n}, free slots ${room}`,T,{ln:[0]}));
+  if(n>room){fr.push(mk(s.a,s.n,{},`n = ${n} > capacity - size = ${room} → prints "Invalid n" → return. Nothing changes.`,T,{err:1,ln:[1,2,3]}));return{st:s,frames:fr}}
+  let k=0;
+  toks.forEach(t=>{if(k>=n)return;
+   if(!isInt(t)){fr.push(mk(s.a,s.n,{},`readInt: "${t}" is not an integer → cin.clear(); cin.ignore(); asks for element ${k+1} again`,T,{err:1,ln:[7]}));return}
+   const i=s.n;s.a[i]=Number(t);s.n++;k++;
+   fr.push(mk(s.a,s.n,{[i]:'w'},`readInt → ${t};  data[${i}] = ${t};  size++ → ${s.n}`,T,{ln:[6,7,8],i}))});
+  fr.push(mk(s.a,s.n,{},`Done. size = ${s.n}.`,T,{ln:[9]}));
   return{st:s,frames:fr}}};
 OPS.show={title:'display()',idle:'Press Run to traverse the list from index 0 to size - 1.',fields:[],
  init:()=>({a:[12,45,7,23,9,null,null,null],n:5,base:4096}),demos:[{}],
@@ -740,7 +745,7 @@ VIZ.cls={cycle:600,draw(c,W,H,f,frame){
  const box=(y,h,col,t,L,p)=>{c.save();c.globalAlpha=p;rr(c,x,y,w,h,12);c.fillStyle=rgba(col,.1);c.fill();c.strokeStyle=col;c.lineWidth=1.8;c.stroke();c.restore();
   txt(c,t,x+16,y+20,{size:11.5,col,align:'left',a:p,weight:800});L.forEach((s,i)=>txt(c,s,x+18,y+44+i*24,{size:13.5,font:'mono',align:'left',a:p}))};
  box(b.y+56,122,CL.pink,'🔒 PRIVATE — hidden state',['int* data;','int size;','int capacity;'],p1);
- box(b.y+196,172,CL.green,'🔓 PUBLIC — interface',['ArrayList(cap) · ~ArrayList()','fillFromUser · display','insertAt · deleteAt','searchByValue · updateAt','push · grow'],p2);
+ box(b.y+196,172,CL.green,'🔓 PUBLIC — interface',['ArrayList(cap) · ~ArrayList()','fillFromUser · readInt','display · insertAt','deleteAt · searchByValue','updateAt · push · grow'],p2);
  const ax=x+w+40,ay=b.y+116,cwid=44;marker(c,[[x+w,ay],[ax,ay]],p3,CL.cyan,2.4);
  for(let k=0;k<5;k++){const v=ease(at(f,150+k*8,180+k*8));c.save();c.globalAlpha=v;rr(c,ax+k*(cwid+4),ay-22,cwid,44,8);c.fillStyle=rgba(CL.cyan,.15);c.fill();c.strokeStyle=CL.cyan;c.lineWidth=1.5;c.stroke();c.restore();txt(c,'['+k+']',ax+k*(cwid+4)+cwid/2,ay,{size:11.5,font:'mono',a:v})}
  txt(c,'heap: new int[capacity]',ax,ay+42,{size:11.5,col:CL.dim,font:'mono',align:'left',a:p3});
@@ -981,7 +986,7 @@ VIZ.newdel={cycle:560,draw(c,W,H,f,frame){
  txt(c,'✗  delete data;      on memory from new[]',b.x+34,b.y+262,{size:12,font:'mono',col:CL.pink,align:'left',a:pw});
  txt(c,'✗  delete[] p;       on memory from new',b.x+34,b.y+288,{size:12,font:'mono',col:CL.pink,align:'left',a:pw});
  txt(c,'Mismatched pairs = undefined behavior.',b.x+b.w/2,b.y+b.h-46,{size:12,font:'marker',col:CL.green,a:ease(at(f,320,350))});
- mmChain(c,b,3);
+ mmChain(c,b,4);
 }};
 
 VIZ.sizecap={cycle:620,draw(c,W,H,f,frame){
@@ -1036,6 +1041,28 @@ VIZ.idx0={cycle:620,draw(c,W,H,f,frame){
  mmChain(c,b,5);
 }};
 
+VIZ.readint={cycle:480,draw(c,W,H,f,frame){
+ const b=board(c,W,H,{title:'readInt() — safe input',frame});
+ const buf=f<20?'':f<140?'42':f<170?'':f<290?'abc':f<335?'7':'';
+ const segs=[[30,65,0,'✓ read 42',CL.green,'cin >> x reads 42'],[65,100,1,'✓ no fail',CL.green,'cin.fail() is false, so the loop is skipped'],[100,140,3,'return 42',CL.green,'valid input: done'],
+  [170,205,0,'✗ read fails',CL.pink,'"abc" is not an int, so cin fails'],[205,245,1,'✗ fail() = true',CL.pink,'cin.fail() is true, so we enter the loop'],
+  [245,290,2,'✓ fixed',CL.amber,'clear() resets cin, ignore() skips "abc", then we ask again'],[290,335,0,'✓ read 7',CL.green,'cin >> x reads the new input: 7'],
+  [335,380,1,'✓ no fail',CL.green,'cin.fail() is false, so the loop ends'],[380,470,3,'return 7',CL.green,'valid input: done']];
+ const act=segs.find(g=>f>=g[0]&&f<g[1]);
+ txt(c,f<150?'Case 1: the user types 42':'Case 2: the user types abc, then 7',b.x+b.w/2,b.y+54,{size:12.5,weight:800,col:f<150?CL.green:CL.pink});
+ const bx=b.x+22,bw=b.w-44,by=b.y+72;
+ rr(c,bx,by,bw,38,10);c.fillStyle=rgba(CL.violet,.1);c.fill();c.strokeStyle=rgba(CL.violet,.7);c.lineWidth=1.5;c.stroke();
+ txt(c,'input buffer',bx+12,by+19,{size:10.5,col:CL.dim,align:'left'});
+ txt(c,buf?buf+' ⏎':'(empty)',bx+bw-14,by+19,{size:15,font:'mono',weight:800,col:buf?CL.chalk:CL.dim,align:'right'});
+ const rows=[['cin >> x;','try to read a number'],['while (cin.fail())','did the user type letters?'],["cin.clear();  cin.ignore(1000, '\\n');",'fix cin, throw away the letters, ask again'],['return x;','x is always a real number']];
+ rows.forEach((r,i)=>{const y=b.y+128+i*54,on=act&&act[2]===i,col=on?act[4]:CL.violet;
+  rr(c,bx,y,bw,44,10);c.fillStyle=rgba(col,on?.2:.06);c.fill();c.strokeStyle=on?col:rgba(col,.45);c.lineWidth=on?2.4:1.2;c.stroke();
+  txt(c,r[0],bx+12,y+16,{size:12,font:'mono',weight:800,col:on?col:CL.chalk,align:'left'});
+  txt(c,r[1],bx+12,y+33,{size:10.5,col:CL.dim,align:'left'});
+  if(on)txt(c,act[3],bx+bw-12,y+22,{size:12,weight:800,col:col,align:'right'})});
+ if(act)txt(c,act[5],b.x+b.w/2,b.y+b.h-40,{size:11.5,font:'marker',col:CL.green});
+}};
+
 const CODE={
 c_ptr:`int x = 10;
 int* p = &x;      // p holds the ADDRESS of x
@@ -1084,6 +1111,7 @@ public:
     ArrayList(int cap);
     ~ArrayList();
     void fillFromUser(int n);
+    static int readInt();
     void display() const;
     bool insertAt(int pos, int value);
     bool deleteAt(int pos);
@@ -1114,11 +1142,26 @@ ArrayList::~ArrayList() {
     delete[] data;              // free memory
 }`,
 c_fill:`void ArrayList::fillFromUser(int n) {
-    for (int i = 0; i < n && i < capacity; i++) {
+    if (n < 0 || n > capacity - size) {
+        cout << "Invalid n" << endl;
+        return;                  // change nothing
+    }
+    for (int i = 0; i < n; i++) {
         cout << "Enter element " << i + 1 << ": ";
-        cin >> data[i];
+        data[size] = readInt();
         size++;
     }
+}`,
+c_read:`int ArrayList::readInt() {
+    int x;
+    cin >> x;                    // try to read a number
+    while (cin.fail()) {         // typed letters?
+        cin.clear();             // step 1: clear error
+        cin.ignore(1000, '\\n');  // step 2: drop letters
+        cout << "Invalid, try again: ";
+        cin >> x;                // step 3: ask again
+    }
+    return x;                    // x is a real number
 }`,
 c_show:`void ArrayList::display() const {
     for (int i = 0; i < size; i++) {
@@ -1198,7 +1241,7 @@ public:
 c_main:`int main() {
     int n;
     cout << "How many elements? ";
-    cin >> n;
+    n = ArrayList::readInt();
     ArrayList list(n + 2);   // spare capacity
     list.fillFromUser(n);
     list.display();
@@ -1247,33 +1290,36 @@ const HERO=`
 <div class="chips"><span>class ArrayList</span><span>Auto &amp; Manual Labs</span><span>Rule of Three</span><span>2D Arrays</span><span>6 Interactive MCQs</span><span>Student Tasks 1–2</span></div>`;
 
 const SL=[
-{part:'part-intro',hero:true,next:'Where does the array fit?'},
-{part:'part-intro',lbl:'Big Picture',h2:'Where does the <em>Array</em> fit?',sub:'Every data structure is Primitive or Non-Primitive. Follow the branches to find the Array.',viz:'classtree',next:'Spot the difference'},
-{part:'part-intro',lbl:'Big Picture',h2:'Spot the <em>difference</em>',sub:'Three families, one picture each. Ask: how many "next" items can a value have?',viz:'classcmp',next:'Procedural vs OOP'},
-{part:'part-classes',lbl:'Paradigm Shift',h2:'Procedural vs <em>OOP</em> Arrays',sub:'Same operations, very different safety.',
- cards:{fs:13,items:[{h:'Procedural (Week 03 style)',code:'c_proc',n:'The array and <code>arrLength</code> are loose variables: any code can break them.'},{h:'OOP (today)',code:'c_oop',n:'<b>Encapsulation:</b> state is private, and methods enforce the rules.'}]},next:'Anatomy of the class'},
-{part:'part-classes',lbl:'Class Anatomy',h2:'Anatomy of <em>ArrayList</em>',sub:'Private state on the left, public interface below, heap storage on the right.',viz:'cls',next:'Pointer Basics'},
+{part:'part-intro',hero:true,next:'Pointer Basics'},
 {part:'part-classes',lbl:'Pointer Basics',h2:'Pointer Basics — What does <em>int* data</em> mean?',sub:'Before we use data, learn what a pointer is: a variable that stores an address.',split:1,viz:'ptr',
  chip:'Value vs address',req:['A normal variable stores a <b>value</b>; a pointer stores an <b>address</b>.','<code>&amp;x</code> = "address of x" · <code>*p</code> = "value at the address stored in p".','<code>int*</code> means "pointer to int".'],code:'c_ptr',next:'Stack vs Heap'},
 {part:'part-classes',lbl:'Memory Basics',h2:'Memory Basics — <em>Stack vs Heap</em>',sub:'Small local variables on the left, the dynamic array on the right.',split:1,viz:'heap',
  chip:'Where does data live?',req:['<code>size</code>, <code>capacity</code> and <code>data</code> are local variables (stack).','<code>new int[5]</code> creates the array in dynamically allocated memory (heap) and returns the address of its first element.','<code>data</code> stores that address.'],code:'c_heap',next:'Why is data a pointer?'},
 {part:'part-classes',lbl:'Why a Pointer?',h2:'Why is <em>data</em> a Pointer?',sub:'Fixed size at compile time vs size chosen at runtime.',split:1,viz:'whyptr',
  chip:'Runtime size',req:['The array size is decided at <b>runtime</b>: <code>capacity</code> can differ for every ArrayList object.','<code>int data[5]</code> has a fixed compile-time size.','A pointer lets the class refer to dynamically allocated storage.'],code:'c_whyptr',
- key:'<b>Key takeaway:</b> <code>data</code> is a pointer because the ArrayList needs dynamically allocated storage whose size is decided at runtime.',next:'Constructor & Destructor'},
-{part:'part-rules',lbl:'Lifecycle',h2:'Constructor &amp; <em>Destructor</em>',sub:'The class owns its memory: allocate on creation, free on destruction.',
- task:{chip:'RAII Idea',req:['<code>new int[capacity]</code> allocates the array on the heap.','Constructor sets <code>size = 0</code>: capacity is room, size is what is used.','<code>delete[]</code> in the destructor frees it automatically at scope end.'],trap:'Use <code>delete[]</code> (not <code>delete</code>) for arrays, or memory leaks and undefined behavior follow.',code:'c_ctor'},next:'new[] and delete[]'},
+ key:'<b>Key takeaway:</b> <code>data</code> is a pointer because the ArrayList needs dynamically allocated storage whose size is decided at runtime.',next:'new[] and delete[]'},
 {part:'part-rules',lbl:'Checkpoint',h2:'<em>new[]</em> and <em>delete[]</em> belong together',sub:'Whatever form of new you use, the matching delete frees it.',split:1,viz:'newdel',
- chip:'Allocate and free in pairs',req:['<code>new int</code> → <code>delete</code>','<code>new int[n]</code> → <code>delete[]</code>','The constructor allocates; the destructor frees the same block.'],code:'c_pair',next:'size vs capacity'},
+ chip:'Allocate and free in pairs',req:['<code>new int</code> → <code>delete</code>','<code>new int[n]</code> → <code>delete[]</code>','The constructor allocates; the destructor frees the same block.'],code:'c_pair',next:'Concept check'},
+{part:'part-rules',lbl:'Interactive Predictor',h2:'Concept check: <em>What does data store?</em>',sub:'Pointer, address and heap in one question.',mcq:true,
+ q:'<b>What does <code>data</code> store in the following declaration?</b>',options:['The entire array','The number of elements','The address of the first element','The capacity'],answer:'The address of the first element',
+ explain:'<b>Correct!</b> <code>data</code> is a pointer. It stores the address of the first element of the dynamically allocated array.',hint:'A pointer stores an address, not the values themselves.',code:'c_q0',next:'Where does the array fit?'},
+{part:'part-intro',lbl:'Big Picture',h2:'Where does the <em>Array</em> fit?',sub:'Every data structure is Primitive or Non-Primitive. Follow the branches to find the Array.',viz:'classtree',next:'Spot the difference'},
+{part:'part-intro',lbl:'Big Picture',h2:'Spot the <em>difference</em>',sub:'Three families, one picture each. Ask: how many "next" items can a value have?',viz:'classcmp',next:'Procedural vs OOP'},
+{part:'part-classes',lbl:'Paradigm Shift',h2:'Procedural vs <em>OOP</em> Arrays',sub:'Same operations, very different safety.',
+ cards:{fs:13,items:[{h:'Procedural (Week 03 style)',code:'c_proc',n:'The array and <code>arrLength</code> are loose variables: any code can break them.'},{h:'OOP (today)',code:'c_oop',n:'<b>Encapsulation:</b> state is private, and methods enforce the rules.'}]},next:'Anatomy of the class'},
+{part:'part-classes',lbl:'Class Anatomy',h2:'Anatomy of <em>ArrayList</em>',sub:'Private state on the left, public interface below, heap storage on the right.',viz:'cls',next:'size vs capacity'},
 {part:'part-seq',lbl:'Size vs Capacity',h2:'<em>size</em> vs <em>capacity</em>',sub:'Room available vs elements actually stored.',split:1,viz:'sizecap',
  chip:'capacity = 8 · size = 5',req:['<code>capacity</code> = total available slots; <code>size</code> = elements currently stored.','Unused slots sit between <code>size</code> and <code>capacity</code>.','Valid data is in indices <code>0</code> to <code>size - 1</code>.'],code:'c_sizecap',
  key:'<b>Connect it:</b> <code>size == capacity</code> means no free slot is left, so the list must grow.',next:'Why index 0?'},
 {part:'part-seq',lbl:'Array Index',h2:'Why does Array Index start at <em>0</em>?',sub:'An index is a distance from the beginning of the array.',split:1,viz:'idx0',
  chip:'Index = offset',req:['Index 0 is offset 0: no steps from the beginning. Index 1 is one element away.','First index = <code>0</code>, last index = <code>capacity - 1</code>.','<code>data[i]</code> is conceptually <code>*(data + i)</code>.'],code:'c_index',
- key:'<b>Intro only:</b> <code>data + i</code> moves <code>i</code> elements forward (i × 4 bytes for int).',next:'Concept check'},
-{part:'part-rules',lbl:'Interactive Predictor',h2:'Concept check: <em>What does data store?</em>',sub:'Pointer, address and heap in one question.',mcq:true,
- q:'<b>What does <code>data</code> store in the following declaration?</b>',options:['The entire array','The number of elements','The address of the first element','The capacity'],answer:'The address of the first element',
- explain:'<b>Correct!</b> <code>data</code> is a pointer. It stores the address of the first element of the dynamically allocated array.',hint:'A pointer stores an address, not the values themselves.',code:'c_q0',next:'fillFromUser()'},
-{part:'part-seq',lbl:'Method 1 · User Input',h2:'<em>fillFromUser()</em> — write each slot',lab:'fill',chip:'Auto demo or type your own values',req:['Loops once per element and reads into <code>data[i]</code>.','Increments <code>size</code> as slots become used.'],code:'c_fill',next:'display()'},
+ key:'<b>Intro only:</b> <code>data + i</code> moves <code>i</code> elements forward (i × 4 bytes for int).',next:'Constructor & Destructor'},
+{part:'part-rules',lbl:'Lifecycle',h2:'Constructor &amp; <em>Destructor</em>',sub:'The class owns its memory: allocate on creation, free on destruction.',
+ task:{chip:'RAII Idea',req:['<code>new int[capacity]</code> allocates the array on the heap.','Constructor sets <code>size = 0</code>: capacity is room, size is what is used.','<code>delete[]</code> in the destructor frees it automatically at scope end.'],trap:'Use <code>delete[]</code> (not <code>delete</code>) for arrays, or memory leaks and undefined behavior follow.',code:'c_ctor'},next:'readInt()'},
+{part:'part-seq',lbl:'Safe Input',h2:'<em>readInt()</em> — never trust the keyboard',sub:'One helper keeps asking until the user types a real number.',split:1,viz:'readint',
+ chip:'Validation helper',req:['The user types letters like <code>abc</code>: <code>cin &gt;&gt; x</code> fails.','<code>cin.fail()</code> asks: did the read fail?','<code>clear()</code> + <code>ignore()</code> fix <code>cin</code>, then we ask again.'],code:'c_read',
+ key:'<b>Why a helper?</b> We write the checking once; every method that needs a number just calls <code>readInt()</code>.',next:'fillFromUser()'},
+{part:'part-seq',lbl:'Method 1 · User Input',h2:'<em>fillFromUser()</em> — write each slot',lab:'fill',chip:'Auto demo or type your own values',req:['<b>Validate first:</b> <code>n</code> must be in <code>0 … capacity − size</code>, otherwise return and change nothing.','Each value comes from <code>readInt()</code>, so it is always a real int.','Writes at <code>data[size]</code>, then <code>size++</code>.'],code:'c_fill',next:'display()'},
 {part:'part-seq',lbl:'Method 2',h2:'<em>display()</em> — traverse',lab:'show',chip:'Read-only traversal',req:['Visits index <code>0</code> to <code>size - 1</code>.','Marked <code>const</code>: it reads but never modifies.'],code:'c_show',next:'insertAt()'},
 {part:'part-sel',lbl:'Method 3 · User Input',h2:'<em>insertAt()</em> — shift right, then place',lab:'ins',chip:'Try any value and position',req:['Validates <code>pos</code> and free capacity first.','Shifts from the end down to <code>pos</code>.'],code:'c_ins',trap:'Try pos 7, or insert until the list is full: it returns <code>false</code> instead of corrupting memory.',next:'deleteAt()'},
 {part:'part-sel',lbl:'Method 4 · User Input',h2:'<em>deleteAt()</em> — shift left, then shrink',lab:'del',chip:'Try any position',req:['Valid range is <code>0 ≤ pos &lt; size</code>.','Shifts left, then <code>size--</code>.'],code:'c_del',next:'searchByValue()'},

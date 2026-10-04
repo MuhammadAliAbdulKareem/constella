@@ -80,7 +80,7 @@ window.SITE = {
         {
           week: 3,
           title: "Arrays with OOP in C++",
-          topics: ["pointers & dynamic memory", "class ArrayList", "constructor & destructor", "insert & delete", "linear search", "grow() dynamic resize", "Rule of Three", "2D arrays", "student tasks"],
+          topics: ["pointers & dynamic memory", "class ArrayList", "constructor & destructor", "safe input (readInt)", "insert & delete", "linear search", "grow() dynamic resize", "Rule of Three", "2D arrays", "student tasks"],
           file: "decks/data-structures/Week ⇔ 03/Session ⇔ 03.html",
           date: "2026-10-06",
           duration: "75 min"
