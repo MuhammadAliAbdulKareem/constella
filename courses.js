@@ -59,8 +59,20 @@ window.SITE = {
           date: "2026-09-29",
           duration: "75 min",
           slides: 17
+        },
+        {
+          week: 3,
+          title: "Digital Sound with Python",
+          titleAr: "معالجة وتوليد الصوت الرقمي (Digital Sound)",
+          topics: ["sine wave generation", "gain & loudness", "sampling rate (Fs)", "Nyquist theorem & aliasing", "quantization & bit depth", "DAC reconstruction & zero-order hold", "interactive audio labs"],
+          keywordsAr: ["صوت رقمي", "موجة جيبية", "تردد", "أخذ العينات", "سامبلنج", "نظرية نايكوست", "تكميم", "عمق بت", "تحويل تناظري رقمي", "بايثون وسائط متعددة", "داك"],
+          file: "decks/multimedia/Week ⇔ 03/Session ⇔ 03.html",
+          codeFile: "decks/multimedia/Week ⇔ 03/session03_digital_sound.py",
+          codeName: "session03_digital_sound.py",
+          date: "2026-10-06",
+          duration: "75 min",
+          slides: 12
         }
-        // ,{ week: 3, title: "…", topics: ["…"], file: "decks/multimedia/Week ⇔ 03/Session ⇔ 03.html", date: "2026-10-06" }
       ]
     },
 
