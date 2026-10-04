@@ -22,7 +22,8 @@ course-site/
     ├── template-session.html    # قالب معياري جاهز لإنشاء أي سكشن جديد بسهولة
     ├── data-structures/         # كورس هياكل البيانات (C++)
     │   ├── Week ⇔ 01/
-    │   └── Week ⇔ 02/
+    │   ├── Week ⇔ 02/
+    │   └── Week ⇔ 03/
     └── multimedia/              # كورس الوسائط المتعددة (Python)
         ├── Week ⇔ 01/
         └── Week ⇔ 02/

@@ -76,8 +76,16 @@ window.SITE = {
           file: "decks/data-structures/Week ⇔ 02/Session ⇔ 02.html",
           date: "2026-09-29",
           duration: "75 min"
+        },
+        {
+          week: 3,
+          title: "Arrays with OOP in C++",
+          topics: ["class ArrayList", "constructor & destructor", "insert & delete", "linear search", "grow() dynamic resize", "Rule of Three", "2D arrays", "student tasks"],
+          file: "decks/data-structures/Week ⇔ 03/Session ⇔ 03.html",
+          date: "2026-10-06",
+          duration: "75 min"
         }
-        // ,{ week: 3, title: "…", topics: ["…"], file: "decks/data-structures/Week ⇔ 03/Session ⇔ 03.html", date: "2026-10-06" }
+        // ,{ week: 4, title: "…", topics: ["…"], file: "decks/data-structures/Week ⇔ 04/Session ⇔ 04.html", date: "2026-10-13" }
       ]
     }
   ]

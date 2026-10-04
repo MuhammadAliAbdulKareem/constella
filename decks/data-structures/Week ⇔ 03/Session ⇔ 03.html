@@ -1,0 +1,1370 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Data Structures — Session 03 · Arrays with OOP in C++</title>
+<meta name="description" content="Data Structures with C++ — Session 03: Arrays with OOP in C++ by Eng. Muhammad Ali Abdul Kareem, Sinai University.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&family=Lemonada:wght@400;600;700&display=swap" rel="stylesheet">
+<script>
+  try {
+    var t = localStorage.getItem('cs:theme') || localStorage.getItem('deck_theme');
+    if (t === 'light') document.documentElement.classList.add('light-mode');
+  } catch(e){}
+</script>
+<style>
+:root{
+  color-scheme: dark;
+  --c:#ec4899; --c-2:#a855f7;
+  --c-grad:linear-gradient(90deg,var(--c),var(--c-2));
+  
+  /* Dark Theme Tokens */
+  --bg:#07070d;
+  --stage-bg:#090912;
+  --card:rgba(18,18,28,.82);
+  --card-border:rgba(255,255,255,.08);
+  --tp:#f0eeff;
+  --ts:#9a9ab5;
+  --tm:#6b6b85;
+  --warn:#fb7185;
+  --syntax-grad:linear-gradient(135deg,#6366f1,#a855f7,#ec4899);
+  --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+  
+  --cv-board:#0a0a13;
+  --cv-grid:rgba(168,85,247,.055);
+  --cv-axis:rgba(255,255,255,.25);
+  --cv-text-dim:#8a8aa3;
+  --cv-text-main:#eef0ff;
+  --shadow-vp:0 32px 70px rgba(0,0,0,.8);
+}
+
+/* Light Theme Tokens */
+html.light-mode, body.light-mode, html.light-mode body{
+  color-scheme: light;
+  --bg:#ebe9f5;
+  --stage-bg:#ffffff;
+  --card:#ffffff;
+  --card-border:rgba(120,110,160,.16);
+  --tp:#181528;
+  --ts:#524d70;
+  --tm:#7f789e;
+  --warn:#e11d48;
+  --syntax-grad:linear-gradient(135deg,#4f46e5,#9333ea,#db2777);
+  
+  --cv-board:#ffffff;
+  --cv-grid:rgba(99,102,241,.06);
+  --cv-axis:rgba(24,21,40,.2);
+  --cv-text-dim:#6d678a;
+  --cv-text-main:#181528;
+  --shadow-vp:0 24px 60px rgba(100,90,140,.14);
+}
+body.light-mode .slide-counter{background:rgba(255,255,255,.88);border-color:var(--card-border);color:var(--ts);backdrop-filter:blur(8px)}
+body.light-mode .brand-left a{background:rgba(255,255,255,.8)!important;color:var(--tp)!important;border-color:var(--card-border)!important;}
+body.light-mode .brand-left a:hover{background:#ffffff!important;border-color:var(--c)!important;}
+body.light-mode .vp-progress{background:rgba(120,110,160,.12)}
+body.light-mode .controls button{background:rgba(255,255,255,.85);border-color:var(--card-border);color:var(--ts)}
+body.light-mode .controls button:hover{background:#ffffff;color:var(--tp);border-color:var(--c)}
+body.light-mode .controls kbd{background:rgba(120,110,160,.14);color:var(--ts)}
+body.light-mode .mnav{background:rgba(255,255,255,.88);border-color:var(--card-border);color:var(--tp);box-shadow:0 4px 16px rgba(100,90,140,.18)}
+
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;height:100dvh;background:var(--bg);color:var(--tp);font-family:Inter,system-ui,"Segoe UI",Roboto,Arial,sans-serif;overflow:hidden;transition:background .3s ease, color .3s ease;}
+body{padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px);display:flex;align-items:center;justify-content:center}
+#fitbox{position:relative;flex:none}
+#deck{width:1100px;height:707px;position:absolute;left:0;top:0;transform-origin:top left}
+
+/* Brand Bar */
+.brand-bar{height:44px;display:flex;justify-content:space-between;align-items:center}
+.brand-left{display:flex;align-items:center;gap:11px}
+
+/* Big-O Speed Pulse Icon */
+.brand-icon{
+  width:32px; height:32px; border-radius:9px;
+  background:var(--syntax-grad); display:flex; align-items:center; justify-content:center;
+  box-shadow:0 4px 14px rgba(168,85,247,.4); flex-shrink:0;
+}
+.brand-icon svg{ width:20px; height:20px; fill:none; stroke:#ffffff; stroke-linecap:round; stroke-linejoin:round; }
+
+.brand-name{font-size:15px;font-weight:900;background:var(--syntax-grad);-webkit-background-clip:text;background-clip:text;color:transparent;line-height:1.2}
+.brand-sub{font-size:11px;color:var(--tm);font-weight:600}
+.brand-right{display:flex;align-items:center;gap:14px;font-size:11.5px;color:var(--ts);font-weight:700}
+
+/* Theme Toggle Button */
+.theme-btn{
+  width:32px;height:32px;border-radius:8px;border:1px solid var(--card-border);background:var(--card);
+  display:grid;place-items:center;cursor:pointer;color:var(--tp);transition:.2s;padding:0;
+}
+.theme-btn:hover{border-color:var(--c);transform:scale(1.05);}
+.theme-btn svg{width:16px;height:16px;stroke-width:2;}
+
+/* Stage Engine */
+.vp{
+  width:1100px;height:619px;position:relative;border-radius:20px;overflow:hidden;
+  border:1px solid var(--card-border);background:var(--stage-bg);box-shadow:var(--shadow-vp);
+  transition:background .3s ease, border-color .3s ease, box-shadow .3s ease;
+}
+.vp.part-intro{--c:#ec4899;--c-2:#a855f7}
+.vp.part-classes{--c:#06b6d4;--c-2:#3b82f6}
+.vp.part-rules{--c:#8b5cf6;--c-2:#ec4899}
+.vp.part-seq{--c:#6366f1;--c-2:#8b5cf6}
+.vp.part-sel{--c:#f59e0b;--c-2:#fbbf24}
+.vp.part-rep{--c:#22d3ee;--c-2:#06b6d4}
+.vp.part-fn{--c:#10b981;--c-2:#34d399}
+
+body.light-mode .vp.part-intro{--c:#db2777;--c-2:#9333ea}
+body.light-mode .vp.part-classes{--c:#0284c7;--c-2:#2563eb}
+body.light-mode .vp.part-rules{--c:#7c3aed;--c-2:#db2777}
+body.light-mode .vp.part-seq{--c:#4f46e5;--c-2:#7c3aed}
+body.light-mode .vp.part-sel{--c:#d97706;--c-2:#b45309}
+body.light-mode .vp.part-rep{--c:#0891b2;--c-2:#0284c7}
+body.light-mode .vp.part-fn{--c:#059669;--c-2:#10b981}
+
+.vp-bg{position:absolute;inset:0;width:100%;height:100%;display:block;z-index:0}
+.vp-progress{position:absolute;top:0;left:0;right:0;height:3px;background:rgba(128,128,128,.1);z-index:6}
+.vp-progress span{display:block;height:100%;width:0;background:var(--syntax-grad);box-shadow:0 0 12px var(--c);border-radius:0 3px 3px 0;transition:width .45s ease}
+.slide-counter{
+  position:absolute;top:14px;left:50%;transform:translateX(-50%);z-index:6;
+  padding:5px 14px;border-radius:999px;background:var(--card);border:1px solid var(--card-border);
+  font-size:12px;font-weight:800;color:var(--ts);box-shadow:0 4px 16px rgba(0,0,0,.08);
+}
+
+/* Slide Animation */
+.slide{position:absolute;inset:0;display:none;flex-direction:column;padding:32px 46px 24px;z-index:2}
+.slide.active{display:flex}
+.slide>*{animation:revealUp .6s ease both}
+.slide>*:nth-child(2){animation-delay:.08s}
+.slide>*:nth-child(3){animation-delay:.16s}
+.slide>*:nth-child(4){animation-delay:.24s}
+.slide>*:nth-child(5){animation-delay:.32s}
+@keyframes revealUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.lbl{font-size:11.5px;font-weight:800;color:var(--c);margin-bottom:3px;letter-spacing:.4px;text-transform:uppercase}
+h2{margin:0 0 4px;font-size:24px;font-weight:900;line-height:1.2;letter-spacing:-.3px}
+h2 em{font-style:normal;background:var(--c-grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.sub{margin:0 0 4px;font-size:13.5px;color:var(--ts);line-height:1.45;max-width:850px}
+.sub strong{color:var(--tp)}
+code,pre.code{font-variant-ligatures:none;font-feature-settings:"liga" 0,"calt" 0}
+code{font-family:var(--mono);font-size:.92em;color:var(--c);background:rgba(128,128,128,.1);padding:1px 6px;border-radius:6px}
+
+/* Fully Stretched Stage */
+.stage{flex:1;position:relative;min-height:0;margin-top:10px;display:flex;flex-direction:column;}
+.viz{position:absolute;inset:0}
+.viz canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+
+/* Footer elements */
+.sf{display:flex;align-items:center;justify-content:space-between;font-size:11px;color:var(--tm);font-weight:600;margin-top:6px;height:16px;flex-shrink:0;}
+.pd{display:flex;gap:4px;align-items:center;max-width:650px;overflow:hidden}
+.dot{width:5px;height:5px;border-radius:99px;background:rgba(128,128,128,.2);transition:.3s;flex:none}
+.dot.on{width:18px;background:var(--c-grad)}
+
+/* Hero View */
+.hero-slide{justify-content:center}
+.hero-slide .lbl{margin-top:auto}
+.hero-slide h1{margin:6px 0 10px;font-size:62px;line-height:1.05;font-weight:900;letter-spacing:-2px}
+.hero-slide h1 em{font-style:normal;background:var(--syntax-grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero-slide .tag{font-size:20px;color:var(--ts);font-weight:600;max-width:820px;line-height:1.45}
+.inst{display:flex;align-items:center;gap:14px;margin-top:26px}
+.avatar{width:54px;height:54px;border-radius:50%;background:var(--syntax-grad);display:grid;place-items:center;font-weight:900;font-size:22px;box-shadow:0 0 24px rgba(168,85,247,.35);color:#fff}
+.inst small{display:block;font-size:11px;letter-spacing:1.6px;text-transform:uppercase;color:var(--tm);font-weight:800;margin-bottom:2px}
+.inst b{font-size:20px;font-weight:800}
+.chips{display:flex;gap:10px;margin-top:22px;flex-wrap:wrap}
+.chips span{padding:6px 14px;border-radius:999px;border:1px solid var(--card-border);background:var(--card);font-size:12.5px;font-weight:700;color:var(--ts)}
+.hero-slide .sf{margin-top:auto}
+.herobg{position:absolute;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none}
+
+/* Split Layouts & Tasks */
+.task{display:grid;grid-template-columns:1fr 1fr;gap:24px;flex:1;min-height:0;height:100%;align-items:center;}
+.tleft{display:flex;flex-direction:column;gap:10px;justify-content:center;min-width:0;overflow-y:auto;padding-right:4px}
+.chip{align-self:flex-start;padding:3px 10px;border-radius:999px;background:rgba(128,128,128,.1);border:1px solid var(--card-border);color:var(--c);font-weight:800;font-size:10.5px;letter-spacing:.4px;text-transform:uppercase}
+.req{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.req li{position:relative;padding-left:22px;font-size:13px;line-height:1.45;color:var(--tp)}
+.req li::before{content:'';position:absolute;left:0;top:.45em;width:8px;height:8px;border-radius:2.5px;background:var(--c-grad)}
+.trap{padding:9px 12px;border-radius:10px;border:1px solid rgba(251,113,133,.4);background:rgba(251,113,133,.08);font-size:12px;line-height:1.45;color:var(--tp)}
+.trap b{color:var(--warn)}
+.tright{position:relative;min-height:0;display:flex;flex-direction:column;justify-content:center;height:100%;}
+
+/* Fit-Content Code Window (No unnecessary giant black boxes) */
+.code-window{
+  background:#090912; border:1px solid var(--card-border); border-radius:12px;
+  overflow:hidden; display:flex; flex-direction:column; width:100%;
+  box-shadow:0 16px 40px rgba(0,0,0,.35);
+  height:fit-content; max-height:100%; align-self:center;
+}
+body.light-mode .code-window{
+  background:#13111f; border-color:rgba(120,110,160,.18); box-shadow:0 14px 30px rgba(50,40,90,.15);
+}
+.code-header{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:7px 14px; background:rgba(255,255,255,.04); border-bottom:1px solid rgba(255,255,255,.07);
+  flex-shrink:0;
+}
+.dots{display:flex; gap:5px;}
+.dots span{width:8px; height:8px; border-radius:50%;}
+.dots span:nth-child(1){background:#ff5f56;}
+.dots span:nth-child(2){background:#ffbd2e;}
+.dots span:nth-child(3){background:#27c93f;}
+.copy-btn{
+  background:transparent; border:1px solid rgba(255,255,255,.15); color:#a5a0c2;
+  font:600 10.5px Inter,system-ui; padding:2px 8px; border-radius:5px; cursor:pointer;
+  transition:.2s; display:flex; align-items:center; gap:4px;
+}
+.copy-btn:hover{color:#ffffff; border-color:var(--c); background:rgba(255,255,255,.08);}
+.copy-btn.copied{color:#34d399; border-color:#34d399;}
+
+.codecard{
+  padding:14px 18px; overflow-x:auto; overflow-y:auto;
+}
+pre.code{margin:0; font:500 13px/1.55 var(--mono); color:#e8e6ff; white-space:pre; tab-size:4; width:100%;}
+pre.code .k{color:#ff79c6; font-weight:700}
+pre.code .t{color:#67e8f9}
+pre.code .s{color:#34d399}
+pre.code .n{color:#fbbf24}
+pre.code .c{color:#797599; font-style:italic}
+pre.code .p{color:#c084fc}
+pre.code .f{color:#93c5fd}
+pre.code .o{color:#f472b6}
+
+/* Cards Layout: Center aligned vertically & natural height */
+.cards{
+  display:grid; gap:20px; width:100%; height:100%;
+  grid-template-columns:repeat(2, 1fr); align-items:center;
+}
+.cc{
+  display:flex; flex-direction:column; gap:8px; min-width:0;
+  height:fit-content; max-height:100%;
+}
+.cc-h{font-size:11.5px; font-weight:800; letter-spacing:.6px; text-transform:uppercase; color:var(--c); flex-shrink:0;}
+.cc .code-window{height:fit-content;}
+.cc-n{font-size:12px; line-height:1.45; color:var(--ts); flex-shrink:0; margin-top:2px;}
+.cc-n b{color:var(--tp)}
+
+/* Solution Popover */
+.sol-actions{display:flex; align-items:center; gap:10px; margin-top:4px;}
+.solbtn{
+  cursor:pointer; padding:6px 14px; border-radius:999px; border:1px solid var(--c);
+  background:var(--card); color:var(--tp); font:800 11.5px Inter,system-ui,sans-serif;
+  letter-spacing:.3px; align-self:flex-start; transition:.2s;
+}
+.solbtn:hover{background:var(--c); color:#ffffff}
+.solbtn kbd{margin-left:5px; padding:1px 4px; border-radius:3px; background:rgba(128,128,128,.15); font:700 10px var(--mono)}
+.sol{display:none; position:absolute; inset:0; background:var(--stage-bg); padding:30px 44px; z-index:8; flex-direction:column; gap:10px}
+.sol.open{display:flex}
+.sol-h{display:flex; justify-content:space-between; align-items:center}
+.sol-h .lbl{margin:0; font-size:13px}
+.sol-body{display:grid; grid-template-columns:1.4fr 1fr; gap:18px; flex:1; min-height:0}
+.notes{display:flex; flex-direction:column; gap:8px; justify-content:center}
+.note-h{font-size:11px; font-weight:800; letter-spacing:.8px; text-transform:uppercase; color:var(--tm)}
+.note{padding:8px 12px; border-radius:8px; border:1px solid var(--card-border); border-left:3px solid var(--c); background:var(--card); font-size:12.5px; line-height:1.45}
+
+/* MCQ Interactive Challenge Box */
+.mcq-box{display:flex; flex-direction:column; gap:10px;}
+.mcq-options{display:grid; grid-template-columns:repeat(2, 1fr); gap:9px; margin-top:2px;}
+.mcq-btn{
+  background:var(--card); border:1px solid var(--card-border);
+  border-radius:9px; padding:10px 12px; color:var(--tp); font:700 13px var(--mono);
+  cursor:pointer; transition:.2s; text-align:center;
+}
+.mcq-btn:hover{border-color:var(--c); transform:translateY(-1px);}
+.mcq-btn.correct{background:rgba(52,211,153,.18); border-color:#34d399; color:#059669;}
+body.light-mode .mcq-btn.correct{color:#047857; background:rgba(52,211,153,.25);}
+.mcq-btn.wrong{background:rgba(251,113,133,.18); border-color:#fb7185; color:#e11d48;}
+.mcq-feedback{min-height:44px; font-size:12.5px; line-height:1.45; padding:8px 12px; border-radius:9px; display:none;}
+.mcq-feedback.show{display:block;}
+.mcq-feedback.correct{background:rgba(52,211,153,.08); border:1px solid rgba(52,211,153,.3); color:#059669;}
+body.light-mode .mcq-feedback.correct{background:rgba(52,211,153,.14); color:#065f46;}
+.mcq-feedback.wrong{background:rgba(251,113,133,.08); border:1px solid rgba(251,113,133,.3); color:#e11d48;}
+
+/* Bottom Controls */
+.controls{height:44px; display:flex; align-items:center; justify-content:space-between; color:var(--tm); font-size:12px; font-weight:600}
+.controls button{cursor:pointer; padding:6px 14px; border-radius:999px; border:1px solid var(--card-border); background:var(--card); color:var(--ts); font:700 12px Inter,system-ui,sans-serif; transition:.2s}
+.controls button:hover{color:var(--tp); border-color:var(--c)}
+.controls kbd{padding:1px 6px; border-radius:5px; background:rgba(128,128,128,.14); font:700 11px var(--mono); color:var(--ts)}
+
+.mnav{display:none; position:absolute; top:50%; z-index:9; width:38px; height:38px; margin-top:-19px; border-radius:50%; border:1px solid var(--card-border); background:var(--card); color:var(--tp); font:800 20px/1 Inter,system-ui,sans-serif; cursor:pointer; place-items:center; padding:0; opacity:.85}
+.mnav.mp{left:6px}.mnav.mn{right:6px}
+.small .mnav{display:grid}
+.small .brand-bar,.small .controls{display:none}
+.small .vp{border-radius:12px}
+
+.ln{display:block;padding:0 8px;margin:0 -8px;border-radius:5px;transition:background .2s,box-shadow .2s}
+.ln.hot{background:rgba(251,191,36,.16);box-shadow:inset 3px 0 0 #fbbf24}
+.vizbox{position:relative;flex:1;min-height:0}
+.vizbox canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.tright.lab{justify-content:flex-start;gap:8px}
+.ctl{display:flex;flex-direction:column;gap:8px;flex-shrink:0;padding:9px 11px;border:1px solid var(--card-border);border-radius:14px;background:var(--card)}
+.ctl-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.seg{display:inline-flex;border:1px solid var(--card-border);border-radius:999px;overflow:hidden}
+.seg button{border:0;background:transparent;color:var(--ts);font:800 11.5px Inter,system-ui,sans-serif;padding:6px 12px;cursor:pointer;transition:.2s}
+.seg button.on{background:var(--c-grad);color:#fff}
+.fld{display:none;align-items:center;gap:6px;font:700 11px var(--mono);color:var(--tm)}
+.ctl.manual .fld{display:inline-flex}
+.fld input{width:58px;padding:5px 8px;border-radius:8px;border:1px solid var(--card-border);background:transparent;color:var(--tp);font:600 12px var(--mono);outline:none}
+.fld input.wide{width:92px}
+.fld input:focus{border-color:var(--c);box-shadow:0 0 0 3px rgba(168,85,247,.18)}
+.runbtn{display:none;cursor:pointer;padding:6px 14px;border-radius:999px;border:0;background:var(--c-grad);color:#fff;font:800 11.5px Inter,system-ui,sans-serif}
+.ctl.manual .runbtn{display:inline-block}
+.tbtn{min-width:30px;height:27px;border-radius:8px;border:1px solid var(--card-border);background:transparent;color:var(--tp);cursor:pointer;font:700 13px Inter,system-ui,sans-serif;padding:0 8px}
+.tbtn:hover{border-color:var(--c)}
+.stp{flex:1;min-width:40px;height:5px;border-radius:99px;background:rgba(128,128,160,.22);overflow:hidden}
+.stp i{display:block;height:100%;width:0;background:var(--c-grad);transition:width .3s}
+.cnt{font:700 11px var(--mono);color:var(--tm);white-space:nowrap}
+</style>
+</head>
+<body>
+<div id="fitbox"><div id="deck">
+  <div class="brand-bar">
+    <div class="brand-left">
+      <a href="../../../index.html" style="padding:6px 13px;border-radius:999px;background:rgba(255,255,255,.07);color:var(--tp);font:600 12px/1 system-ui,sans-serif;text-decoration:none;border:1px solid var(--card-border);display:inline-flex;align-items:center;gap:6px;transition:background .2s,border-color .2s;flex-shrink:0" onmouseover="this.style.background='rgba(255,255,255,.14)';this.style.borderColor='var(--c)'" onmouseout="this.style.background='rgba(255,255,255,.07)';this.style.borderColor='var(--card-border)'">← Back to sessions</a>
+      <!-- Speed / Complexity Gauge Logo Icon -->
+      <div class="brand-icon">
+        <svg viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="9" stroke-width="2"/>
+          <path d="M12 7v5l3 3" stroke-width="2"/>
+          <circle cx="12" cy="12" r="1.5" fill="#ffffff"/>
+        </svg>
+      </div>
+      <div>
+        <div class="brand-name">Data Structures</div>
+        <div class="brand-sub">Session 03 · Arrays &amp; OOP in C++</div>
+      </div>
+    </div>
+    <div class="brand-right">
+      <span>Instructor · Muhammad Ali Abdul Kareem</span>
+      <button class="theme-btn" id="themeToggle" title="Switch to light theme" aria-label="Toggle theme">
+        <svg id="themeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+      </button>
+    </div>
+  </div>
+  <div class="vp part-intro" id="vp">
+    <canvas class="vp-bg" id="amb"></canvas>
+    <div class="vp-progress"><span id="prog"></span></div>
+    <div class="slide-counter" id="counter">1 / 1</div>
+    <button class="mnav mp" id="mprev" aria-label="Previous slide">‹</button>
+    <button class="mnav mn" id="mnext" aria-label="Next slide">›</button>
+  </div>
+  <div class="controls">
+    <button id="prev" tabindex="-1">‹ Prev</button>
+    <span><kbd>→</kbd> next &nbsp;·&nbsp; <kbd>←</kbd> back &nbsp;·&nbsp; <kbd>S</kbd> solution &nbsp;·&nbsp; <kbd>F</kbd> fullscreen</span>
+    <button id="next" tabindex="-1">Next ›</button>
+  </div>
+</div></div>
+
+<script>
+'use strict';
+let isLight = false;
+let CL = {
+  indigo:'#6366f1', violet:'#a855f7', pink:'#ec4899', cyan:'#06b6d4', green:'#10b981', amber:'#f59e0b',
+  chalk:'#eef0ff', dim:'#8a8aa3', board:'#0a0a13', grid:'rgba(168,85,247,.055)', axis:'rgba(255,255,255,.25)'
+};
+
+function updateThemeTokens(){
+  isLight = document.body.classList.contains('light-mode');
+  if(isLight){
+    CL = {
+      indigo:'#4f46e5', violet:'#9333ea', pink:'#db2777', cyan:'#0284c7', green:'#059669', amber:'#d97706',
+      chalk:'#181528', dim:'#6d678a', board:'#ffffff', grid:'rgba(99,102,241,.06)', axis:'rgba(24,21,40,.2)'
+    };
+  } else {
+    CL = {
+      indigo:'#6366f1', violet:'#a855f7', pink:'#ec4899', cyan:'#06b6d4', green:'#10b981', amber:'#f59e0b',
+      chalk:'#eef0ff', dim:'#8a8aa3', board:'#0a0a13', grid:'rgba(168,85,247,.055)', axis:'rgba(255,255,255,.25)'
+    };
+  }
+}
+
+const FONTS={ui:'Inter, system-ui, sans-serif',marker:'Lemonada, Inter, sans-serif',mono:'"JetBrains Mono", ui-monospace, Menlo, monospace'};
+let PC='#ec4899',PC2='#a855f7',SC=1;
+const at=(f,a,b)=>Math.min(1,Math.max(0,(f-a)/(b-a)));
+const ease=t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
+const rgba=(h,a)=>{const n=parseInt(h.slice(1),16);return `rgba(${n>>16},${(n>>8)&255},${n&255},${a})`};
+
+function fit(cv){
+  const ctx=cv.getContext('2d'),s={ctx,W:0,H:0,d:0},p=cv.parentElement;
+  s.rs=()=>{
+    const w=p.clientWidth,h=p.clientHeight,d=Math.min((devicePixelRatio||1)*SC,3);
+    if(!w||!h||(w===s.W&&h===s.H&&Math.abs(d-s.d)<.01))return;
+    s.W=w;s.H=h;s.d=d;cv.width=Math.round(w*d);cv.height=Math.round(h*d);ctx.setTransform(d,0,0,d,0,0);
+  };
+  s.rs();return s;
+}
+function rr(c,x,y,w,h,r){c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath()}
+
+function marker(c,pts,prog,col,lw=2.4){
+  if(prog<=0||pts.length<2)return;
+  let total=0;const seg=[];
+  for(let i=1;i<pts.length;i++){const d=Math.hypot(pts[i][0]-pts[i-1][0],pts[i][1]-pts[i-1][1]);seg.push(d);total+=d}
+  const target=total*prog;c.save();
+  c.strokeStyle=col;c.lineWidth=lw;c.lineJoin='round';c.lineCap='round';
+  if(!isLight){ c.shadowColor=col; c.shadowBlur=6; }
+  c.beginPath();c.moveTo(pts[0][0],pts[0][1]);let acc=0;
+  for(let i=1;i<pts.length;i++){const d=seg[i-1];
+    if(acc+d<=target){c.lineTo(pts[i][0],pts[i][1]);acc+=d}
+    else{const r=(target-acc)/d;c.lineTo(pts[i-1][0]+(pts[i][0]-pts[i-1][0])*r,pts[i-1][1]+(pts[i][1]-pts[i-1][1])*r);break}
+  }
+  c.stroke();c.restore();
+}
+
+let CW=0;
+function txt(c,s,x,y,o={}){
+  const{size=13,col=CL.chalk,weight=700,align='center',a=1,font='ui',base='middle'}=o;
+  if(!s||!(a>0))return;
+  c.save();c.globalAlpha=a;c.font=`${weight} ${size}px ${FONTS[font]}`;
+  const w=c.measureText(s).width;
+  let ax=align==='center'?x-w/2:align==='right'?x-w:x;
+  if(CW)ax=Math.max(12,Math.min(ax,CW-12-w));
+  c.fillStyle=col;c.textAlign='left';c.textBaseline=base;c.fillText(s,ax,y);c.restore();
+}
+function board(c,W,H,o={}){
+  const p=6,x=p,y=p,w=W-p*2,h=H-p*2;
+  rr(c,x,y,w,h,16);c.fillStyle=CL.board;c.fill();
+  c.save();rr(c,x,y,w,h,16);c.clip();c.fillStyle=CL.grid;
+  for(let gx=x+22;gx<x+w;gx+=26)for(let gy=y+22;gy<y+h;gy+=26){c.beginPath();c.arc(gx,gy,1,0,7);c.fill()}
+  c.restore();
+  const g=c.createLinearGradient(x,y,x+w,y+h);
+  g.addColorStop(0,CL.indigo);g.addColorStop(.5,CL.violet);g.addColorStop(1,CL.pink);
+  c.save();c.strokeStyle=g;c.lineWidth=isLight?1.5:2;
+  if(!isLight){ c.shadowColor=CL.violet; c.shadowBlur=10+5*Math.sin((o.frame||0)*.03); }
+  rr(c,x,y,w,h,16);c.stroke();c.restore();
+  if(o.title)txt(c,o.title,x+22,y+28,{size:16,col:CL.chalk,align:'left',font:'marker',weight:600});
+  return{x,y,w,h};
+}
+function table(c,x,y,w,cols,rows,f,o={}){
+  const{rowH=40,hdrH=34,start=14,per=55,col=PC}=o;
+  const hp=at(f,start-10,start+24);
+  c.save();rr(c,x,y,w,hdrH,8);c.fillStyle=rgba(col,(isLight?.12:.16)*ease(hp));c.fill();c.restore();
+  let cx=x;
+  cols.forEach(cd=>{const cw=cd.w*w;
+    txt(c,cd.h,cd.al==='left'?cx+12:cx+cw/2,y+hdrH/2,{size:11.5,col:col,weight:800,align:cd.al==='left'?'left':'center',a:ease(hp)});
+    cx+=cw});
+  marker(c,[[x,y+hdrH],[x+w,y+hdrH]],hp,col,1.6);
+  const first=start+30;
+  rows.forEach((row,r)=>{
+    const s0=first+r*per,p=at(f,s0,s0+24),ry=y+hdrH+8+r*rowH;
+    if(p<=0)return;
+    const active=f>=s0&&f<s0+per;
+    c.save();c.globalAlpha=ease(p);
+    if(active){rr(c,x,ry,w,rowH-4,8);c.fillStyle=rgba(col,isLight?.08:.10);c.fill();c.strokeStyle=rgba(col,.55);c.lineWidth=1.4;c.stroke()}
+    let cx2=x;
+    row.forEach((cell,i)=>{
+      const cd=cols[i],cw=cd.w*w,o2=typeof cell==='string'?{t:cell}:cell;
+      if(o2.hl&&active){c.fillStyle=rgba(o2.col||col,isLight?.16:.24);rr(c,cx2+3,ry+3,cw-6,rowH-10,6);c.fill()}
+      txt(c,o2.t,cd.al==='left'?cx2+12:cx2+cw/2,ry+(rowH-4)/2,{size:cd.size||12.5,col:o2.col||CL.chalk,weight:o2.hl?800:600,align:cd.al==='left'?'left':'center',font:cd.mono?'mono':'ui'});
+      cx2+=cw;
+    });
+    c.restore();
+  });
+  return Math.max(-1,Math.min(rows.length-1,Math.floor((f-first)/per)));
+}
+
+function terminal(c,x,y,w,h,f,lines,o={}){
+  const{start=20,speed=.55,pause=18,title='Expected Console Output'}=o;
+  const p=ease(at(f,0,30));
+  c.save();c.globalAlpha=p;
+  rr(c,x,y,w,h,14);c.fillStyle=isLight?'#13111f':'#090912';c.fill();
+  c.save();rr(c,x,y,w,h,14);c.clip();c.fillStyle='rgba(255,255,255,.05)';c.fillRect(x,y,w,36);c.restore();
+  c.strokeStyle=rgba(PC,.6);c.lineWidth=1.6;rr(c,x,y,w,h,14);c.stroke();
+  ['#ff5f56','#ffbd2e','#27c93f'].forEach((k,i)=>{c.fillStyle=k;c.beginPath();c.arc(x+22+i*18,y+18,5,0,7);c.fill()});
+  c.restore();
+  txt(c,title,x+w-18,y+18,{size:11.5,col:CL.dim,align:'right',a:p});
+  const lh=Math.min(30,(h-70)/lines.length);
+  let t=(f-start)*speed,ly=y+34+lh*.9+10,last=null,cur=null;
+  lines.forEach(seg=>{
+    const len=seg.reduce((n,s)=>n+s[0].length,0);
+    if(t>0){
+      let budget=Math.min(len,Math.floor(t)),cx=x+22;
+      seg.forEach(([tx,ck])=>{
+        const part=tx.slice(0,Math.max(0,budget));budget-=tx.length;
+        if(part){c.save();c.font=`500 14.5px ${FONTS.mono}`;c.fillStyle=CL[ck]||'#f0eeff';c.textAlign='left';c.textBaseline='middle';c.fillText(part,cx,ly);cx+=c.measureText(part).width;c.restore()}
+      });
+      last=[cx,ly];
+      if(t<len+pause*speed)cur=[cx,ly];
+    }
+    t-=len+pause*speed;ly+=lh;
+  });
+  const cp=cur||last;
+  if(cp&&Math.floor(f/24)%2===0){c.fillStyle=PC;c.fillRect(cp[0]+3,cp[1]-8,8,16)}
+}
+
+const VIZ={};
+VIZ.tokens={cycle:100000,draw(c,W,H,f){
+  /* Topic-aware hero background. Content may define HERO_TOKENS (floating words) and HERO_STRIPS (drifting rows of cells). */
+  const T=typeof HERO_TOKENS!=='undefined'?HERO_TOKENS:['O(1)','O(log n)','O(√n)','O(n)','O(n log n)','O(n²)','Predict','int&','cin >>','cout <<'];
+  const S=typeof HERO_STRIPS!=='undefined'?HERO_STRIPS:[];
+  S.forEach((vals,k)=>{
+    const cell=44,gap=8,n=vals.length,len=n*(cell+gap),dir=k%2?-1:1,sp=.55+.12*k,span=W+len;
+    const y=H*[.09,.82,.64][k%3]-cell/2;
+    const x0=(((f*sp*dir)%span)+span)%span-len;
+    const hot=Math.floor(f/28+k*2)%n;
+    vals.forEach((v,j)=>{
+      const x=x0+j*(cell+gap),on=j===hot,inside=x>14&&x+cell<W-14;
+      c.save();c.globalAlpha=(isLight?.34:.2)*(on?2.2:1);
+      rr(c,x,y,cell,cell,9);c.strokeStyle=on?PC2:PC;c.lineWidth=on?2.4:1.4;c.stroke();
+      c.globalAlpha*=.35;c.fillStyle=on?PC2:PC;c.fill();c.restore();
+      if(inside){
+        txt(c,String(v),x+cell/2,y+cell/2,{size:15,col:on?PC2:PC,a:(isLight?.5:.32)*(on?1.8:1),font:'mono',weight:700});
+        txt(c,'['+j+']',x+cell/2,y+cell+13,{size:10,col:PC,a:isLight?.4:.25,font:'mono'});
+      }
+    });
+  });
+  T.forEach((t,i)=>{
+    const sx=((i*137.5)%100)/100,sy=((i*61.8)%100)/100;
+    const x=W*sx+Math.sin(f*.01+i)*18,y=(((H*sy-f*(.12+(i%4)*.05))%H)+H)%H;
+    const inText=x>W*.05&&x<W*.82&&y>H*.24&&y<H*.78;
+    txt(c,t,x,y,{size:15+(i%3)*4,col:i%2?PC:PC2,a:((isLight?.22:.12)+.08*Math.sin(f*.02+i))*(inText?.3:1),font:'mono',weight:700});
+  });
+}};
+
+VIZ.terminal={cycle:600,draw(c,W,H,f,frame,o){
+  const h=Math.min(H-10,Math.max(210,o.data.lines.length*34+80));
+  terminal(c,4,(H-h)/2,W-8,h,f,o.data.lines,{title:o.data.title||'Expected Console Output'});
+}};
+
+/* Growth Curves with Exact Symmetry and Axis Alignment */
+/* ===== helpers ===== */
+const mk=(a,n,h,m,t,x)=>Object.assign({a:[...a],n,h:h||{},m,t},x||{});
+const blank=k=>Array(k).fill(null);
+const cp=st=>Object.assign({},st,{a:[...st.a]});
+function txtWrap(c,s,cx,y,maxW,o={}){
+  const size=o.size||13;c.save();c.font=`600 ${size}px ${FONTS[o.font||'ui']}`;
+  const words=String(s||'').split(' ');let line='',L=[];
+  words.forEach(w=>{const t=line?line+' '+w:w;if(c.measureText(t).width>maxW&&line){L.push(line);line=w}else line=t});
+  if(line)L.push(line);c.restore();
+  L.forEach((l,i)=>txt(c,l,cx,y+i*(size+5),Object.assign({size,weight:600},o)));
+}
+const gmk=(st,hr,hk,hc,m,t,x)=>Object.assign({g:1,rows:st.rows,cols:st.cols,a:[...st.a],hr,hc,hk,m,t,fi:(hr==null?null:hr*st.cols+hc)},x||{});
+
+/* ===== operations registry (filled by CONTENT) ===== */
+const OPS={};
+
+/* ===== lab engine ===== */
+function newLab(op){const L={op,mode:'auto',frames:[],idx:0,playing:true,last:-1,speed:55,hold:95,demo:0,st:null,ui:null};labReset(L);return L}
+function labIdle(L){const O=OPS[L.op],s=L.st;return s.rows?gmk(s,null,null,null,O.idle,O.title):mk(s.a,s.n,{},O.idle,O.title)}
+function labReset(L){const O=OPS[L.op];L.st=O.init();L.speed=O.speed||55;L.demo=0;
+ if(L.mode==='auto'){L.frames=O.run(O.init(),O.demos[0]).frames;L.playing=true}
+ else{L.frames=[labIdle(L)];L.playing=false}
+ L.idx=0;L.last=-1;if(L.ui)L.ui.k=''}
+function labRun(L){const O=OPS[L.op],p={};
+ (O.fields||[]).forEach(fd=>{const v=L.ui.inp[fd.k].value.trim();p[fd.k]=fd.str?v:(v===''||isNaN(parseInt(v,10))?null:parseInt(v,10))});
+ const r=O.run(L.st,p);L.st=r.st;L.frames=r.frames;L.idx=0;L.playing=true;L.last=-1;L.ui.k='';
+ if(O.clear){const i=L.ui.inp[O.fields[0].k];i.value='';i.focus()}}
+function labTick(L,fr){
+ if(L.last<0)L.last=fr;
+ if(L.playing){
+  const end=L.idx>=L.frames.length-1;
+  if(!end){if(fr-L.last>=L.speed){L.idx++;L.last=fr}}
+  else if(L.mode==='auto'){if(fr-L.last>=L.hold){const O=OPS[L.op];L.demo++;L.st=O.init();L.frames=O.run(O.init(),O.demos[L.demo%O.demos.length]).frames;L.idx=0;L.last=fr}}
+  else L.playing=false;
+ }
+ if(L.ui){const s=L.frames[L.idx],k=L.idx+'/'+L.frames.length+(L.playing?'p':'s')+'|'+(s.ln||'')+'|'+L.st.n;
+  if(L.ui.k!==k){L.ui.k=k;L.ui.cnt.textContent=(L.idx+1)+' / '+L.frames.length;L.ui.play.textContent=L.playing?'⏸':'▶';
+   L.ui.bar.style.width=((L.idx+1)/L.frames.length*100)+'%';
+   if(L.ui.code){const on=s.ln||[];Array.from(L.ui.code.children).forEach((e,j)=>e.classList.toggle('hot',on.includes(j)))}
+   if(L.ui.lbl)L.ui.lbl.textContent=OPS[L.op].lbl(L.st)}}
+}
+function ctlHTML(L){const O=OPS[L.op];
+ const f=(O.fields||[]).map(fd=>`<label class="fld"><span class="fl">${fd.l}</span><input data-k="${fd.k}" class="${fd.cls||''}" value="${fd.d===undefined?'':fd.d}" placeholder="${fd.ph||''}" autocomplete="off" spellcheck="false"></label>`).join('');
+ return `<div class="ctl"><div class="ctl-row"><div class="seg"><button data-m="auto" class="on">▶ Auto demo</button><button data-m="manual">✍ Manual</button></div>${f}<button class="runbtn" data-run>${O.btn||'Run ▶'}</button></div>
+ <div class="ctl-row"><button class="tbtn" data-t="reset" title="Reset">⟲</button><button class="tbtn" data-t="prev" title="Previous step">‹</button><button class="tbtn" data-t="play" title="Play / Pause">⏸</button><button class="tbtn" data-t="next" title="Next step">›</button><div class="stp"><i></i></div><span class="cnt"></span></div></div>`}
+function bindLab(L,el){
+ const ctl=el.querySelector('.ctl'),O=OPS[L.op];
+ L.ui={ctl,cnt:ctl.querySelector('.cnt'),play:ctl.querySelector('[data-t=play]'),bar:ctl.querySelector('.stp i'),code:el.querySelector('.tleft pre.code'),lbl:O.lbl?ctl.querySelector('.fl'):null,inp:{},k:''};
+ ctl.querySelectorAll('input[data-k]').forEach(i=>{L.ui.inp[i.dataset.k]=i;i.addEventListener('keydown',ev=>{if(ev.key==='Enter'){ev.preventDefault();labRun(L)}})});
+ ctl.addEventListener('click',ev=>{const b=ev.target.closest('button');if(!b)return;
+  if(b.dataset.m){L.mode=b.dataset.m;ctl.classList.toggle('manual',L.mode==='manual');ctl.querySelectorAll('.seg button').forEach(x=>x.classList.toggle('on',x===b));labReset(L);b.blur();if(L.mode==='manual'){const first=ctl.querySelector('input[data-k]');if(first)first.focus()}return}
+  else if(b.hasAttribute('data-run'))labRun(L);
+  else if(b.dataset.t==='reset')labReset(L);
+  else if(b.dataset.t==='prev'){L.playing=false;L.idx=Math.max(0,L.idx-1)}
+  else if(b.dataset.t==='next'){L.playing=false;L.idx=Math.min(L.frames.length-1,L.idx+1)}
+  else if(b.dataset.t==='play'){if(L.playing)L.playing=false;else{if(L.idx>=L.frames.length-1)L.idx=0;L.playing=true;L.last=-1}}
+  L.ui.k='';b.blur()});
+}
+
+/* ===== visualizations ===== */
+function drawCell(c,x,y,cw,ch,v,hl,live,COL){
+ const col=COL[hl]||CL.violet;
+ c.save();c.globalAlpha=live||hl?1:.4;rr(c,x+3,y,cw-6,ch,9);c.fillStyle=rgba(col,hl?.28:.1);c.fill();
+ c.strokeStyle=rgba(col,hl?1:.55);c.lineWidth=hl?2.6:1.4;c.setLineDash(live||hl?[]:[4,4]);c.stroke();c.restore();
+ txt(c,v===null||v===undefined?'·':String(v),x+cw/2,y+ch/2,{size:cw<40?13:17,font:'mono',a:live||hl?1:.5});
+}
+VIZ.arr={cycle:1e9,draw(c,W,H,f,frame,o){
+ const L=o.data;labTick(L,frame);const s=L.frames[L.idx];
+ const b=board(c,W,H,{title:s.t,frame});
+ const COL={w:CL.green,r:CL.amber,x:CL.pink,f:CL.green};
+ const hex=v=>'x'+v.toString(16).toUpperCase().padStart(4,'0');
+ if(s.g){
+  const cell=40,gw=s.cols*cell,gx=b.x+b.w/2-gw/2,gy=b.y+62;
+  for(let j=0;j<s.cols;j++)txt(c,'['+j+']',gx+j*cell+cell/2,gy-9,{size:10,font:'mono',col:CL.dim});
+  for(let i=0;i<s.rows;i++){txt(c,'['+i+']',gx-20,gy+i*cell+cell/2,{size:10,font:'mono',col:CL.dim});
+   for(let j=0;j<s.cols;j++){const hl=(s.hr===i&&s.hc===j)?s.hk:null;drawCell(c,gx+j*cell,gy+i*cell+2,cell,cell-6,s.a[i*s.cols+j],hl,true,COL)}}
+  const n=s.a.length,cw=Math.min(40,(b.w-30)/n),x0=b.x+b.w/2-cw*n/2,y2=gy+s.rows*cell+34;
+  txt(c,'flat memory (row-major):  index = row × cols + col',b.x+b.w/2,y2-12,{size:11,font:'mono',col:CL.cyan});
+  s.a.forEach((v,k)=>{drawCell(c,x0+k*cw,y2,cw,30,v,k===s.fi?s.hk:null,true,COL);txt(c,String(k),x0+k*cw+cw/2,y2+42,{size:10,font:'mono',col:CL.dim})});
+ }else{
+  const row=(a,hl,live,y,ch,label,base,top)=>{
+   const n=a.length,cw=Math.min(72,(b.w-34)/n),x0=b.x+b.w/2-cw*n/2;
+   if(label)txt(c,label,x0+3,y-(top?26:14),{size:11,col:CL.dim,font:'mono',align:'left'});
+   a.forEach((v,k)=>{const x=x0+k*cw;
+    drawCell(c,x,y,cw,ch,v,hl[k],k<live,COL);
+    txt(c,'['+k+']',x+cw/2,y+ch+18,{size:11,col:CL.dim,font:'mono'});
+    if(!s.b&&cw>=38)txt(c,hex(base+4*k),x+cw/2,y+ch+34,{size:cw<48?8.5:9.5,col:CL.dim,font:'mono',a:.8});
+    if(hl[k]==='f'&&s.found===k)txt(c,'found ✓',x+cw/2,y-12,{size:11.5,font:'mono',col:CL.green,weight:800});
+    else if(top&&s.i===k)txt(c,'i ▼',x+cw/2,y-12,{size:11.5,font:'mono',col:CL.amber,weight:800});
+   });
+   if(top&&!s.b){
+    if(live<n){const x=x0+live*cw+cw/2;txt(c,'▲',x,y+ch+54,{size:11,col:CL.cyan});txt(c,'size',x,y+ch+68,{size:10.5,font:'mono',col:CL.cyan,weight:800})}
+    else txt(c,'size == capacity  (FULL)',x0+n*cw-3,y+ch+54,{size:10.5,font:'mono',col:CL.pink,align:'right',weight:800});
+   }
+  };
+  const base=s.base||4096;
+  if(s.b){row(s.a,s.h,s.n,b.y+84,44,'data  (old block @ '+hex(base)+')',base,true);row(s.b,s.bh||{},s.bn,b.y+186,44,'bigger  (new block @ '+hex(s.bb||8192)+', capacity '+s.b.length+')',s.bb||8192,false)}
+  else row(s.a,s.h,s.n,b.y+92,58,'data  →  '+hex(base)+'   (contiguous: address = base + 4 × i)',base,true);
+  txt(c,'size = '+s.n+'   capacity = '+s.a.length,b.x+b.w-18,b.y+28,{size:12,font:'mono',col:CL.cyan,align:'right'});
+ }
+ const cx=b.x+16,cy=b.y+b.h-92,cw2=b.w-32;
+ c.save();rr(c,cx,cy,cw2,58,10);c.fillStyle=isLight?'#13111f':'#090912';c.fill();c.strokeStyle='rgba(255,255,255,.1)';c.lineWidth=1;c.stroke();c.restore();
+ ['#ff5f56','#ffbd2e','#27c93f'].forEach((k,i)=>{c.fillStyle=k;c.beginPath();c.arc(cx+14+i*12,cy+11,3.2,0,7);c.fill()});
+ txt(c,'console',cx+cw2-12,cy+11,{size:10,col:'#6b6b85',align:'right',font:'mono'});
+ txtWrap(c,(s.err?'✗ ':'❯ ')+s.m,cx+14,cy+32,cw2-28,{size:12.5,font:'mono',col:s.err?'#fb7185':'#e8e6ff',align:'left'});
+ [['read',CL.amber],['write',CL.green],['target / removed',CL.pink]].reduce((x,[t,col])=>{c.fillStyle=col;c.fillRect(x,b.y+b.h-22,9,9);txt(c,t,x+14,b.y+b.h-17,{size:10.5,col:CL.dim,align:'left'});return x+t.length*6.4+36},b.x+22);
+}};
+
+/* ===== operations (generate frames from real state) ===== */
+OPS.fill={title:'fillFromUser()',btn:'Enter ↵',clear:1,lbl:st=>`cin >> data[${Math.min(st.n,st.a.length-1)}] =`,
+ idle:'Manual mode: type a value and press Enter (like cin). Several values separated by spaces also work.',
+ fields:[{k:'vals',l:'cin >> data[0] =',str:1,d:'',ph:'e.g. 12',cls:'wide'}],
+ init:()=>({a:blank(8),n:0,base:4096}),demos:[{vals:'12 45 7 23 9'}],
+ run(st,p){const s=cp(st),T=this.title,fr=[];
+  const vs=String(p.vals||'').split(/[\s,]+/).filter(x=>x!==''&&!isNaN(x)).map(Number);
+  if(!vs.length)return{st:s,frames:[mk(s.a,s.n,{},'Type at least one number, for example: 12',T,{err:1,ln:[3]})]};
+  const room=s.a.length-s.n,use=vs.slice(0,room);
+  fr.push(mk(s.a,s.n,{},`fillFromUser(${vs.length}): capacity ${s.a.length}, size ${s.n}`,T,{ln:[0]}));
+  use.forEach(v=>{const i=s.n;s.a[i]=v;s.n++;fr.push(mk(s.a,s.n,{[i]:'w'},`cin >> data[${i}]  reads ${v};  size++ → ${s.n}`,T,{ln:[2,3,4],i}))});
+  if(vs.length>room)fr.push(mk(s.a,s.n,{},`Array is full (capacity ${s.a.length}): the guard i < capacity ignores ${vs.length-room} value(s).`,T,{err:1,ln:[1]}));
+  else fr.push(mk(s.a,s.n,{},`Done. size = ${s.n}.`,T,{ln:[5]}));
+  return{st:s,frames:fr}}};
+OPS.show={title:'display()',idle:'Press Run to traverse the list from index 0 to size - 1.',fields:[],
+ init:()=>({a:[12,45,7,23,9,null,null,null],n:5,base:4096}),demos:[{}],
+ run(st){const s=cp(st),T=this.title,fr=[];
+  fr.push(mk(s.a,s.n,{},`display(): start traversal, i = 0, size = ${s.n}`,T,{ln:[0]}));
+  for(let i=0;i<s.n;i++)fr.push(mk(s.a,s.n,{[i]:'r'},`i = ${i}: cout << "Index ${i} = ${s.a[i]}"  (read only)`,T,{ln:[1,2,3],i}));
+  fr.push(mk(s.a,s.n,{},'i == size → loop ends. One pass over n elements = O(n).',T,{ln:[1]}));
+  return{st:s,frames:fr}}};
+OPS.ins={title:'insertAt(pos, value)',idle:'Manual mode: choose a value and a position, then press Run.',fields:[{k:'v',l:'value',d:99},{k:'p',l:'pos',d:2}],
+ init:()=>({a:[10,20,30,40,null,null],n:4,base:4096}),demos:[{v:99,p:2}],
+ run(st,p){const s=cp(st),T=this.title,fr=[],cap=s.a.length;
+  if(p.v===null||p.p===null)return{st:s,frames:[mk(s.a,s.n,{},'Enter both a value and a position.',T,{err:1})]};
+  fr.push(mk(s.a,s.n,{},`insertAt(${p.p}, ${p.v}): size ${s.n}, capacity ${cap}`,T,{ln:[0]}));
+  if(s.n===cap){fr.push(mk(s.a,s.n,{},'size == capacity → the list is FULL → returns false. Nothing changes.',T,{err:1,ln:[1,2]}));return{st:s,frames:fr}}
+  if(p.p<0||p.p>s.n){fr.push(mk(s.a,s.n,{},`pos ${p.p} is outside 0 … ${s.n} → returns false. Nothing changes.`,T,{err:1,ln:[1,2]}));return{st:s,frames:fr}}
+  if(p.p===s.n)fr.push(mk(s.a,s.n,{},'pos == size → appending at the end, nothing to shift.',T,{ln:[3]}));
+  for(let i=s.n;i>p.p;i--){
+   fr.push(mk(s.a,s.n,{[i-1]:'r',[i]:'x'},`i = ${i}: copy data[${i-1}] → data[${i}]`,T,{ln:[3,4],i}));
+   s.a[i]=s.a[i-1];
+   fr.push(mk(s.a,s.n,{[i]:'w'},`data[${i}] = ${s.a[i]} ✓  (shifted right)`,T,{ln:[4],i}));
+  }
+  s.a[p.p]=p.v;
+  fr.push(mk(s.a,s.n,{[p.p]:'w'},`Gap is free → data[${p.p}] = ${p.v}`,T,{ln:[5]}));
+  s.n++;
+  fr.push(mk(s.a,s.n,{[p.p]:'w'},`size++ → ${s.n}. insertAt returns true. Cost: O(n).`,T,{ln:[6,7]}));
+  return{st:s,frames:fr}}};
+OPS.del={title:'deleteAt(pos)',idle:'Manual mode: choose a position to delete, then press Run.',fields:[{k:'p',l:'pos',d:1}],
+ init:()=>({a:[10,20,99,30,40,null],n:5,base:4096}),demos:[{p:1}],
+ run(st,p){const s=cp(st),T=this.title,fr=[];
+  if(p.p===null)return{st:s,frames:[mk(s.a,s.n,{},'Enter a position.',T,{err:1})]};
+  fr.push(mk(s.a,s.n,{},`deleteAt(${p.p}): size ${s.n}`,T,{ln:[0]}));
+  if(p.p<0||p.p>=s.n){fr.push(mk(s.a,s.n,{},`pos ${p.p} is outside 0 … ${s.n-1} → returns false. Nothing changes.`,T,{err:1,ln:[1,2]}));return{st:s,frames:fr}}
+  fr.push(mk(s.a,s.n,{[p.p]:'x'},`Removing data[${p.p}] = ${s.a[p.p]}`,T,{ln:[3]}));
+  for(let i=p.p;i<s.n-1;i++){
+   fr.push(mk(s.a,s.n,{[i+1]:'r',[i]:'x'},`i = ${i}: copy data[${i+1}] → data[${i}]`,T,{ln:[3,4],i}));
+   s.a[i]=s.a[i+1];
+   fr.push(mk(s.a,s.n,{[i]:'w'},`data[${i}] = ${s.a[i]} ✓  (shifted left)`,T,{ln:[4],i}));
+  }
+  fr.push(mk(s.a,s.n,{[s.n-1]:'x'},'Loop ends. The last slot is now a stale duplicate.',T,{ln:[3]}));
+  s.n--;s.a[s.n]=null;
+  fr.push(mk(s.a,s.n,{},`size-- → ${s.n}. deleteAt returns true. Cost: O(n).`,T,{ln:[5,6]}));
+  return{st:s,frames:fr}}};
+OPS.search={title:'searchByValue(target)',idle:'Manual mode: type a value to look for, then press Run.',fields:[{k:'v',l:'target',d:23}],
+ init:()=>({a:[12,45,7,23,9,31,null,null],n:6,base:4096}),demos:[{v:23},{v:50}],
+ run(st,p){const s=cp(st),T=this.title,fr=[];
+  if(p.v===null)return{st:s,frames:[mk(s.a,s.n,{},'Enter a value to search for.',T,{err:1})]};
+  fr.push(mk(s.a,s.n,{},`searchByValue(${p.v}): linear search over ${s.n} elements`,T,{ln:[0]}));
+  for(let i=0;i<s.n;i++){
+   const hit=s.a[i]===p.v;
+   fr.push(mk(s.a,s.n,{[i]:hit?'f':'r'},hit?`i = ${i}: data[${i}] == ${p.v}  → FOUND, return ${i}`:`i = ${i}: data[${i}] = ${s.a[i]} == ${p.v} ?  no, keep going`,T,hit?{found:i,ln:[2,3]}:{ln:[1,2],i}));
+   if(hit){fr.push(mk(s.a,s.n,{[i]:'f'},`Returned index ${i} after ${i+1} comparison(s). Best case O(1), worst case O(n).`,T,{found:i,ln:[3]}));return{st:s,frames:fr}}
+  }
+  fr.push(mk(s.a,s.n,{},`Loop ended after ${s.n} comparisons → return -1 (not found). Worst case: O(n).`,T,{err:1,ln:[5]}));
+  return{st:s,frames:fr}}};
+OPS.update={title:'updateAt(pos, value)',idle:'Manual mode: choose a position and a new value, then press Run.',fields:[{k:'p',l:'pos',d:2},{k:'v',l:'value',d:77}],
+ init:()=>({a:[10,20,30,40,50,null],n:5,base:4096}),demos:[{p:2,v:77}],
+ run(st,p){const s=cp(st),T=this.title,fr=[];
+  if(p.v===null||p.p===null)return{st:s,frames:[mk(s.a,s.n,{},'Enter both a position and a value.',T,{err:1})]};
+  fr.push(mk(s.a,s.n,{},`updateAt(${p.p}, ${p.v}): size ${s.n}`,T,{ln:[0]}));
+  if(p.p<0||p.p>=s.n){fr.push(mk(s.a,s.n,{},`pos ${p.p} is outside 0 … ${s.n-1} → returns false.`,T,{err:1,ln:[1,2]}));return{st:s,frames:fr}}
+  fr.push(mk(s.a,s.n,{[p.p]:'r'},`Jump straight to data[${p.p}] (currently ${s.a[p.p]}). No loop needed.`,T,{ln:[3],i:p.p}));
+  const old=s.a[p.p];s.a[p.p]=p.v;
+  fr.push(mk(s.a,s.n,{[p.p]:'w'},`data[${p.p}] = ${p.v};  (${old} → ${p.v}). Cost: O(1).`,T,{ln:[3,4],i:p.p}));
+  return{st:s,frames:fr}}};
+OPS.push={title:'push(value) and grow()',idle:'Manual mode: push a value. When the list is full it doubles its capacity.',fields:[{k:'v',l:'value',d:50}],
+ init:()=>({a:[10,20,30,40],n:4,base:4096}),demos:[{v:50}],
+ run(st,p){const s=cp(st),T=this.title,fr=[];const X=o=>Object.assign({base:s.base},o);
+  if(p.v===null)return{st:s,frames:[mk(s.a,s.n,{},'Enter a value to push.',T,X({err:1}))]};
+  fr.push(mk(s.a,s.n,{},`push(${p.v}): size ${s.n}, capacity ${s.a.length}`,T,X({ln:[0]})));
+  if(s.n===s.a.length){
+   const oc=s.a.length,nc=oc*2,nbase=s.base+4096;
+   if(nc>16){fr.push(mk(s.a,s.n,{},'Demo limit: capacity 16 reached. Press Reset to start again.',T,X({err:1})));return{st:s,frames:fr}}
+   fr.push(mk(s.a,s.n,{},'size == capacity → FULL → call grow()',T,X({err:1,ln:[1,2]})));
+   const nb=blank(nc);
+   fr.push(mk(s.a,s.n,{},`newCap = ${oc} × 2 = ${nc};  int* bigger = new int[${nc}];`,T,X({b:[...nb],bn:0,bb:nbase,ln:[6,7,8]})));
+   for(let i=0;i<s.n;i++){nb[i]=s.a[i];fr.push(mk(s.a,s.n,{[i]:'r'},`bigger[${i}] = data[${i}];  // copy ${s.a[i]}`,T,X({b:[...nb],bh:{[i]:'w'},bn:i+1,bb:nbase,i,ln:[9,10]})))}
+   const all={};s.a.forEach((_,i)=>{all[i]='x'});
+   fr.push(mk(s.a,s.n,all,'delete[] data;  // free the old block',T,X({b:[...nb],bn:s.n,bb:nbase,ln:[11]})));
+   s.a=nb;s.base=nbase;
+   fr.push(mk(s.a,s.n,{},`data = bigger; capacity = ${nc}. The block moved to a new address; the copy cost O(n).`,T,X({ln:[12,13]})));
+  }
+  s.a[s.n]=p.v;s.n++;
+  fr.push(mk(s.a,s.n,{[s.n-1]:'w'},`data[size++] = ${p.v};  → size = ${s.n}. Without a grow, push is O(1).`,T,X({ln:[3]})));
+  return{st:s,frames:fr}}};
+OPS.grid={title:'2D array in one block',idle:'Manual mode: pick row and col (and optionally a value to write), then press Run.',speed:42,fields:[{k:'r',l:'row',d:1},{k:'c',l:'col',d:2},{k:'v',l:'set'}],
+ init:()=>({a:[1,2,3,4,5,6,7,8,9,10,11,12],n:12,rows:3,cols:4}),demos:[{trav:1},{r:1,c:2}],
+ run(st,p){const s=cp(st),T=this.title,fr=[],R=s.rows,C=s.cols;
+  if(p.trav){
+   fr.push(gmk(s,null,null,null,'Row-major order: the whole matrix lives in ONE flat block.',T,{ln:[4,5]}));
+   for(let r=0;r<R;r++)for(let c=0;c<C;c++)fr.push(gmk(s,r,'r',c,`a[${r}][${c}] → index ${r} × ${C} + ${c} = ${r*C+c}`,T,{ln:[7,8]}));
+   return{st:s,frames:fr}}
+  if(p.r===null||p.c===null)return{st:s,frames:[gmk(s,null,null,null,'Enter a row and a column.',T,{err:1})]};
+  if(p.r<0||p.r>=R||p.c<0||p.c>=C)return{st:s,frames:[gmk(s,null,null,null,`a[${p.r}][${p.c}] is outside the ${R} × ${C} matrix.`,T,{err:1})]};
+  const fi=p.r*C+p.c;
+  fr.push(gmk(s,p.r,'r',p.c,`index = row × cols + col = ${p.r} × ${C} + ${p.c} = ${fi}  → value ${s.a[fi]}. O(1).`,T,{ln:[7,8]}));
+  if(p.v!==null){s.a[fi]=p.v;fr.push(gmk(s,p.r,'w',p.c,`data[${fi}] = ${p.v};  (a[${p.r}][${p.c}] updated)`,T,{ln:[8]}))}
+  return{st:s,frames:fr}}};
+
+VIZ.cls={cycle:600,draw(c,W,H,f,frame){
+ const b=board(c,W,H,{title:'class ArrayList — Encapsulation',frame}),x=b.x+34,w=290,p1=ease(at(f,10,60)),p2=ease(at(f,60,120)),p3=ease(at(f,130,190));
+ const box=(y,h,col,t,L,p)=>{c.save();c.globalAlpha=p;rr(c,x,y,w,h,12);c.fillStyle=rgba(col,.1);c.fill();c.strokeStyle=col;c.lineWidth=1.8;c.stroke();c.restore();
+  txt(c,t,x+16,y+20,{size:11.5,col,align:'left',a:p,weight:800});L.forEach((s,i)=>txt(c,s,x+18,y+44+i*24,{size:13.5,font:'mono',align:'left',a:p}))};
+ box(b.y+56,122,CL.pink,'🔒 PRIVATE — hidden state',['int* data;','int size;','int capacity;'],p1);
+ box(b.y+196,172,CL.green,'🔓 PUBLIC — interface',['ArrayList(cap) · ~ArrayList()','fillFromUser · display','insertAt · deleteAt','searchByValue · updateAt','push · grow'],p2);
+ const ax=x+w+40,ay=b.y+116,cwid=44;marker(c,[[x+w,ay],[ax,ay]],p3,CL.cyan,2.4);
+ for(let k=0;k<5;k++){const v=ease(at(f,150+k*8,180+k*8));c.save();c.globalAlpha=v;rr(c,ax+k*(cwid+4),ay-22,cwid,44,8);c.fillStyle=rgba(CL.cyan,.15);c.fill();c.strokeStyle=CL.cyan;c.lineWidth=1.5;c.stroke();c.restore();txt(c,'['+k+']',ax+k*(cwid+4)+cwid/2,ay,{size:11.5,font:'mono',a:v})}
+ txt(c,'heap: new int[capacity]',ax,ay+42,{size:11.5,col:CL.dim,font:'mono',align:'left',a:p3});
+ ['Outside code cannot touch data or size.','Every change goes through a checked method.','Invalid state becomes impossible.'].forEach((s,i)=>txt(c,s,ax,b.y+232+i*32,{size:12.5,col:i?CL.chalk:CL.amber,align:'left',a:ease(at(f,200+i*30,230+i*30))}))}};
+
+VIZ.copy={cycle:660,draw(c,W,H,f,frame){
+ const deep=f>=330,ff=deep?f-330:f;
+ const b=board(c,W,H,{title:deep?'Deep copy: each object owns its block':'Shallow copy (compiler default): one shared block',frame});
+ const col=deep?CL.green:CL.pink,ox=b.x+28,ow=150,y1=b.y+70,y2=b.y+210;
+ const obj=(y,nm)=>{rr(c,ox,y,ow,84,12);c.fillStyle=rgba(CL.violet,.12);c.fill();c.strokeStyle=CL.violet;c.lineWidth=1.8;c.stroke();
+  txt(c,nm,ox+14,y+18,{size:12,col:CL.violet,align:'left',weight:800,font:'mono'});txt(c,'data  ●',ox+14,y+44,{size:13.5,font:'mono',align:'left'});txt(c,'size = 4',ox+14,y+66,{size:12,col:CL.dim,font:'mono',align:'left'})};
+ const heap=(y,p,lbl,fill)=>{const hx=b.x+b.w-4*52-26;for(let k=0;k<4;k++){c.save();c.globalAlpha=p;rr(c,hx+k*52,y,46,40,8);c.fillStyle=rgba(col,.15);c.fill();c.strokeStyle=col;c.lineWidth=1.6;c.stroke();c.restore();txt(c,fill(k),hx+k*52+23,y+20,{size:13,font:'mono',a:p})}
+  txt(c,lbl,hx,y-12,{size:11,col:CL.dim,font:'mono',align:'left',a:p});return hx};
+ obj(y1,'ArrayList a');obj(y2,'ArrayList b');
+ const p1=ease(at(ff,10,50)),p2=ease(at(ff,50,100));
+ if(!deep){
+  const hx=heap((y1+y2)/2+22,p1,'ONE heap block',k=>[10,20,30,40][k]);
+  marker(c,[[ox+ow,y1+44],[hx-24,y1+44],[hx-24,(y1+y2)/2+42],[hx,(y1+y2)/2+42]],p1,col,2.4);
+  marker(c,[[ox+ow,y2+44],[hx-24,y2+44],[hx-24,(y1+y2)/2+42],[hx,(y1+y2)/2+42]],p1,col,2.4);
+  const e=ease(at(ff,150,190));
+  txtWrap(c,'~b() frees the block, then ~a() frees the SAME block again → double delete[] → crash',b.x+b.w/2,b.y+b.h-84,b.w-60,{col:CL.pink,a:e,size:13});
+ }else{
+  const hx=heap(y1+22,p1,'a.data block',k=>[10,20,30,40][k]);
+  marker(c,[[ox+ow,y1+44],[hx,y1+42]],p1,col,2.4);
+  heap(y2+22,p2,'b.data block (copied)',k=>ease(at(ff,80+k*14,100+k*14))>.5?[10,20,30,40][k]:'·');
+  marker(c,[[ox+ow,y2+44],[hx,y2+42]],p2,col,2.4);
+  const e=ease(at(ff,150,190));
+  txtWrap(c,'Copy constructor: new int[capacity] + copy every element. Destructors now free different blocks.',b.x+b.w/2,b.y+b.h-84,b.w-60,{col:CL.green,a:e,size:13});
+ }}};
+
+VIZ.sum={cycle:600,draw(c,W,H,f,frame){const b=board(c,W,H,{title:'Array operations — cost summary',frame});
+ table(c,b.x+24,b.y+52,b.w-48,[{h:'METHOD',w:.28,al:'left',mono:1},{h:'WHAT IT DOES',w:.52,al:'left'},{h:'COST',w:.2}],[
+ ['data[i] access','Jumps straight to the address',{t:'O(1)',hl:1,col:CL.green}],
+ ['display()','Visits every element once',{t:'O(n)',hl:1}],
+ ['insertAt(pos, v)','Shifts elements right to open a gap',{t:'O(n)',hl:1}],
+ ['deleteAt(pos)','Shifts elements left to close the gap',{t:'O(n)',hl:1}],
+ ['searchByValue(x)','Linear scan until the value is found',{t:'O(n)',hl:1}],
+ ['updateAt(pos, v)','Direct write, no shifting',{t:'O(1)',hl:1,col:CL.green}],
+ ['push(v) / grow()','Write at the end; copy all only when full',{t:'O(1) · O(n)',hl:1}]],f,{rowH:40,start:6,per:46});
+ txt(c,'Encapsulation keeps size, capacity and bounds checks inside the class.',b.x+b.w/2,b.y+b.h-26,{size:13,font:'marker',col:CL.green,a:ease(at(f,380,420))})}};
+
+/* ===== code samples ===== */
+VIZ.classtree={cycle:700,draw(c,W,H,f,frame){
+ const b=board(c,W,H,{title:'Family tree',frame});
+ const X=k=>b.x+b.w*k,Y=k=>b.y+k;
+ const node=(cx,cy,w,label,sub,col,p)=>{c.save();c.globalAlpha=p;rr(c,cx-w/2,cy-22,w,44,14);c.fillStyle=rgba(col,.18);c.fill();c.strokeStyle=col;c.lineWidth=2;c.stroke();c.restore();
+  txt(c,label,cx,cy-6,{size:13.5,weight:800,col:CL.chalk,a:p});txt(c,sub,cx,cy+11,{size:10.5,col:CL.dim,a:p})};
+ const edge=(x1,y1,x2,y2,col,p)=>marker(c,[[x1,y1+22],[x1,(y1+y2)/2],[x2,(y1+y2)/2],[x2,y2-22]],p,col,2);
+ const R=[X(.40),Y(42)],P=[X(.14),Y(106)],NP=[X(.66),Y(106)],LI=[X(.48),Y(170)],NL=[X(.84),Y(170)];
+ const pr=ease(at(f,8,30)),p1=ease(at(f,30,60)),p2=ease(at(f,60,92));
+ node(R[0],R[1],190,'Data Structures','how we organize data',CL.violet,pr);
+ edge(R[0],R[1],P[0],P[1],CL.amber,p1);edge(R[0],R[1],NP[0],NP[1],CL.pink,p1);
+ node(P[0],P[1],170,'Primitive','built in · ONE value',CL.amber,p1);
+ node(NP[0],NP[1],190,'Non-Primitive','built FROM primitives',CL.pink,p1);
+ edge(NP[0],NP[1],LI[0],LI[1],CL.green,p2);edge(NP[0],NP[1],NL[0],NL[1],CL.cyan,p2);
+ node(LI[0],LI[1],160,'Linear','one after another',CL.green,p2);
+ node(NL[0],NL[1],160,'Non-Linear','branches / links',CL.cyan,p2);
+ const groups=[
+  {cx:P[0],col:CL.amber,t0:96,items:[['int','42'],['float','3.14'],['char',"'A'"],['bool','true']],top:P[1]+22},
+  {cx:LI[0],col:CL.green,t0:120,items:[['Array ★','[10|20|30]'],['Linked List','●→●→●'],['Stack','LIFO · plates'],['Queue','FIFO · a line']],top:LI[1]+22},
+  {cx:NL[0],col:CL.cyan,t0:150,items:[['Tree','parent → kids'],['Graph','nodes + links']],top:NL[1]+22}];
+ groups.forEach(g=>g.items.forEach(([nm,eg],k)=>{
+  const p=ease(at(f,g.t0+k*14,g.t0+k*14+26)),w=196,x=g.cx-w/2,y=Y(226)+k*36,star=nm.indexOf('★')>=0;
+  if(k===0)marker(c,[[g.cx,g.top],[g.cx,y]],p,g.col,1.6);
+  c.save();c.globalAlpha=p;
+  if(star){c.shadowColor=CL.pink;c.shadowBlur=10+6*Math.sin(f/10)}
+  rr(c,x,y,w,30,9);c.fillStyle=rgba(star?CL.pink:g.col,star?.3:.12);c.fill();c.strokeStyle=star?CL.pink:rgba(g.col,.8);c.lineWidth=star?2.8:1.5;c.stroke();c.restore();
+  txt(c,nm,x+12,y+15,{size:13,weight:800,col:CL.chalk,align:'left',a:p});txt(c,eg,x+w-10,y+15,{size:11,font:'mono',col:CL.dim,align:'right',a:p})}));
+ const e=ease(at(f,200,230));
+ txt(c,'◀ we are here',LI[0]+112,Y(241),{size:12,weight:800,col:CL.pink,align:'left',a:e});
+ txt(c,'Rule of thumb:  Primitive = ONE value   ·   Linear = a LINE of values   ·   Non-Linear = values that BRANCH',b.x+b.w/2,b.y+b.h-20,{size:12.5,font:'marker',col:CL.green,a:ease(at(f,260,300))});
+}};
+
+VIZ.classcmp={cycle:720,draw(c,W,H,f,frame){
+ const b=board(c,W,H,{title:'Spot the difference',frame});
+ const gap=16,cw=(b.w-48-2*gap)/3,cy0=b.y+46,ch=b.h-92;
+ const K=[
+  {name:'PRIMITIVE',sub:'ONE value',col:CL.amber,an:'🪙  One coin = one value',code:['int age = 20;',"char grade = 'A';"],rule:'Test: it cannot be split further',use:'age · price · grade · is_active'},
+  {name:'LINEAR',sub:'A LINE of values',col:CL.green,an:'🚌  People queuing at a bus stop',code:['int scores[3] = {90, 75, 60};','scores[1];   // 75'],rule:'Test: every item has ONE next',use:'scores · playlist · undo history'},
+  {name:'NON-LINEAR',sub:'Values that BRANCH',col:CL.cyan,an:'🌳  A family tree: parent → kids',code:['struct Node { int val;','   Node *left, *right; };'],rule:'Test: one item can have MANY next',use:'folders · maps · networks'}];
+ K.forEach((k,i)=>{
+  const p=ease(at(f,8+i*22,48+i*22)),x=b.x+24+i*(cw+gap),cx=x+cw/2,py=cy0+98;
+  c.save();c.globalAlpha=p;rr(c,x,cy0,cw,ch,14);c.fillStyle=rgba(k.col,.07);c.fill();c.strokeStyle=rgba(k.col,.7);c.lineWidth=1.8;c.stroke();c.restore();
+  txt(c,k.name,cx,cy0+22,{size:13,weight:900,col:k.col,a:p});
+  txt(c,k.sub,cx,cy0+42,{size:12,col:CL.chalk,a:p});
+  if(i===0){
+   const s=1+.05*Math.sin(f/12);c.save();c.globalAlpha=p;c.translate(cx,py);c.scale(s,s);rr(c,-34,-24,68,48,10);c.fillStyle=rgba(k.col,.2);c.fill();c.strokeStyle=k.col;c.lineWidth=2.2;c.stroke();c.restore();
+   txt(c,'42',cx,py,{size:20,font:'mono',a:p});txt(c,'int',cx,py+38,{size:10.5,font:'mono',col:CL.dim,a:p});
+  }else if(i===1){
+   const v=[90,75,60,88,100],bw=40,g2=12,x0=cx-(5*bw+4*g2)/2,w=Math.floor(f/24)%5;
+   v.forEach((val,j)=>{const bx=x0+j*(bw+g2),on=j===w;c.save();c.globalAlpha=p;rr(c,bx,py-19,bw,38,8);c.fillStyle=rgba(on?CL.green:k.col,on?.45:.12);c.fill();c.strokeStyle=on?CL.green:rgba(k.col,.7);c.lineWidth=on?2.6:1.4;c.stroke();c.restore();
+    txt(c,String(val),bx+bw/2,py,{size:13.5,font:'mono',a:p});txt(c,'['+j+']',bx+bw/2,py+32,{size:9.5,font:'mono',col:CL.dim,a:p});
+    if(j<4)txt(c,'→',bx+bw+g2/2,py,{size:12,col:k.col,a:p})});
+  }else{
+   const N=[[0,-34],[-58,0],[58,0],[-86,34],[-30,34],[30,34],[86,34]],E=[[0,1],[0,2],[1,3],[1,4],[2,5],[2,6]],w=Math.floor(f/24)%7;
+   c.save();c.globalAlpha=p;c.strokeStyle=rgba(k.col,.6);c.lineWidth=1.6;E.forEach(([a,d])=>{const dx=N[d][0]-N[a][0],dy=N[d][1]-N[a][1],L=Math.hypot(dx,dy),ux=dx/L,uy=dy/L,r0=(a===w?12:10)+1,r1=(d===w?12:10)+1;c.beginPath();c.moveTo(cx+N[a][0]+ux*r0,py+N[a][1]+uy*r0);c.lineTo(cx+N[d][0]-ux*r1,py+N[d][1]-uy*r1);c.stroke()});
+   N.forEach(([dx,dy],j)=>{const on=j===w;c.beginPath();c.arc(cx+dx,py+dy,on?12:10,0,7);c.fillStyle=rgba(on?CL.cyan:k.col,on?.6:.2);c.fill();c.strokeStyle=on?CL.cyan:rgba(k.col,.9);c.lineWidth=on?2.6:1.5;c.stroke()});c.restore();
+  }
+  txt(c,k.an,cx,cy0+156,{size:12,a:p});
+  txt(c,'e.g.',x+14,cy0+180,{size:10.5,font:'mono',col:k.col,weight:800,align:'left',a:p});
+  c.save();c.globalAlpha=p;rr(c,x+12,cy0+188,cw-24,50,9);c.fillStyle='#090912';c.fill();c.strokeStyle='rgba(255,255,255,.1)';c.stroke();c.restore();
+  k.code.forEach((l,j)=>txt(c,l,x+24,cy0+206+j*20,{size:11.5,font:'mono',col:'#e8e6ff',align:'left',a:p}));
+  txt(c,k.rule,cx,cy0+266,{size:12,weight:800,col:k.col,a:p});
+  c.save();c.globalAlpha=p*.5;c.strokeStyle=k.col;c.lineWidth=1;c.setLineDash([4,4]);c.beginPath();c.moveTo(x+18,cy0+286);c.lineTo(x+cw-18,cy0+286);c.stroke();c.restore();
+  txt(c,'Used for:  '+k.use,cx,cy0+308,{size:11.5,col:CL.dim,a:p});
+ });
+ txt(c,'Today: the Array, the simplest LINEAR structure, wrapped in a class.',b.x+b.w/2,b.y+b.h-22,{size:13,font:'marker',col:CL.green,a:ease(at(f,300,340))});
+}};
+
+
+const CODE={
+c_cls:`class ArrayList {
+private:
+    int* data;      // hidden storage
+    int size;       // used slots
+    int capacity;   // total slots
+public:
+    ArrayList(int cap);
+    ~ArrayList();
+    void fillFromUser(int n);
+    void display() const;
+    bool insertAt(int pos, int value);
+    bool deleteAt(int pos);
+    int  searchByValue(int target) const;
+    bool updateAt(int pos, int value);
+    void push(int value);
+};`,
+c_proc:`// Procedural: data and logic are separate
+void insertAt(int arr[], int &arrLength);
+void deleteAt(int arr[], int &arrLength);
+
+int arr[5];
+int arrLength = 5;   // anyone can change it
+arr[arrLength] = 7;  // out of bounds!`,
+c_oop:`// OOP: data + behavior live together
+ArrayList list(6);
+list.insertAt(2, 99);   // checks rules inside
+list.deleteAt(1);
+list.display();
+// list.size = 50;  ✗ private: won't compile`,
+c_ctor:`ArrayList::ArrayList(int cap) {
+    capacity = cap;
+    size = 0;
+    data = new int[capacity];   // allocate
+}
+
+ArrayList::~ArrayList() {
+    delete[] data;              // free memory
+}`,
+c_fill:`void ArrayList::fillFromUser(int n) {
+    for (int i = 0; i < n && i < capacity; i++) {
+        cout << "Enter element " << i + 1 << ": ";
+        cin >> data[i];
+        size++;
+    }
+}`,
+c_show:`void ArrayList::display() const {
+    for (int i = 0; i < size; i++) {
+        cout << "Index " << i
+             << " = " << data[i] << endl;
+    }
+}`,
+c_ins:`bool ArrayList::insertAt(int pos, int value) {
+    if (size == capacity || pos < 0 || pos > size)
+        return false;
+    for (int i = size; i > pos; i--)
+        data[i] = data[i - 1];   // shift right
+    data[pos] = value;
+    size++;
+    return true;
+}`,
+c_del:`bool ArrayList::deleteAt(int pos) {
+    if (pos < 0 || pos >= size)
+        return false;
+    for (int i = pos; i < size - 1; i++)
+        data[i] = data[i + 1];   // shift left
+    size--;
+    return true;
+}`,
+c_search:`int ArrayList::searchByValue(int target) const {
+    for (int i = 0; i < size; i++) {
+        if (data[i] == target)
+            return i;       // found
+    }
+    return -1;              // not found
+}`,
+c_update:`bool ArrayList::updateAt(int pos, int value) {
+    if (pos < 0 || pos >= size)
+        return false;
+    data[pos] = value;      // direct access: O(1)
+    return true;
+}`,
+c_push:`void ArrayList::push(int value) {
+    if (size == capacity)
+        grow();                  // full: double it
+    data[size++] = value;
+}
+
+void ArrayList::grow() {
+    int newCap = capacity * 2;
+    int* bigger = new int[newCap];
+    for (int i = 0; i < size; i++)
+        bigger[i] = data[i];     // copy
+    delete[] data;               // free old block
+    data = bigger;
+    capacity = newCap;
+}`,
+c_copy:`ArrayList b = a;   // default copy: SHALLOW
+// b.data == a.data -> block freed twice!
+
+// Fix: a DEEP copy constructor
+ArrayList::ArrayList(const ArrayList& other) {
+    capacity = other.capacity;
+    size = other.size;
+    data = new int[capacity];      // own block
+    for (int i = 0; i < size; i++)
+        data[i] = other.data[i];   // copy values
+}
+// + operator= + destructor = Rule of Three`,
+c_grid:`class Matrix {
+    int* data;
+    int rows, cols;
+public:
+    Matrix(int r, int c) : rows(r), cols(c) {
+        data = new int[r * c];     // ONE flat block
+    }
+    int& at(int r, int c) {
+        return data[r * cols + c]; // row-major
+    }
+    ~Matrix() { delete[] data; }
+};`,
+c_main:`int main() {
+    int n;
+    cout << "How many elements? ";
+    cin >> n;
+    ArrayList list(n + 2);   // spare capacity
+    list.fillFromUser(n);
+    list.display();
+    list.deleteAt(1);
+    cout << "-- after deleteAt(1) --" << endl;
+    list.display();
+    return 0;   // ~ArrayList() runs here
+}`,
+c_q1:`ArrayList list(4);
+list.fillFromUser(4);   // 10 20 30 40
+bool ok = list.insertAt(2, 99);`,
+c_q2:`// the list holds n = 1000 elements
+list.deleteAt(0);   // delete the FIRST one`,
+c_q3:`ArrayList list(4);   // capacity 4
+// list is FULL (size = 4)
+list.push(50);       // triggers grow()`,
+c_q4:`ArrayList a(3);
+ArrayList b = a;   // compiler-made copy
+// scope ends: ~b() runs, then ~a()`,
+c_q5:`// size = 8, and 50 is NOT in the list
+int idx = list.searchByValue(50);`,
+sol_max:`int ArrayList::findMax() const {
+    if (size == 0) return -1;      // empty guard
+    int best = 0;
+    for (int i = 1; i < size; i++) {
+        if (data[i] > data[best])
+            best = i;
+    }
+    return best;
+}`,
+sol_rev:`void ArrayList::reverse() {
+    for (int i = 0, j = size - 1; i < j; i++, j--) {
+        int tmp = data[i];
+        data[i] = data[j];
+        data[j] = tmp;
+    }
+}`
+};
+const HERO_TOKENS=['data[i]','new int[n]','delete[]','private:','size','capacity','insertAt()','~ArrayList()','int* data','grow()','0x1000','O(1)','O(n)','class'];
+const HERO_STRIPS=[[12,45,7,23,9,31],[10,20,99,30,40,50]];
+const HERO=`
+<div class="lbl">Data Structures · Session 03</div>
+<h1>Arrays, the <em>OOP</em> way</h1>
+<div class="tag">Wrap a dynamic array in a C++ class: constructor, destructor, insert, delete, search, update, grow, deep copy and 2D layout, with live Auto / Manual visual labs</div>
+<div class="inst"><div class="avatar">M</div><div><small>Instructor</small><b>Muhammad Ali Abdul Kareem</b></div></div>
+<div class="chips"><span>class ArrayList</span><span>Auto &amp; Manual Labs</span><span>Rule of Three</span><span>2D Arrays</span><span>5 Interactive MCQs</span><span>Student Tasks 1–2</span></div>`;
+
+const SL=[
+{part:'part-intro',hero:true,next:'Where does the array fit?'},
+{part:'part-intro',lbl:'Big Picture',h2:'Where does the <em>Array</em> fit?',sub:'Every data structure is Primitive or Non-Primitive. Follow the branches to find the Array.',viz:'classtree',next:'Spot the difference'},
+{part:'part-intro',lbl:'Big Picture',h2:'Spot the <em>difference</em>',sub:'Three families, one picture each. Ask: how many "next" items can a value have?',viz:'classcmp',next:'Procedural vs OOP'},
+{part:'part-classes',lbl:'Paradigm Shift',h2:'Procedural vs <em>OOP</em> Arrays',sub:'Same operations, very different safety.',
+ cards:{fs:13,items:[{h:'Procedural (Week 03 style)',code:'c_proc',n:'The array and <code>arrLength</code> are loose variables: any code can break them.'},{h:'OOP (today)',code:'c_oop',n:'<b>Encapsulation:</b> state is private, and methods enforce the rules.'}]},next:'Anatomy of the class'},
+{part:'part-classes',lbl:'Class Anatomy',h2:'Anatomy of <em>ArrayList</em>',sub:'Private state on the left, public interface below, heap storage on the right.',viz:'cls',next:'Constructor & Destructor'},
+{part:'part-rules',lbl:'Lifecycle',h2:'Constructor &amp; <em>Destructor</em>',sub:'The class owns its memory: allocate on creation, free on destruction.',
+ task:{chip:'RAII Idea',req:['<code>new int[capacity]</code> allocates the array on the heap.','Constructor sets <code>size = 0</code>: capacity is room, size is what is used.','<code>delete[]</code> in the destructor frees it automatically at scope end.'],trap:'Use <code>delete[]</code> (not <code>delete</code>) for arrays, or memory leaks and undefined behavior follow.',code:'c_ctor'},next:'fillFromUser()'},
+{part:'part-seq',lbl:'Method 1 · User Input',h2:'<em>fillFromUser()</em> — write each slot',lab:'fill',chip:'Auto demo or type your own values',req:['Loops once per element and reads into <code>data[i]</code>.','Increments <code>size</code> as slots become used.'],code:'c_fill',next:'display()'},
+{part:'part-seq',lbl:'Method 2',h2:'<em>display()</em> — traverse',lab:'show',chip:'Read-only traversal',req:['Visits index <code>0</code> to <code>size - 1</code>.','Marked <code>const</code>: it reads but never modifies.'],code:'c_show',next:'insertAt()'},
+{part:'part-sel',lbl:'Method 3 · User Input',h2:'<em>insertAt()</em> — shift right, then place',lab:'ins',chip:'Try any value and position',req:['Validates <code>pos</code> and free capacity first.','Shifts from the end down to <code>pos</code>.'],code:'c_ins',trap:'Try pos 7, or insert until the list is full: it returns <code>false</code> instead of corrupting memory.',next:'deleteAt()'},
+{part:'part-sel',lbl:'Method 4 · User Input',h2:'<em>deleteAt()</em> — shift left, then shrink',lab:'del',chip:'Try any position',req:['Valid range is <code>0 ≤ pos &lt; size</code>.','Shifts left, then <code>size--</code>.'],code:'c_del',next:'searchByValue()'},
+{part:'part-rep',lbl:'Method 5 · User Input',h2:'<em>searchByValue()</em> — linear search',lab:'search',chip:'Found vs not found',req:['Compares each element with <code>target</code> from index 0.','Returns the index, or <code>-1</code> if the loop finishes.'],code:'c_search',trap:'Auto mode shows both cases: 23 is found at index 3, then 50 scans all 6 elements and fails.',next:'updateAt()'},
+{part:'part-rep',lbl:'Method 6 · User Input',h2:'<em>updateAt()</em> — direct write',lab:'update',chip:'No shifting needed',req:['Jumps straight to <code>data[pos]</code> using the index.','Same bounds check as <code>deleteAt</code>; cost is O(1).'],code:'c_update',next:'Knowledge check'},
+{part:'part-rules',lbl:'Interactive Predictor',h2:'Check 1: <em>Will the insert succeed?</em>',sub:'Capacity is 4 and the list is full.',mcq:true,
+ q:'Read the code on the right. <b>What does insertAt return?</b>',options:['true','false','crash','undefined'],answer:'false',
+ explain:'<b>Correct!</b> <code>size == capacity</code> (4 == 4), so <code>insertAt</code> returns <code>false</code> and nothing is shifted. The class protects itself.',hint:'Check the first condition inside insertAt: size vs capacity.',code:'c_q1',next:'Check 2'},
+{part:'part-rules',lbl:'Interactive Predictor',h2:'Check 2: <em>Cost of deleting the first element</em>',sub:'Shifting is where the time goes.',mcq:true,
+ q:'<b>How many element copies does deleteAt(0) perform?</b>',options:['0','1','n - 1','n²'],answer:'n - 1',
+ explain:'<b>Correct!</b> Every element after index 0 moves one slot left: <code>n - 1</code> copies, so deleteAt is <code>O(n)</code> in the worst case.',hint:'Every element after the deleted one has to move.',code:'c_q2',next:'Dynamic resize'},
+{part:'part-fn',lbl:'Dynamic Capacity · User Input',h2:'<em>push()</em> and <em>grow()</em> — resize by doubling',lab:'push',chip:'Fill it, then watch it double',req:['When <code>size == capacity</code>, allocate a block twice as big.','Copy, <code>delete[]</code> the old block, then continue.'],code:'c_push',next:'Check 3'},
+{part:'part-rules',lbl:'Interactive Predictor',h2:'Check 3: <em>Capacity after grow()</em>',sub:'The list is full and a new value arrives.',mcq:true,
+ q:'<b>What is the capacity after push(50)?</b>',options:['4','5','8','16'],answer:'8',
+ explain:'<b>Correct!</b> <code>grow()</code> doubles: <code>4 × 2 = 8</code>. The copy costs O(n) once, but the next pushes are O(1) until it fills again.',hint:'grow() uses capacity * 2.',code:'c_q3',next:'Copy constructor'},
+{part:'part-classes',lbl:'Rule of Three',h2:'Shallow vs <em>Deep Copy</em>',sub:'A class that owns memory must copy that memory.',split:1,viz:'copy',
+ chip:'Why the default copy is dangerous',req:['Default copy duplicates the <b>pointer</b>, not the array.','Two objects then free the same block.','Own <code>new[]</code> in the copy constructor fixes it.'],code:'c_copy',next:'Check 4'},
+{part:'part-rules',lbl:'Interactive Predictor',h2:'Check 4: <em>The hidden crash</em>',sub:'No custom copy constructor was written.',mcq:true,
+ q:'<b>What goes wrong when the scope ends?</b>',options:['Nothing','Double delete[] crash','Compile error','Leak only'],answer:'Double delete[] crash',
+ explain:'<b>Correct!</b> <code>a.data</code> and <code>b.data</code> point to the same block. <code>~b()</code> frees it, then <code>~a()</code> frees it again: undefined behavior.',hint:'Think about what the default copy does to the pointer.',code:'c_q4',next:'2D arrays'},
+{part:'part-seq',lbl:'2D Arrays · User Input',h2:'<em>2D Arrays</em> in one flat block',lab:'grid',chip:'Row-major layout',req:['Rows are stored one after another in a single block.','<code>index = row × cols + col</code> gives O(1) access.'],code:'c_grid',next:'main() output'},
+{part:'part-rep',lbl:'Putting It Together',h2:'<em>main()</em> and its expected output',sub:'Create, fill, show, delete, show again.',split:1,viz:'terminal',
+ data:{title:'Console Output (input: 3, then 10 20 30)',lines:[
+  [['How many elements? ','dim'],['3','amber']],
+  [['Enter element 1: ','dim'],['10','amber']],
+  [['Enter element 2: ','dim'],['20','amber']],
+  [['Enter element 3: ','dim'],['30','amber']],
+  [['Index 0 = 10','green']],[['Index 1 = 20','green']],[['Index 2 = 30','green']],
+  [['-- after deleteAt(1) --','cyan']],
+  [['Index 0 = 10','green']],[['Index 1 = 30','green']]]},
+ chip:'Execution Order',req:['The constructor runs at <code>ArrayList list(n + 2)</code>.','Methods run in order: fill → display → deleteAt → display.','The destructor frees the block at <code>return 0</code>.'],code:'c_main',next:'Student Task 1'},
+{part:'part-rules',lbl:'Student Task 1',h2:'Task 1: <em>findMax()</em>',sub:'Applied practice · scan and keep the best index.',
+ tt:{chip:'Student Task 1 · Applied Practice',req:['Add <code>int findMax() const;</code> to <code>ArrayList</code>.','Return the <b>index</b> of the largest element, or <code>-1</code> if empty.','Use one pass and remember the best index so far.','<b>Time Complexity:</b> a single loop over n elements: <b>O(n)</b>.'],
+  trap:'<b>Trap:</b> guard the empty list first. Reading <code>data[0]</code> when <code>size == 0</code> returns garbage.',
+  title:'Console Output (Expected)',lines:[[['Enter 5 values: ','dim'],['3 9 4 1 7','amber']],[['findMax() returned index 1','green']],[['Max value = 9','green']]]},
+ sol:'sol_max',solTitle:'Task 1 Solution &amp; Complexity Walkthrough',solNotes:['<b>1. Time Complexity: O(n)</b> — the loop visits each element once and does one comparison each.','<b>2. Return an index, not a value</b> — the caller can use it with <code>updateAt</code> or <code>deleteAt</code>.','<b>3. Empty guard</b> — <code>size == 0</code> returns <code>-1</code>, the same "not found" convention as <code>searchByValue</code>.'],next:'Student Task 2'},
+{part:'part-rules',lbl:'Student Task 2',h2:'Task 2: <em>reverse()</em> in place',sub:'Applied practice · two-pointer swap.',
+ tt:{chip:'Student Task 2 · Applied Practice',req:['Add <code>void reverse();</code> to <code>ArrayList</code>.','Swap <code>data[i]</code> with <code>data[j]</code>; <code>i</code> starts at the front, <code>j</code> at the back.','Move the two indices toward each other and stop when they meet.','<b>Complexity:</b> O(n) time, O(1) extra memory.'],
+  trap:'<b>Trap:</b> do not loop to <code>size</code>. Swapping every pair twice puts the array back as it was. Stop at the middle.',
+  title:'Console Output (Expected)',lines:[[['Before: ','dim'],['10 20 30 40 50','amber']],[['reverse()','cyan']],[['After:  ','dim'],['50 40 30 20 10','green']]]},
+ sol:'sol_rev',solTitle:'Task 2 Solution &amp; Complexity Walkthrough',solNotes:['<b>1. Time Complexity: O(n)</b> — only n/2 swaps, which is still linear.','<b>2. In place</b> — one temporary variable, no second array: O(1) extra memory.','<b>3. Stop condition</b> — <code>i &lt; j</code> handles both even and odd sizes; the middle element stays put.'],next:'Check 5'},
+{part:'part-rules',lbl:'Interactive Predictor',h2:'Check 5: <em>Searching for a missing value</em>',sub:'Worst case of linear search.',mcq:true,
+ q:'<b>How many comparisons run, and what is returned?</b>',options:['1 and -1','8 and -1','8 and 0','0 and -1'],answer:'8 and -1',
+ explain:'<b>Correct!</b> The value is absent, so the loop compares all 8 elements and then returns <code>-1</code>. Worst case is <code>O(n)</code>.',hint:'The loop only stops early when it finds the target.',code:'c_q5',next:'Summary'},
+{part:'part-fn',lbl:'Wrap-up',h2:'Key <em>Takeaways</em>',sub:'Access and update are O(1); insert, delete and search are O(n).',viz:'sum',next:'End of Session 03'}
+];
+const N=SL.length;
+
+
+function highlight(src){
+  const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const re=/(\/\/[^\n]*)|(#include\s*<[^>\n]+>)|("(?:[^"\\\n]|\\.)*")|('(?:[^'\\\n]|\\.)')|\b(\d+(?:\.\d+)?)\b|\b(long long|int|double|char|bool|void|float|ArrayList|Matrix)\b|\b(return|if|else|for|while|do|using|namespace|true|false|class|public|private|const|new|delete)\b|\b(cout|cin|endl)\b|\b([A-Za-z_]\w*)(?=\()/g;
+  let out='',last=0,m;
+  while((m=re.exec(src))){
+    out+=esc(src.slice(last,m.index));const t=m[0];
+    const cls=m[1]?'c':m[2]?'p':(m[3]||m[4])?'s':m[5]?'n':m[6]?'t':m[7]?'k':m[8]?'o':'f';
+    out+=`<span class="${cls}">${esc(t)}</span>`;last=m.index+t.length;
+  }
+  return out+esc(src.slice(last));
+}
+
+let codeSeq=0;
+function renderCodeWindow(k){
+  const id="cw_"+(codeSeq++);
+  const raw=CODE[k]||k;
+  return `
+  <div class="code-window">
+    <div class="code-header">
+      <div class="dots"><span></span><span></span><span></span></div>
+      <button class="copy-btn" data-target="${id}">📋 Copy</button>
+    </div>
+    <div class="codecard">
+      <pre class="code" id="${id}">${raw.split('\n').map(l=>`<span class="ln">${highlight(l)||' '}</span>`).join('')}</pre>
+    </div>
+  </div>`;
+}
+
+const vp=document.getElementById('vp'),live=[];
+const dots=i=>Array.from({length:N},(_,k)=>`<i class="dot${k===i?' on':''}"></i>`).join('');
+const footer=(i,next)=>`<div class="sf"><span>Data Structures · Session 03</span><div class="pd">${dots(i)}</div><span>${next}</span></div>`;
+const leftCol=s=>`<div class="tleft">${s.chip?`<div class="chip">${s.chip}</div>`:''}<ul class="req">${s.req.map(r=>`<li>${r}</li>`).join('')}</ul>${s.code?renderCodeWindow(s.code):''}${s.trap?`<div class="trap">${s.trap}</div>`:''}</div>`;
+
+SL.forEach((s,i)=>{
+  const el=document.createElement('section');
+  el.className='slide'+(s.hero?' hero-slide':'');
+  let h='';
+  if(s.hero){
+    h=HERO+footer(i,s.next)+'<canvas class="herobg" data-viz="tokens"></canvas>';
+  }else{
+    let stage='';
+    if(s.lab){
+      s.L=newLab(s.lab);
+      stage=`<div class="task">${leftCol(s)}<div class="tright lab"><div class="vizbox"><canvas data-viz="${s.labViz||'arr'}"></canvas></div>${ctlHTML(s.L)}</div></div>`;
+    }else if(s.split){
+      stage=`<div class="task">${leftCol(s)}<div class="tright"><div class="viz"><canvas data-viz="${s.viz}"></canvas></div></div></div>`;
+    }else if(s.tt){
+      stage=`<div class="task">
+        <div class="tleft">
+          <div class="chip">${s.tt.chip}</div>
+          <ul class="req">${s.tt.req.map(r=>`<li>${r}</li>`).join('')}</ul>
+          ${s.tt.trap?`<div class="trap">${s.tt.trap}</div>`:''}
+          <div class="sol-actions"><button class="solbtn" data-sol>Reference Solution<kbd>S</kbd></button></div>
+        </div>
+        <div class="tright"><div class="viz"><canvas data-viz="terminal"></canvas></div></div>
+      </div>`;
+    }else if(s.mcq){
+      stage=`<div class="task">
+        <div class="tleft">
+          <div class="chip">Interactive Knowledge Check</div>
+          <p style="font-size:14px;color:var(--ts);line-height:1.5;margin:0 0 6px;">${s.q}</p>
+          <div class="mcq-box" data-ans="${s.answer}" data-exp="${encodeURIComponent(s.explain)}" data-hint="${encodeURIComponent(s.hint||'Try another option.')}">
+            <div class="mcq-options">${s.options.map(opt=>`<button class="mcq-btn" data-val="${opt}">${opt}</button>`).join('')}</div>
+            <div class="mcq-feedback"></div>
+          </div>
+        </div>
+        <div class="tright">${renderCodeWindow(s.code)}</div>
+      </div>`;
+    }else if(s.task){
+      stage=`<div class="task">
+        <div class="tleft">
+          <div class="chip">${s.task.chip}</div>
+          <ul class="req">${s.task.req.map(r=>`<li>${r}</li>`).join('')}</ul>
+          ${s.task.trap?`<div class="trap">${s.task.trap}</div>`:''}
+        </div>
+        <div class="tright">${renderCodeWindow(s.task.code)}</div>
+      </div>`;
+    }else if(s.cards){
+      const C=s.cards;
+      stage=`<div class="cards" style="--fs:${C.fs}px;">
+        ${C.items.map(it=>`<div class="cc"><div class="cc-h">${it.h}</div>${renderCodeWindow(it.code)}<div class="cc-n">${it.n}</div></div>`).join('')}
+      </div>`;
+    }else if(s.viz){
+      stage=`<div class="viz"><canvas data-viz="${s.viz}"></canvas></div>`;
+    }
+    h=`<div class="lbl">${s.lbl}</div><h2>${s.h2}</h2>${s.sub?`<p class="sub">${s.sub}</p>`:''}<div class="stage">${stage}</div>${footer(i,s.next)}`;
+    if(s.sol){
+      h+=`<div class="sol"><div class="sol-h"><div class="lbl">${s.solTitle}</div><button class="solbtn" style="position:static" data-sol>Hide<kbd>S</kbd></button></div>
+      <div class="sol-body">${renderCodeWindow(s.sol)}<div class="notes"><div class="note-h">Key Takeaways</div>${s.solNotes.map(n=>`<div class="note">${n}</div>`).join('')}</div></div></div>`;
+    }
+  }
+  el.innerHTML=h;vp.appendChild(el);s.el=el;
+  if(s.L)bindLab(s.L,el);
+  el.querySelectorAll('canvas[data-viz]').forEach(cv=>{
+    const def=VIZ[cv.dataset.viz];
+    const data=s.L?s.L:s.tt?{lines:s.tt.lines,title:s.tt.title}:(s.data||null);
+    live.push({cv,s:fit(cv),def,slide:i,data});
+  });
+});
+
+/* Copy-to-Clipboard Event Listener */
+document.addEventListener("click", async e=>{
+  const btn = e.target.closest(".copy-btn");
+  if(!btn) return;
+  const targetId = btn.getAttribute("data-target");
+  const el = document.getElementById(targetId);
+  if(!el) return;
+  const text = el.innerText;
+  try{
+    await navigator.clipboard.writeText(text);
+  }catch(_){
+    const ta = document.createElement("textarea");
+    ta.value = text; document.body.appendChild(ta); ta.select();
+    document.execCommand("copy"); document.body.removeChild(ta);
+  }
+  const original = btn.innerHTML;
+  btn.classList.add("copied");
+  btn.innerHTML = "✅ Copied";
+  setTimeout(()=>{ btn.classList.remove("copied"); btn.innerHTML = original; }, 1600);
+});
+
+/* MCQ Option Handler */
+document.addEventListener("click", e=>{
+  const btn = e.target.closest(".mcq-btn");
+  if(!btn) return;
+  const box = btn.closest(".mcq-box");
+  const expected = box.getAttribute("data-ans");
+  const explain = decodeURIComponent(box.getAttribute("data-exp"));
+  const hint = decodeURIComponent(box.getAttribute("data-hint"));
+  const val = btn.getAttribute("data-val");
+  const fb = box.querySelector(".mcq-feedback");
+  box.querySelectorAll(".mcq-btn").forEach(b=>b.classList.remove("correct", "wrong"));
+  if(val === expected){ btn.classList.add("correct"); fb.className = "mcq-feedback show correct"; fb.innerHTML = explain; }
+  else { btn.classList.add("wrong"); fb.className = "mcq-feedback show wrong"; fb.innerHTML = "Not quite! " + hint; }
+  btn.blur();
+});
+
+function closeSol(){document.querySelectorAll('.sol.open').forEach(e=>e.classList.remove('open'))}
+function toggleSol(){const el=SL[cur].el.querySelector('.sol');if(el)el.classList.toggle('open')}
+
+let cur=-1,frame=0,t0=0;
+const counter=document.getElementById('counter'),prog=document.getElementById('prog');
+function go(i){
+  i=Math.max(0,Math.min(N-1,i));if(i===cur)return;
+  if(cur>=0){SL[cur].el.classList.remove('active');closeSol()}
+  cur=i;SL[i].el.classList.add('active');if(SL[i].L)labReset(SL[i].L);
+  vp.className='vp '+SL[i].part;
+  const cs=getComputedStyle(vp);PC=cs.getPropertyValue('--c').trim();PC2=cs.getPropertyValue('--c-2').trim();
+  counter.textContent=(i+1)+' / '+N;prog.style.width=((i+1)/N*100)+'%';t0=frame;
+}
+
+/* Keyboard Listener Supporting Both English and Arabic Layouts */
+document.addEventListener('keydown', e=>{
+  if(e.metaKey||e.ctrlKey||e.altKey) return;
+  if(e.target&&/^(INPUT|TEXTAREA)$/.test(e.target.tagName)){ if(e.key==='Escape') e.target.blur(); return; }
+  const k = e.key;
+  const code = e.code;
+
+  if(['ArrowRight','ArrowDown','PageDown',' '].includes(k) || code === 'Space' || code === 'Enter'){
+    e.preventDefault(); go(cur+1);
+  }
+  else if(['ArrowLeft','ArrowUp','PageUp','Backspace'].includes(k)){
+    e.preventDefault(); go(cur-1);
+  }
+  else if(code === 'Home') go(0);
+  else if(code === 'End') go(N-1);
+  // S / s / س
+  else if(code === 'KeyS' || k === 's' || k === 'S' || k === 'س'){
+    toggleSol();
+  }
+  // F / f / ب
+  else if(code === 'KeyF' || k === 'f' || k === 'F' || k === 'ب'){
+    try{ document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen(); }catch(_){}
+  }
+  else if(code === 'Escape') closeSol();
+});
+
+document.getElementById('next').onclick=e=>{go(cur+1);e.target.blur()};
+document.getElementById('prev').onclick=e=>{go(cur-1);e.target.blur()};
+document.addEventListener('click',e=>{
+  if(e.target.closest('[data-sol]')){toggleSol();e.target.blur()}
+});
+
+/* Theme Toggle Listener */
+const themeBtn = document.getElementById('themeToggle');
+const themeIcon = document.getElementById('themeIcon');
+const sunSvg = '<circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>';
+const moonSvg = '<path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>';
+
+function setTheme(light){
+  document.documentElement.classList.toggle('light-mode', light);
+  document.body.classList.toggle('light-mode', light);
+  if(themeIcon) themeIcon.innerHTML = light ? moonSvg : sunSvg;
+  if(themeBtn) themeBtn.title = light ? 'Switch to dark theme' : 'Switch to light theme';
+  updateThemeTokens();
+  try {
+    localStorage.setItem('cs:theme', light ? 'light' : 'dark');
+    localStorage.setItem('deck_theme', light ? 'light' : 'dark');
+  } catch(_){}
+}
+
+if(themeBtn){
+  themeBtn.onclick = () => setTheme(!document.body.classList.contains('light-mode'));
+}
+
+window.addEventListener('storage', e => {
+  if (e.key === 'cs:theme' || e.key === 'deck_theme') {
+    setTheme(e.newValue === 'light');
+  }
+});
+
+const initialTheme = (function(){
+  try { return localStorage.getItem('cs:theme') || localStorage.getItem('deck_theme'); }
+  catch(_) { return null; }
+})();
+if(initialTheme === 'light' || document.documentElement.classList.contains('light-mode')){
+  setTheme(true);
+} else {
+  updateThemeTokens();
+}
+
+const fitbox=document.getElementById('fitbox'),deck=document.getElementById('deck');
+function layout(){
+  const cs=getComputedStyle(document.body);
+  const W=innerWidth-parseFloat(cs.paddingLeft)-parseFloat(cs.paddingRight);
+  const H=innerHeight-parseFloat(cs.paddingTop)-parseFloat(cs.paddingBottom);
+  const small=Math.min(W,H)<640,rot=small&&H>W;
+  document.body.classList.toggle('small',small);document.body.classList.toggle('rot90',rot);
+  let s;
+  if(small){
+    const aw=rot?H:W,ah=rot?W:H,dh=619,s0=ah/dh,dw=Math.min(1500,Math.max(1100,aw/s0));
+    s=Math.min(s0,aw/dw);
+    vp.style.width=dw+'px';deck.style.width=dw+'px';deck.style.height=dh+'px';
+    fitbox.style.width=(rot?dh*s:dw*s)+'px';fitbox.style.height=(rot?dw*s:dh*s)+'px';
+    deck.style.transform=rot?`translate(${dh*s}px,0) rotate(90deg) scale(${s})`:`scale(${s})`;
+  }else{
+    s=Math.min((W-12)/1100,(H-12)/707);
+    vp.style.width='1100px';deck.style.width='1100px';deck.style.height='707px';
+    fitbox.style.width=1100*s+'px';fitbox.style.height=707*s+'px';deck.style.transform=`scale(${s})`;
+  }
+  SC=Math.max(.2,s);
+}
+addEventListener('resize',layout);layout();
+
+const amb=fit(document.getElementById('amb'));
+const blobs=[[.2,.3,'#6366f1'],[.75,.25,'#a855f7'],[.55,.75,'#ec4899'],[.15,.8,'#6366f1']];
+const specks=Array.from({length:46},(_,i)=>[(i*.6180339)%1,(i*.3819661+.17)%1,i*1.7]);
+function aurora(f){
+  amb.rs();const{ctx,W,H}=amb;if(!W)return;
+  ctx.fillStyle=isLight?'#ebe9f5':'#07070d';ctx.fillRect(0,0,W,H);ctx.globalCompositeOperation='lighter';
+  blobs.forEach(([bx,by,col],i)=>{
+    const x=W*bx+Math.sin(f*.004+i)*70,y=H*by+Math.cos(f*.003+i*1.7)*50,r=Math.min(W,H)*(.42+.05*Math.sin(f*.006+i));
+    const g=ctx.createRadialGradient(x,y,0,x,y,r);
+    g.addColorStop(0,col+(isLight?'15':'22'));
+    g.addColorStop(1,col+'00');
+    ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y,r,0,7);ctx.fill();
+  });
+  ctx.globalCompositeOperation='source-over';
+  specks.forEach(([dx,dy,ph])=>{
+    ctx.fillStyle=isLight?`rgba(90,80,140,${.12+.1*Math.sin(f*.02+ph)})`:`rgba(200,190,255,${.18+.18*Math.sin(f*.02+ph)})`;
+    ctx.beginPath();ctx.arc(dx*W,dy*H,1.1,0,7);ctx.fill()
+  });
+  const v=ctx.createRadialGradient(W/2,H/2,Math.min(W,H)*.3,W/2,H/2,Math.max(W,H)*.75);
+  v.addColorStop(0,'rgba(5,5,9,0)');
+  v.addColorStop(1,isLight?'rgba(235,233,245,.65)':'rgba(5,5,9,.7)');
+  ctx.fillStyle=v;ctx.fillRect(0,0,W,H);
+}
+function tick(){
+  frame++;aurora(frame);
+  for(const o of live){
+    if(o.slide!==cur)continue;
+    o.s.rs();const{ctx,W,H}=o.s;if(!W)continue;
+    ctx.clearRect(0,0,W,H);CW=W;
+    o.def.draw(ctx,W,H,(frame-t0)%o.def.cycle,frame,o);
+  }
+  requestAnimationFrame(tick);
+}
+go(0);tick();
+</script>
+</body>
+</html>
