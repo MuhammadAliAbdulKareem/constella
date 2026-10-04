@@ -60,14 +60,6 @@ html.light-mode, body.light-mode, html.light-mode body{
   --cv-text-main:#181528;
   --shadow-vp:0 24px 60px rgba(100,90,140,.14);
 }
-body.light-mode .slide-counter{background:rgba(255,255,255,.88);border-color:var(--card-border);color:var(--ts);backdrop-filter:blur(8px)}
-body.light-mode .brand-left a{background:rgba(255,255,255,.8)!important;color:var(--tp)!important;border-color:var(--card-border)!important;}
-body.light-mode .brand-left a:hover{background:#ffffff!important;border-color:var(--c)!important;}
-body.light-mode .vp-progress{background:rgba(120,110,160,.12)}
-body.light-mode .controls button{background:rgba(255,255,255,.85);border-color:var(--card-border);color:var(--ts)}
-body.light-mode .controls button:hover{background:#ffffff;color:var(--tp);border-color:var(--c)}
-body.light-mode .controls kbd{background:rgba(120,110,160,.14);color:var(--ts)}
-body.light-mode .mnav{background:rgba(255,255,255,.88);border-color:var(--card-border);color:var(--tp);box-shadow:0 4px 16px rgba(100,90,140,.18)}
 
 *{box-sizing:border-box}
 html,body{margin:0;height:100%;height:100dvh;background:var(--bg);color:var(--tp);font-family:Inter,system-ui,"Segoe UI",Roboto,Arial,sans-serif;overflow:hidden;transition:background .3s ease, color .3s ease;}
@@ -182,6 +174,10 @@ code{font-family:var(--mono);font-size:.92em;color:var(--c);background:rgba(128,
 .req li::before{content:'';position:absolute;left:0;top:.45em;width:8px;height:8px;border-radius:2.5px;background:var(--c-grad)}
 .trap{padding:9px 12px;border-radius:10px;border:1px solid rgba(251,113,133,.4);background:rgba(251,113,133,.08);font-size:12px;line-height:1.45;color:var(--tp)}
 .trap b{color:var(--warn)}
+.key{padding:9px 12px;border-radius:10px;border:1px solid rgba(16,185,129,.45);background:rgba(16,185,129,.08);font-size:12px;line-height:1.45;color:var(--tp)}
+.key b{color:#10b981}
+body.light-mode .key b{color:#059669}
+
 .tright{position:relative;min-height:0;display:flex;flex-direction:column;justify-content:center;height:100%;}
 
 /* Fit-Content Code Window (No unnecessary giant black boxes) */
@@ -315,7 +311,6 @@ body.light-mode .mcq-feedback.correct{background:rgba(52,211,153,.14); color:#06
 <div id="fitbox"><div id="deck">
   <div class="brand-bar">
     <div class="brand-left">
-      <a href="../../../index.html" style="padding:6px 13px;border-radius:999px;background:rgba(255,255,255,.07);color:var(--tp);font:600 12px/1 system-ui,sans-serif;text-decoration:none;border:1px solid var(--card-border);display:inline-flex;align-items:center;gap:6px;transition:background .2s,border-color .2s;flex-shrink:0" onmouseover="this.style.background='rgba(255,255,255,.14)';this.style.borderColor='var(--c)'" onmouseout="this.style.background='rgba(255,255,255,.07)';this.style.borderColor='var(--card-border)'">← Back to sessions</a>
       <!-- Speed / Complexity Gauge Logo Icon -->
       <div class="brand-icon">
         <svg viewBox="0 0 24 24">
@@ -331,8 +326,8 @@ body.light-mode .mcq-feedback.correct{background:rgba(52,211,153,.14); color:#06
     </div>
     <div class="brand-right">
       <span>Instructor · Muhammad Ali Abdul Kareem</span>
-      <button class="theme-btn" id="themeToggle" title="Switch to light theme" aria-label="Toggle theme">
-        <svg id="themeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+      <button class="theme-btn" id="themeToggle" title="Toggle Light / Dark mode" aria-label="Toggle theme">
+        <svg id="themeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
       </button>
     </div>
   </div>
@@ -856,7 +851,230 @@ VIZ.classcmp={cycle:720,draw(c,W,H,f,frame){
 }};
 
 
+/* ===== Session 03 additions: pointer / memory / index concepts ===== */
+function arrowHead(c,x,y,dir,col,sz){
+ c.save();c.fillStyle=col;c.beginPath();
+ if(dir==='down'){c.moveTo(x,y);c.lineTo(x-sz,y-sz*1.5);c.lineTo(x+sz,y-sz*1.5)}
+ else if(dir==='left'){c.moveTo(x,y);c.lineTo(x+sz*1.5,y-sz);c.lineTo(x+sz*1.5,y+sz)}
+ else{c.moveTo(x,y);c.lineTo(x-sz*1.5,y-sz);c.lineTo(x-sz*1.5,y+sz)}
+ c.closePath();c.fill();c.restore();
+}
+function mmChain(c,b,active){
+ const items=['Memory','Address','Pointer','Heap','Dynamic array','Index','ArrayList'];
+ c.save();c.font=`700 10.5px ${FONTS.ui}`;
+ const sep=18,ws=items.map(s=>c.measureText(s).width),tot=ws.reduce((a,v)=>a+v,0)+sep*(items.length-1);
+ let x=b.x+b.w/2-tot/2;const y=b.y+b.h-18;c.textBaseline='middle';c.textAlign='left';
+ items.forEach((s,i)=>{
+  c.fillStyle=i===active?CL.pink:i<active?CL.chalk:CL.dim;c.globalAlpha=i===active?1:i<active?.85:.55;
+  c.fillText(s,x,y);x+=ws[i];
+  if(i<items.length-1){c.fillStyle=CL.dim;c.globalAlpha=.7;c.fillText('›',x+sep/2-3,y);x+=sep}
+ });
+ c.restore();
+}
+function memCell(c,x,y,w,h,col,v,p,o={}){
+ c.save();c.globalAlpha=p;
+ if(o.dash)c.setLineDash([5,4]);
+ rr(c,x,y,w,h,9);c.fillStyle=rgba(col,o.dash?.05:(o.fill||.16));c.fill();
+ c.strokeStyle=o.dash?rgba(col,.6):col;c.lineWidth=o.lw||1.8;c.stroke();c.restore();
+ if(v!==undefined&&v!==null)txt(c,String(v),x+w/2,y+h/2,{size:o.size||15,font:'mono',a:p,col:o.tcol||CL.chalk});
+}
+
+VIZ.ptr={cycle:620,draw(c,W,H,f,frame){
+ const b=board(c,W,H,{title:'Pointer basics',frame});
+ const bw=122,bh=64,xy=b.y+104,pxx=b.x+b.w-bw-26,xx=b.x+28;
+ const p1=ease(at(f,8,40)),p2=ease(at(f,50,90)),p3=ease(at(f,100,140));
+ const lbl=(cx,name,type,col,p)=>{txt(c,name,cx,xy-30,{size:15,font:'mono',weight:800,col,a:p});txt(c,type,cx,xy-12,{size:10.5,font:'mono',col:CL.dim,a:p})};
+ lbl(xx+bw/2,'x','int',CL.amber,p1);lbl(pxx+bw/2,'p','int*',CL.cyan,p2);
+ memCell(c,xx,xy,bw,bh,CL.amber,10,p1,{size:24});
+ memCell(c,pxx,xy,bw,bh,CL.cyan,'0x1000',p2,{size:18,tcol:CL.cyan});
+ txt(c,'address 0x1000',xx+bw/2,xy+bh+18,{size:10.5,font:'mono',col:CL.dim,a:p1});
+ txt(c,'address 0x2000',pxx+bw/2,xy+bh+18,{size:10.5,font:'mono',col:CL.dim,a:p2});
+ txt(c,'stores a VALUE',xx+bw/2,xy+bh+36,{size:11.5,weight:800,col:CL.amber,a:p1});
+ txt(c,'stores an ADDRESS',pxx+bw/2,xy+bh+36,{size:11.5,weight:800,col:CL.cyan,a:p2});
+ const ay=xy+bh/2;marker(c,[[pxx,ay],[xx+bw+10,ay]],p3,CL.pink,2.6);
+ if(p3>.98)arrowHead(c,xx+bw+3,ay,'left',CL.pink,6);
+ txt(c,'points to',(xx+bw+pxx)/2,ay-14,{size:11.5,font:'marker',col:CL.pink,a:p3});
+ const rows=[['&x','"address of x"','0x1000',CL.pink],['*p','"value at the address in p"','10',CL.green],['int*','"pointer to int"','',CL.cyan]];
+ const ry=b.y+236,rh=40,act=f>170?Math.floor((f-170)/110)%3:-1;
+ rows.forEach((r,i)=>{
+  const p=ease(at(f,150+i*18,185+i*18)),y=ry+i*(rh+8),on=i===act;
+  c.save();c.globalAlpha=p;rr(c,b.x+22,y,b.w-44,rh,10);c.fillStyle=rgba(r[3],on?.2:.07);c.fill();c.strokeStyle=on?r[3]:rgba(r[3],.5);c.lineWidth=on?2.2:1.2;c.stroke();c.restore();
+  txt(c,r[0],b.x+40,y+rh/2,{size:15,font:'mono',weight:800,col:r[3],align:'left',a:p});
+  txt(c,r[1],b.x+112,y+rh/2,{size:11.5,align:'left',a:p});
+  if(r[2])txt(c,'→  '+r[2],b.x+b.w-40,y+rh/2,{size:14,font:'mono',weight:800,col:r[3],align:'right',a:p});
+ });
+ txt(c,'A pointer is a variable whose value is an address.',b.x+b.w/2,b.y+b.h-46,{size:12,font:'marker',col:CL.green,a:ease(at(f,300,340))});
+ mmChain(c,b,2);
+}};
+
+VIZ.heap={cycle:640,draw(c,W,H,f,frame){
+ const b=board(c,W,H,{title:'Stack vs Heap',frame});
+ const sx=b.x+16,sw=150,zy=b.y+52,zh=210,hx=sx+sw+30,hw=b.w-(hx-b.x)-16;
+ const pz=ease(at(f,6,36));
+ const zone=(x,w,col,t,s)=>{c.save();c.globalAlpha=pz;rr(c,x,zy,w,zh,14);c.fillStyle=rgba(col,.06);c.fill();c.strokeStyle=rgba(col,.7);c.lineWidth=1.6;c.stroke();c.restore();
+  txt(c,t,x+w/2,zy+20,{size:12.5,weight:900,col,a:pz});txt(c,s,x+w/2,zy+38,{size:10.5,col:CL.dim,a:pz})};
+ zone(sx,sw,CL.violet,'STACK','local variables');zone(hx,hw,CL.green,'HEAP','dynamic memory');
+ const vars=[['size','0',CL.amber],['capacity','5',CL.amber],['data','0x5000',CL.cyan]];
+ vars.forEach((v,i)=>{const p=ease(at(f,36+i*14,64+i*14)),y=zy+54+i*50;
+  txt(c,v[0],sx+12,y+17,{size:11,font:'mono',weight:800,col:v[2],align:'left',a:p});
+  memCell(c,sx+sw-70,y,58,34,v[2],v[1],p,{size:i===2?12:15,tcol:i===2?CL.cyan:CL.chalk})});
+ const cw=40,g=4,cx0=hx+(hw-(5*cw+4*g))/2,cy=zy+96;
+ const ph=ease(at(f,110,150));
+ for(let k=0;k<5;k++){const p=ease(at(f,110+k*8,140+k*8));
+  memCell(c,cx0+k*(cw+g),cy,cw,cw,CL.green,'?',p,{size:14,tcol:CL.dim});
+  txt(c,'['+k+']',cx0+k*(cw+g)+cw/2,cy+cw+13,{size:10,font:'mono',col:CL.dim,a:p})}
+ txt(c,'new int[5]',hx+hw/2,zy+70,{size:12,font:'mono',weight:800,col:CL.green,a:ph});
+ txt(c,'address 0x5000',cx0,cy+cw+32,{size:10.5,font:'mono',col:CL.dim,align:'left',a:ph});
+ const pa=ease(at(f,190,240)),dy=zy+54+2*50+17;
+ marker(c,[[sx+sw-10,dy],[hx-12,dy],[hx-12,cy+cw/2],[cx0-8,cy+cw/2]],pa,CL.pink,2.6);
+ if(pa>.98)arrowHead(c,cx0-3,cy+cw/2,'right',CL.pink,6);
+ const st=[['① new int[5]','asks the heap for 5 ints'],['② returns','the address of the 1st element'],['③ data','stores that address']];
+ st.forEach((s,i)=>{const p=ease(at(f,230+i*26,256+i*26)),y=zy+zh+22+i*26;
+  txt(c,s[0],b.x+28,y,{size:12.5,font:'mono',weight:800,col:[CL.green,CL.amber,CL.cyan][i],align:'left',a:p});
+  txt(c,s[1],b.x+150,y,{size:12,align:'left',a:p})});
+ mmChain(c,b,3);
+}};
+
+VIZ.whyptr={cycle:640,draw(c,W,H,f,frame){
+ const b=board(c,W,H,{title:'Why a pointer?',frame});
+ const pf=ease(at(f,8,40));
+ c.save();c.globalAlpha=pf;rr(c,b.x+18,b.y+46,b.w-36,96,14);c.fillStyle=rgba(CL.amber,.06);c.fill();c.strokeStyle=rgba(CL.amber,.7);c.lineWidth=1.6;c.stroke();c.restore();
+ txt(c,'🔒  int data[5];',b.x+34,b.y+68,{size:14,font:'mono',weight:800,col:CL.amber,align:'left',a:pf});
+ txt(c,'size frozen at compile time',b.x+b.w-34,b.y+68,{size:11,col:CL.dim,align:'right',a:pf});
+ for(let k=0;k<5;k++)memCell(c,b.x+34+k*48,b.y+86,44,40,CL.amber,'',pf,{});
+ txt(c,'every object gets 5 slots',b.x+34+5*48+10,b.y+106,{size:11,col:CL.dim,align:'left',a:pf});
+ const ph=ease(at(f,60,100));
+ c.save();c.globalAlpha=ph;rr(c,b.x+18,b.y+158,b.w-36,206,14);c.fillStyle=rgba(CL.green,.06);c.fill();c.strokeStyle=rgba(CL.green,.7);c.lineWidth=1.6;c.stroke();c.restore();
+ txt(c,'data = new int[capacity];',b.x+34,b.y+180,{size:14,font:'mono',weight:800,col:CL.green,align:'left',a:ph});
+ const caps=[5,8,3],t=Math.max(0,f-150),idx=Math.floor(t/150)%3,cap=f<150?5:caps[idx],lt=f<150?f-100:t%150;
+ const pc=f<100?0:ease(at(lt,0,18));
+ txt(c,'capacity = '+cap,b.x+b.w-34,b.y+180,{size:14,font:'mono',weight:800,col:CL.pink,align:'right',a:ph});
+ txt(c,'runtime decides',b.x+b.w-34,b.y+198,{size:10.5,col:CL.dim,align:'right',a:ph});
+ memCell(c,b.x+34,b.y+222,70,32,CL.cyan,'0x5000',ph,{size:12,tcol:CL.cyan});
+ txt(c,'data',b.x+34+35,b.y+210,{size:12,font:'mono',weight:800,col:CL.cyan,a:ph});
+ const cw=40,g=4,x0=b.x+34,cy=b.y+296;
+ marker(c,[[b.x+34+35,b.y+254],[b.x+34+35,cy-8]],ease(at(f,110,140)),CL.pink,2.4);
+ if(f>140)arrowHead(c,b.x+34+35,cy-3,'down',CL.pink,6);
+ for(let k=0;k<cap;k++){const d=ph*(f<100?0:1);memCell(c,x0+k*(cw+g),cy,cw,cw,CL.green,'',Math.min(d,k===cap-1?pc:1)*(f<110?0:1),{})}
+ txt(c,'HEAP',x0+cap*(cw+g)+8,cy+cw/2,{size:12,font:'marker',col:CL.green,align:'left',a:ph});
+ txt(c,'different objects → different capacity',b.x+b.w-34,b.y+b.h-62,{size:11,col:CL.dim,align:'right',a:ph});
+ mmChain(c,b,4);
+}};
+
+VIZ.newdel={cycle:560,draw(c,W,H,f,frame){
+ const b=board(c,W,H,{title:'Always in pairs',frame});
+ const rows=[{y:b.y+50,col:CL.amber,n:1,a:'new int',d:'delete',t:'one value'},{y:b.y+156,col:CL.green,n:5,a:'new int[5]',d:'delete[]',t:'an array  ★ ArrayList'}];
+ rows.forEach((r,i)=>{
+  const p=ease(at(f,8+i*30,40+i*30)),fr=f>190+i*20,pf=ease(at(f,190+i*20,220+i*20));
+  c.save();c.globalAlpha=p;rr(c,b.x+18,r.y,b.w-36,92,14);c.fillStyle=rgba(r.col,.06);c.fill();c.strokeStyle=rgba(r.col,.7);c.lineWidth=1.6;c.stroke();c.restore();
+  txt(c,r.a,b.x+34,r.y+22,{size:14,font:'mono',weight:800,col:r.col,align:'left',a:p});
+  txt(c,'⟷',b.x+b.w/2,r.y+22,{size:16,col:CL.dim,a:p});
+  txt(c,r.d,b.x+b.w-34,r.y+22,{size:14,font:'mono',weight:800,col:CL.pink,align:'right',a:p});
+  const cw=40,g=4;
+  for(let k=0;k<r.n;k++){const x=b.x+34+k*(cw+g),pk=ease(at(f,40+i*30+k*6,66+i*30+k*6));
+   memCell(c,x,r.y+42,cw,38,fr?CL.dim:r.col,fr?'':'?',pk,{dash:fr,tcol:CL.dim,size:14});
+   if(fr)txt(c,'✕',x+cw/2,r.y+61,{size:14,col:CL.pink,a:pf})}
+  txt(c,fr?'freed':'allocated',b.x+b.w-34,r.y+62,{size:11.5,weight:800,col:fr?CL.pink:r.col,align:'right',a:p});
+  txt(c,r.t,b.x+b.w-34,r.y+78,{size:10.5,col:CL.dim,align:'right',a:p});
+ });
+ const pw=ease(at(f,260,290));
+ txt(c,'✗  delete data;      on memory from new[]',b.x+34,b.y+262,{size:12,font:'mono',col:CL.pink,align:'left',a:pw});
+ txt(c,'✗  delete[] p;       on memory from new',b.x+34,b.y+288,{size:12,font:'mono',col:CL.pink,align:'left',a:pw});
+ txt(c,'Mismatched pairs = undefined behavior.',b.x+b.w/2,b.y+b.h-46,{size:12,font:'marker',col:CL.green,a:ease(at(f,320,350))});
+ mmChain(c,b,3);
+}};
+
+VIZ.sizecap={cycle:620,draw(c,W,H,f,frame){
+ const b=board(c,W,H,{title:'size vs capacity',frame});
+ const cw=46,g=4,x0=b.x+(b.w-(8*cw+7*g))/2,cy=b.y+112,vals=[10,20,30,40,50];
+ const brk=(xa,xb,y,up,col,p,label)=>{
+  const yy=up?y-6:y+6;marker(c,[[xa,y],[xa,yy],[xb,yy],[xb,y]],p,col,2.2);
+  txt(c,label,(xa+xb)/2,up?y-24:y+24,{size:12.5,font:'mono',weight:800,col,a:p})};
+ for(let k=0;k<8;k++){const p=ease(at(f,8+k*5,34+k*5)),x=x0+k*(cw+g),used=k<5;
+  memCell(c,x,cy,cw,cw,used?CL.green:CL.dim,used?vals[k]:'',p,{dash:!used,size:15});
+  txt(c,'['+k+']',x+cw/2,cy+cw+14,{size:10.5,font:'mono',col:CL.dim,a:p})}
+ const e=cw+g;
+ brk(x0,x0+8*cw+7*g,cy-8,true,CL.violet,ease(at(f,70,110)),'capacity = 8  (total slots)');
+ brk(x0,x0+5*cw+4*g,cy+cw+34,false,CL.green,ease(at(f,120,160)),'size = 5  (used)');
+ brk(x0+5*e,x0+8*cw+7*g,cy+cw+34,false,CL.dim,ease(at(f,150,190)),'free');
+ const pm=ease(at(f,200,230));
+ txt(c,'valid data = indices 0 … size - 1  (0 … 4)',b.x+b.w/2,b.y+252,{size:12,col:CL.chalk,a:pm});
+ txt(c,'next free slot = index size  (5)',b.x+b.w/2,b.y+274,{size:12,col:CL.amber,a:pm});
+ const q=[['size < capacity','room left → write at data[size]',CL.green],['size == capacity','FULL → grow() first',CL.pink]];
+ q.forEach((r,i)=>{const p=ease(at(f,270+i*30,300+i*30)),y=b.y+300+i*34;
+  c.save();c.globalAlpha=p;rr(c,b.x+22,y,b.w-44,28,9);c.fillStyle=rgba(r[2],.1);c.fill();c.strokeStyle=rgba(r[2],.7);c.lineWidth=1.4;c.stroke();c.restore();
+  txt(c,r[0],b.x+36,y+14,{size:12,font:'mono',weight:800,col:r[2],align:'left',a:p});
+  txt(c,r[1],b.x+b.w-36,y+14,{size:11.5,align:'right',a:p})});
+ mmChain(c,b,4);
+}};
+
+VIZ.idx0={cycle:620,draw(c,W,H,f,frame){
+ const b=board(c,W,H,{title:'Index = offset',frame});
+ const cw=62,g=8,x0=b.x+(b.w-(5*cw+4*g))/2,cy=b.y+112,vals=[10,20,30,40,50],e=cw+g;
+ const act=f>190?Math.floor((f-190)/70)%5:-1;
+ const pd=ease(at(f,6,36));
+ txt(c,'data',x0+cw/2,cy-52,{size:13,font:'mono',weight:800,col:CL.cyan,a:pd});
+ marker(c,[[x0+cw/2,cy-40],[x0+cw/2,cy-8]],pd,CL.cyan,2.2);
+ if(pd>.98)arrowHead(c,x0+cw/2,cy-3,'down',CL.cyan,5);
+ for(let k=0;k<5;k++){const p=ease(at(f,20+k*8,48+k*8)),x=x0+k*e,on=k===act;
+  memCell(c,x,cy,cw,46,on?CL.pink:CL.violet,vals[k],p,{size:16,fill:on?.3:.16,lw:on?2.8:1.8});
+  txt(c,'['+k+']',x+cw/2,cy+62,{size:12,font:'mono',weight:800,col:on?CL.pink:CL.chalk,a:p});
+  txt(c,'+'+k,x+cw/2,cy+80,{size:11,font:'mono',col:CL.amber,a:p});
+  txt(c,'0x'+(4096+4*k).toString(16),x+cw/2,cy+97,{size:9.5,font:'mono',col:CL.dim,a:p})}
+ const pl=ease(at(f,80,110));
+ txt(c,'index',b.x+22,cy+62,{size:9.5,col:CL.dim,align:'left',a:pl});txt(c,'offset',b.x+22,cy+80,{size:9.5,col:CL.dim,align:'left',a:pl});txt(c,'address',b.x+22,cy+97,{size:9.5,col:CL.dim,align:'left',a:pl});
+ if(act>0){const xa=x0+cw/2,xb=x0+act*e+cw/2;
+  c.save();c.strokeStyle=CL.pink;c.lineWidth=2.2;c.setLineDash([5,4]);c.beginPath();c.moveTo(xa,cy-6);c.quadraticCurveTo((xa+xb)/2,cy-42-act*6,xb,cy-6);c.stroke();c.restore();
+  txt(c,'jump '+act,(xa+xb)/2+18,cy-38-act*5,{size:11.5,font:'mono',weight:800,col:CL.pink})}
+ const rows=[['data + 0','first element','data[0]'],['data + 1','second element','data[1]'],['data + 2','third element','data[2]']];
+ rows.forEach((r,i)=>{const p=ease(at(f,130+i*18,160+i*18)),y=b.y+258+i*30,on=act===i;
+  c.save();c.globalAlpha=p;rr(c,b.x+22,y,b.w-44,25,8);c.fillStyle=rgba(CL.cyan,on?.2:.06);c.fill();c.strokeStyle=on?CL.cyan:rgba(CL.cyan,.4);c.lineWidth=on?2:1.1;c.stroke();c.restore();
+  txt(c,r[0],b.x+36,y+13,{size:12.5,font:'mono',weight:800,col:CL.cyan,align:'left',a:p});
+  txt(c,'→  '+r[1],b.x+150,y+13,{size:12,align:'left',a:p});
+  txt(c,r[2],b.x+b.w-36,y+13,{size:12.5,font:'mono',weight:800,col:CL.pink,align:'right',a:p})});
+ txt(c,'Start is 0 away from the start → the first index is 0.',b.x+b.w/2,b.y+b.h-46,{size:12,font:'marker',col:CL.green,a:ease(at(f,300,340))});
+ mmChain(c,b,5);
+}};
+
 const CODE={
+c_ptr:`int x = 10;
+int* p = &x;      // p holds the ADDRESS of x
+
+cout << x;        // 10
+cout << *p;       // 10  (value at that address)
+cout << p;        // an address, e.g. 0x1000`,
+c_heap:`int size = 0;
+int capacity = 5;
+int* data = new int[5];
+// new returns the address of
+// the first element; data keeps it`,
+c_whyptr:`// Fixed: size frozen at compile time
+int data[5];
+
+// Dynamic: size chosen at runtime
+int* data;
+data = new int[capacity];`,
+c_pair:`// constructor: allocate
+data = new int[capacity];
+
+// destructor: free
+delete[] data;
+
+// new    -> delete
+// new[]  -> delete[]`,
+c_sizecap:`// capacity = 8, size = 5
+if (size == capacity)  // 5 == 8 ? false
+    grow();            // not needed yet
+data[size] = 60;       // first free slot: 5
+size++;                // size = 6`,
+c_index:`int* data = new int[5];  // 10 20 30 40 50
+
+data[2];          // 30
+*(data + 2);      // 30  (same thing)
+
+cout << *(data + 3);   // 40`,
+c_q0:`int* data;                 // declaration
+data = new int[capacity];  // capacity = 8`,
 c_cls:`class ArrayList {
 private:
     int* data;      // hidden storage
@@ -1026,7 +1244,7 @@ const HERO=`
 <h1>Arrays, the <em>OOP</em> way</h1>
 <div class="tag">Wrap a dynamic array in a C++ class: constructor, destructor, insert, delete, search, update, grow, deep copy and 2D layout, with live Auto / Manual visual labs</div>
 <div class="inst"><div class="avatar">M</div><div><small>Instructor</small><b>Muhammad Ali Abdul Kareem</b></div></div>
-<div class="chips"><span>class ArrayList</span><span>Auto &amp; Manual Labs</span><span>Rule of Three</span><span>2D Arrays</span><span>5 Interactive MCQs</span><span>Student Tasks 1–2</span></div>`;
+<div class="chips"><span>class ArrayList</span><span>Auto &amp; Manual Labs</span><span>Rule of Three</span><span>2D Arrays</span><span>6 Interactive MCQs</span><span>Student Tasks 1–2</span></div>`;
 
 const SL=[
 {part:'part-intro',hero:true,next:'Where does the array fit?'},
@@ -1034,9 +1252,27 @@ const SL=[
 {part:'part-intro',lbl:'Big Picture',h2:'Spot the <em>difference</em>',sub:'Three families, one picture each. Ask: how many "next" items can a value have?',viz:'classcmp',next:'Procedural vs OOP'},
 {part:'part-classes',lbl:'Paradigm Shift',h2:'Procedural vs <em>OOP</em> Arrays',sub:'Same operations, very different safety.',
  cards:{fs:13,items:[{h:'Procedural (Week 03 style)',code:'c_proc',n:'The array and <code>arrLength</code> are loose variables: any code can break them.'},{h:'OOP (today)',code:'c_oop',n:'<b>Encapsulation:</b> state is private, and methods enforce the rules.'}]},next:'Anatomy of the class'},
-{part:'part-classes',lbl:'Class Anatomy',h2:'Anatomy of <em>ArrayList</em>',sub:'Private state on the left, public interface below, heap storage on the right.',viz:'cls',next:'Constructor & Destructor'},
+{part:'part-classes',lbl:'Class Anatomy',h2:'Anatomy of <em>ArrayList</em>',sub:'Private state on the left, public interface below, heap storage on the right.',viz:'cls',next:'Pointer Basics'},
+{part:'part-classes',lbl:'Pointer Basics',h2:'Pointer Basics — What does <em>int* data</em> mean?',sub:'Before we use data, learn what a pointer is: a variable that stores an address.',split:1,viz:'ptr',
+ chip:'Value vs address',req:['A normal variable stores a <b>value</b>; a pointer stores an <b>address</b>.','<code>&amp;x</code> = "address of x" · <code>*p</code> = "value at the address stored in p".','<code>int*</code> means "pointer to int".'],code:'c_ptr',next:'Stack vs Heap'},
+{part:'part-classes',lbl:'Memory Basics',h2:'Memory Basics — <em>Stack vs Heap</em>',sub:'Small local variables on the left, the dynamic array on the right.',split:1,viz:'heap',
+ chip:'Where does data live?',req:['<code>size</code>, <code>capacity</code> and <code>data</code> are local variables (stack).','<code>new int[5]</code> creates the array in dynamically allocated memory (heap) and returns the address of its first element.','<code>data</code> stores that address.'],code:'c_heap',next:'Why is data a pointer?'},
+{part:'part-classes',lbl:'Why a Pointer?',h2:'Why is <em>data</em> a Pointer?',sub:'Fixed size at compile time vs size chosen at runtime.',split:1,viz:'whyptr',
+ chip:'Runtime size',req:['The array size is decided at <b>runtime</b>: <code>capacity</code> can differ for every ArrayList object.','<code>int data[5]</code> has a fixed compile-time size.','A pointer lets the class refer to dynamically allocated storage.'],code:'c_whyptr',
+ key:'<b>Key takeaway:</b> <code>data</code> is a pointer because the ArrayList needs dynamically allocated storage whose size is decided at runtime.',next:'Constructor & Destructor'},
 {part:'part-rules',lbl:'Lifecycle',h2:'Constructor &amp; <em>Destructor</em>',sub:'The class owns its memory: allocate on creation, free on destruction.',
- task:{chip:'RAII Idea',req:['<code>new int[capacity]</code> allocates the array on the heap.','Constructor sets <code>size = 0</code>: capacity is room, size is what is used.','<code>delete[]</code> in the destructor frees it automatically at scope end.'],trap:'Use <code>delete[]</code> (not <code>delete</code>) for arrays, or memory leaks and undefined behavior follow.',code:'c_ctor'},next:'fillFromUser()'},
+ task:{chip:'RAII Idea',req:['<code>new int[capacity]</code> allocates the array on the heap.','Constructor sets <code>size = 0</code>: capacity is room, size is what is used.','<code>delete[]</code> in the destructor frees it automatically at scope end.'],trap:'Use <code>delete[]</code> (not <code>delete</code>) for arrays, or memory leaks and undefined behavior follow.',code:'c_ctor'},next:'new[] and delete[]'},
+{part:'part-rules',lbl:'Checkpoint',h2:'<em>new[]</em> and <em>delete[]</em> belong together',sub:'Whatever form of new you use, the matching delete frees it.',split:1,viz:'newdel',
+ chip:'Allocate and free in pairs',req:['<code>new int</code> → <code>delete</code>','<code>new int[n]</code> → <code>delete[]</code>','The constructor allocates; the destructor frees the same block.'],code:'c_pair',next:'size vs capacity'},
+{part:'part-seq',lbl:'Size vs Capacity',h2:'<em>size</em> vs <em>capacity</em>',sub:'Room available vs elements actually stored.',split:1,viz:'sizecap',
+ chip:'capacity = 8 · size = 5',req:['<code>capacity</code> = total available slots; <code>size</code> = elements currently stored.','Unused slots sit between <code>size</code> and <code>capacity</code>.','Valid data is in indices <code>0</code> to <code>size - 1</code>.'],code:'c_sizecap',
+ key:'<b>Connect it:</b> <code>size == capacity</code> means no free slot is left, so the list must grow.',next:'Why index 0?'},
+{part:'part-seq',lbl:'Array Index',h2:'Why does Array Index start at <em>0</em>?',sub:'An index is a distance from the beginning of the array.',split:1,viz:'idx0',
+ chip:'Index = offset',req:['Index 0 is offset 0: no steps from the beginning. Index 1 is one element away.','First index = <code>0</code>, last index = <code>capacity - 1</code>.','<code>data[i]</code> is conceptually <code>*(data + i)</code>.'],code:'c_index',
+ key:'<b>Intro only:</b> <code>data + i</code> moves <code>i</code> elements forward (i × 4 bytes for int).',next:'Concept check'},
+{part:'part-rules',lbl:'Interactive Predictor',h2:'Concept check: <em>What does data store?</em>',sub:'Pointer, address and heap in one question.',mcq:true,
+ q:'<b>What does <code>data</code> store in the following declaration?</b>',options:['The entire array','The number of elements','The address of the first element','The capacity'],answer:'The address of the first element',
+ explain:'<b>Correct!</b> <code>data</code> is a pointer. It stores the address of the first element of the dynamically allocated array.',hint:'A pointer stores an address, not the values themselves.',code:'c_q0',next:'fillFromUser()'},
 {part:'part-seq',lbl:'Method 1 · User Input',h2:'<em>fillFromUser()</em> — write each slot',lab:'fill',chip:'Auto demo or type your own values',req:['Loops once per element and reads into <code>data[i]</code>.','Increments <code>size</code> as slots become used.'],code:'c_fill',next:'display()'},
 {part:'part-seq',lbl:'Method 2',h2:'<em>display()</em> — traverse',lab:'show',chip:'Read-only traversal',req:['Visits index <code>0</code> to <code>size - 1</code>.','Marked <code>const</code>: it reads but never modifies.'],code:'c_show',next:'insertAt()'},
 {part:'part-sel',lbl:'Method 3 · User Input',h2:'<em>insertAt()</em> — shift right, then place',lab:'ins',chip:'Try any value and position',req:['Validates <code>pos</code> and free capacity first.','Shifts from the end down to <code>pos</code>.'],code:'c_ins',trap:'Try pos 7, or insert until the list is full: it returns <code>false</code> instead of corrupting memory.',next:'deleteAt()'},
@@ -1118,7 +1354,7 @@ function renderCodeWindow(k){
 const vp=document.getElementById('vp'),live=[];
 const dots=i=>Array.from({length:N},(_,k)=>`<i class="dot${k===i?' on':''}"></i>`).join('');
 const footer=(i,next)=>`<div class="sf"><span>Data Structures · Session 03</span><div class="pd">${dots(i)}</div><span>${next}</span></div>`;
-const leftCol=s=>`<div class="tleft">${s.chip?`<div class="chip">${s.chip}</div>`:''}<ul class="req">${s.req.map(r=>`<li>${r}</li>`).join('')}</ul>${s.code?renderCodeWindow(s.code):''}${s.trap?`<div class="trap">${s.trap}</div>`:''}</div>`;
+const leftCol=s=>`<div class="tleft">${s.chip?`<div class="chip">${s.chip}</div>`:''}<ul class="req">${s.req.map(r=>`<li>${r}</li>`).join('')}</ul>${s.code?renderCodeWindow(s.code):''}${s.trap?`<div class="trap">${s.trap}</div>`:''}${s.key?`<div class="key">${s.key}</div>`:''}</div>`;
 
 SL.forEach((s,i)=>{
   const el=document.createElement('section');
