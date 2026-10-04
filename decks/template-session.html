@@ -118,9 +118,38 @@ kbd{padding:2px 6px;border-radius:4px;background:rgba(255,255,255,.08);font:700 
 .laser-pointer.active{display:block}
 .laser-pointer::after{content:'';position:absolute;inset:4px;border-radius:50%;background:#fff}
 body.laser-active,body.laser-active *{cursor:none!important}
+
+/* Mobile Persistent Navigation */
+.m-home-btn,.m-theme-btn{display:none}
+.small .m-home-btn{
+  display:inline-flex;align-items:center;gap:6px;
+  position:fixed;top:max(12px,env(safe-area-inset-top));left:max(12px,env(safe-area-inset-left));
+  z-index:999;padding:7px 14px;border-radius:999px;
+  background:rgba(18,16,28,.88);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  border:1px solid rgba(255,255,255,.14);color:#fff;
+  font:700 12.5px Inter,system-ui,sans-serif;text-decoration:none;
+  box-shadow:0 6px 20px rgba(0,0,0,.35);transition:transform .15s ease,border-color .2s ease;
+}
+.small .m-theme-btn{
+  display:grid;place-items:center;
+  position:fixed;top:max(12px,env(safe-area-inset-top));right:max(12px,env(safe-area-inset-right));
+  z-index:999;width:34px;height:34px;border-radius:50%;
+  background:rgba(18,16,28,.88);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  border:1px solid rgba(255,255,255,.14);color:#fff;
+  box-shadow:0 6px 20px rgba(0,0,0,.35);cursor:pointer;padding:0;
+  transition:transform .15s ease,border-color .2s ease;
+}
+.small .m-home-btn:active,.small .m-theme-btn:active{transform:scale(0.94);border-color:var(--c)}
 </style>
 </head>
 <body>
+<a href="../../../index.html" class="m-home-btn" aria-label="Back to home">
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+  <span>Home</span>
+</a>
+<button class="m-theme-btn" id="mThemeToggle" aria-label="Toggle theme">
+  <svg id="mThemeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" width="15" height="15"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+</button>
 <div id="fitbox"><div id="deck">
   <div class="brand-bar">
     <div class="brand-left">
@@ -174,23 +203,26 @@ function fit(c){const dpr=Math.min(window.devicePixelRatio||1,2);let w=0,h=0;ret
 let isLight = document.documentElement.classList.contains('light-mode');
 const themeBtn = document.getElementById('themeToggle');
 const themeIcon = document.getElementById('themeIcon');
+const mThemeBtn = document.getElementById('mThemeToggle');
+const mThemeIcon = document.getElementById('mThemeIcon');
 
 function setTheme(light){
   isLight = !!light;
   document.documentElement.classList.toggle('light-mode', isLight);
   document.body.classList.toggle('light-mode', isLight);
   if(themeBtn) themeBtn.title = isLight ? 'Switch to dark theme' : 'Switch to light theme';
-  if(themeIcon){
-    themeIcon.innerHTML = isLight
-      ? '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>'
-      : '<circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>';
-  }
+  const iconMarkup = isLight
+    ? '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>'
+    : '<circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>';
+  if(themeIcon) themeIcon.innerHTML = iconMarkup;
+  if(mThemeIcon) mThemeIcon.innerHTML = iconMarkup;
   try {
     localStorage.setItem('deck_theme', isLight ? 'light' : 'dark');
     localStorage.setItem('cs:theme', isLight ? 'light' : 'dark');
   } catch(e){}
 }
 if(themeBtn) themeBtn.addEventListener('click', ()=>setTheme(!isLight));
+if(mThemeBtn) mThemeBtn.addEventListener('click', ()=>setTheme(!isLight));
 window.addEventListener('storage', e=>{
   if(e.key==='deck_theme'||e.key==='cs:theme'){
     const shouldLight = e.newValue === 'light';

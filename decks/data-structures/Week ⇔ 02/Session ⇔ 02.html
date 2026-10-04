@@ -289,9 +289,38 @@ body.small{padding:0!important}
 .laser-pointer.active{display:block}
 .laser-pointer::after{content:'';position:absolute;inset:4px;border-radius:50%;background:#fff}
 body.laser-active,body.laser-active *{cursor:none!important}
+
+/* Mobile Persistent Navigation */
+.m-home-btn,.m-theme-btn{display:none}
+.small .m-home-btn{
+  display:inline-flex;align-items:center;gap:6px;
+  position:fixed;top:max(12px,env(safe-area-inset-top));left:max(12px,env(safe-area-inset-left));
+  z-index:999;padding:7px 14px;border-radius:999px;
+  background:var(--card);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  border:1px solid var(--card-border);color:var(--tp);
+  font:700 12.5px Inter,system-ui,sans-serif;text-decoration:none;
+  box-shadow:0 6px 20px rgba(0,0,0,.35);transition:transform .15s ease,border-color .2s ease;
+}
+.small .m-theme-btn{
+  display:grid;place-items:center;
+  position:fixed;top:max(12px,env(safe-area-inset-top));right:max(12px,env(safe-area-inset-right));
+  z-index:999;width:34px;height:34px;border-radius:50%;
+  background:var(--card);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  border:1px solid var(--card-border);color:var(--tp);
+  box-shadow:0 6px 20px rgba(0,0,0,.35);cursor:pointer;padding:0;
+  transition:transform .15s ease,border-color .2s ease;
+}
+.small .m-home-btn:active,.small .m-theme-btn:active{transform:scale(0.94);border-color:var(--c)}
 </style>
 </head>
 <body>
+<a href="../../../index.html" class="m-home-btn" aria-label="Back to home">
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+  <span>Home</span>
+</a>
+<button class="m-theme-btn" id="mThemeToggle" aria-label="Toggle theme">
+  <svg id="mThemeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" width="15" height="15"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+</button>
 <div id="fitbox"><div id="deck">
   <div class="brand-bar">
     <div class="brand-left">
@@ -310,6 +339,10 @@ body.laser-active,body.laser-active *{cursor:none!important}
       </div>
     </div>
     <div class="brand-right">
+      <a href="Complexity_BigO.cpp" download="Complexity_BigO.cpp" style="padding:5px 11px;border-radius:6px;border:1px solid var(--card-border);background:transparent;color:var(--tp);cursor:pointer;font:600 11.5px Inter,sans-serif;text-decoration:none;display:inline-flex;align-items:center;gap:5px;transition:border-color .2s,background .2s;" onmouseover="this.style.borderColor='var(--c)';this.style.background='rgba(255,255,255,.08)'" onmouseout="this.style.borderColor='var(--card-border)';this.style.background='transparent'">
+        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+        <span>Download Code</span>
+      </a>
       <span>Instructor · Muhammad Ali Abdul Kareem</span>
       <button class="theme-btn" id="themeToggle" title="Switch to light theme" aria-label="Toggle theme">
         <svg id="themeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
@@ -1161,18 +1194,10 @@ document.addEventListener('touchend', e => {
   tx = null; ty = null;
 
   // Don't swipe when tapping on interactive controls
-  if(e.target && e.target.closest && e.target.closest('button, .mcq-btn, .copy-btn, .solbtn, .theme-btn, a')) return;
+  if(e.target && e.target.closest && e.target.closest('button, .mcq-btn, .copy-btn, .solbtn, .theme-btn, .m-theme-btn, .m-home-btn, a, input, textarea')) return;
 
-  if(document.body.classList.contains('rot90')){
-    // Portrait orientation: deck is rotated 90deg, vertical swipe maps to horizontal slide step
-    if(Math.abs(dy) > 50 && Math.abs(dy) > Math.abs(dx)) {
-      go(cur + (dy < 0 ? 1 : -1));
-    }
-  } else {
-    // Landscape orientation or desktop
-    if(Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) {
-      go(cur + (dx < 0 ? 1 : -1));
-    }
+  if(Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy)) {
+    go(cur + (dx < 0 ? 1 : -1));
   }
 }, {passive:true});
 
@@ -1202,6 +1227,8 @@ window.addEventListener('mousemove', e => {
 /* Theme Toggle Listener */
 const themeBtn = document.getElementById('themeToggle');
 const themeIcon = document.getElementById('themeIcon');
+const mThemeBtn = document.getElementById('mThemeToggle');
+const mThemeIcon = document.getElementById('mThemeIcon');
 const sunSvg = '<circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>';
 const moonSvg = '<path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>';
 
@@ -1210,6 +1237,7 @@ function setTheme(light){
   document.body.classList.toggle('light-mode', light);
   if(themeIcon) themeIcon.innerHTML = light ? moonSvg : sunSvg;
   if(themeBtn) themeBtn.title = light ? 'Switch to dark theme' : 'Switch to light theme';
+  if(mThemeIcon) mThemeIcon.innerHTML = light ? moonSvg : sunSvg;
   updateThemeTokens();
   try {
     localStorage.setItem('cs:theme', light ? 'light' : 'dark');
@@ -1219,6 +1247,9 @@ function setTheme(light){
 
 if(themeBtn){
   themeBtn.onclick = () => setTheme(!document.body.classList.contains('light-mode'));
+}
+if(mThemeBtn){
+  mThemeBtn.onclick = () => setTheme(!document.body.classList.contains('light-mode'));
 }
 
 window.addEventListener('storage', e => {
@@ -1239,46 +1270,26 @@ if(initialTheme === 'light' || document.documentElement.classList.contains('ligh
 
 const fitbox = document.getElementById('fitbox'), deck = document.getElementById('deck');
 function layout(){
-  const vv = window.visualViewport;
-  const W = Math.floor(vv ? vv.width : innerWidth);
-  const H = Math.floor(vv ? vv.height : innerHeight);
-  const small = Math.min(W, H) < 680;
-  const portrait = H > W;
-  const rot = portrait;
-  document.body.classList.toggle('portrait', portrait);
+  const cs = getComputedStyle(document.body);
+  const W = innerWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+  const H = innerHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+  const small = Math.min(W, H) < 680 || W < 768;
   document.body.classList.toggle('small', small);
-  document.body.classList.toggle('rot90', rot);
-
-  let s, dw, dh, totalH;
-  if(rot){
-    dh = 619;
-    s = W / dh;
-    dw = Math.round(H / s);
-    vp.style.width = dw + 'px';
-    vp.style.height = dh + 'px';
-    deck.style.width = dw + 'px';
-    deck.style.height = dh + 'px';
-    fitbox.style.width = W + 'px';
-    fitbox.style.height = H + 'px';
-    deck.style.transform = `translate(${W}px,0) rotate(90deg) scale(${s})`;
-  } else {
-    totalH = small ? 619 : 707;
-    dh = 619;
-    s = Math.min(W / 1050, H / totalH);
-    dw = Math.max(1050, Math.round(W / s));
-    vp.style.width = dw + 'px';
-    vp.style.height = dh + 'px';
-    deck.style.width = dw + 'px';
-    deck.style.height = totalH + 'px';
-    fitbox.style.width = Math.round(dw * s) + 'px';
-    fitbox.style.height = Math.round(totalH * s) + 'px';
-    deck.style.transform = `scale(${s})`;
-  }
+  const dw = 1100;
+  const dh = small ? 619 : 707;
+  const s = Math.min((W - 12) / dw, (H - 12) / dh);
+  vp.style.width = dw + 'px';
+  vp.style.height = '619px';
+  deck.style.width = dw + 'px';
+  deck.style.height = dh + 'px';
+  fitbox.style.width = Math.round(dw * s) + 'px';
+  fitbox.style.height = Math.round(dh * s) + 'px';
+  deck.style.transformOrigin = 'top left';
+  deck.style.transform = `scale(${s})`;
   SC = Math.max(.2, s);
 }
 addEventListener('resize', layout);
-addEventListener('orientationchange', () => setTimeout(layout, 120));
-if(window.visualViewport) visualViewport.addEventListener('resize', layout);
+addEventListener('orientationchange', () => setTimeout(layout, 100));
 layout();
 
 const amb=fit(document.getElementById('amb'));
