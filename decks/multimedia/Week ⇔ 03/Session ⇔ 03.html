@@ -266,6 +266,9 @@ body.light-mode .mcq-feedback.correct{background:rgba(52,211,153,.14); color:#06
 .controls button:hover{color:var(--tp); border-color:var(--c)}
 .controls kbd{padding:1px 6px; border-radius:5px; background:rgba(128,128,128,.14); font:700 11px var(--mono); color:var(--ts)}
 
+.mnav{display:none; position:absolute; top:50%; z-index:99; width:38px; height:38px; margin-top:-19px; border-radius:50%; border:1px solid var(--card-border); background:var(--card); color:var(--tp); font:800 20px/1 Inter,system-ui,sans-serif; cursor:pointer; place-items:center; padding:0; opacity:.85}
+.mnav.mp{left:6px}.mnav.mn{right:6px}
+
 .ln{display:block;padding:0 8px;margin:0 -8px;border-radius:5px;transition:background .2s,box-shadow .2s}
 .ln.hot{background:rgba(251,191,36,.16);box-shadow:inset 3px 0 0 #fbbf24}
 .vizbox{position:relative;flex:1;min-height:0}
@@ -439,11 +442,11 @@ body.small.light-mode{background:#ebe9f5}
       </div>
     </div>
     <div class="brand-right">
-      <span>Instructor · Muhammad Ali Abdul Kareem</span>
       <a href="session03_digital_sound.py" download="session03_digital_sound.py" style="padding:5px 11px;border-radius:6px;border:1px solid rgba(255,255,255,.2);background:transparent;color:#e9edff;cursor:pointer;font:600 11.5px Inter,sans-serif;text-decoration:none;display:inline-flex;align-items:center;gap:5px;transition:border-color .2s,background .2s;" onmouseover="this.style.borderColor='var(--c)';this.style.background='rgba(255,255,255,.08)'" onmouseout="this.style.borderColor='rgba(255,255,255,.2)';this.style.background='transparent'">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-        <span>session03_digital_sound.py</span>
+        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+        <span>Download Code</span>
       </a>
+      <span>Instructor · Muhammad Ali Abdul Kareem</span>
       <button class="theme-btn" id="themeToggle" title="Toggle Light / Dark mode" aria-label="Toggle theme">
         <svg id="themeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
       </button>
@@ -774,21 +777,31 @@ OPS.quant={title:'Quantization',idle:'Choose bit depth and Fs.',fields:[{k:'bits
 OPS.dac={title:'DAC (ZOH)',idle:'Choose bit depth and Fs, then Run.',fields:[{k:'bits',l:'bits',d:3},{k:'fs',l:'Fs (Hz)',d:25}],init:()=>({a:[],n:0,base:4096}),demos:[{bits:3,fs:25},{bits:8,fs:60}],
  run(st,p){return qRun('dac',st,p,this.title,[0],[0,1,2]);}};
 VIZ.sig={cycle:1e9,draw(c,W,H,tick,frame,o){
-  const L=o.data;labTick(L,frame);const s=L.frames[L.idx]||{};const b=board(c,W,H,{title:s.t||'',frame});
-  const fs=s.fs||25,f=s.f||5,bits=s.bits||3,R=s.R||1.2;
-  const x0=b.x+34,y0=b.y+82,w=b.w-68,h=b.h-82-108,ym=v=>y0+h/2-(v/R)*h/2,xm=t=>x0+t*w;
+  const L=o.data;labTick(L,frame);const s=L.frames[L.idx];const b=board(c,W,H,{title:s.t||'',frame});
+  const x0=b.x+50,y0=b.y+82,w=b.w-84,h=b.h-82-128,R=s.R,ym=v=>y0+h/2-(v/R)*h/2,xm=t=>x0+t*w;
   L.hold=420;const sw=ease(at(frame-L.last,0,240)),gc=isLight?'rgba(0,0,0,.18)':'rgba(255,255,255,.16)';
   c.lineWidth=1;c.strokeStyle=gc;c.strokeRect(x0,y0,w,h);c.beginPath();c.moveTo(x0,ym(0));c.lineTo(x0+w,ym(0));c.stroke();
+  const yt=[-1,0,1];if(s.kind==='gain')[s.g,-s.g].forEach(v=>{if(Math.abs(Math.abs(v)-1)>.15&&v!==0)yt.push(v);});
+  const fmt=v=>v===0?'0':(v>0?'+':'−')+(Math.abs(v)%1?Math.abs(v).toFixed(1):Math.abs(v));
+  yt.forEach(v=>{const yy=ym(v);c.save();c.strokeStyle=gc;c.lineWidth=1;if(v!==0){c.setLineDash([2,4]);c.beginPath();c.moveTo(x0,yy);c.lineTo(x0+w,yy);c.stroke();c.setLineDash([]);}
+    c.beginPath();c.moveTo(x0-4,yy);c.lineTo(x0,yy);c.stroke();c.restore();txt(c,fmt(v),x0-8,yy,{size:11,col:CL.dim,font:'mono',align:'right'});});
+  [0,.5,1].forEach(t=>{const xx=xm(t);c.save();c.strokeStyle=gc;c.lineWidth=1;if(t>0&&t<1){c.setLineDash([2,4]);c.beginPath();c.moveTo(xx,y0);c.lineTo(xx,y0+h);c.stroke();c.setLineDash([]);}
+    c.beginPath();c.moveTo(xx,y0+h);c.lineTo(xx,y0+h+4);c.stroke();c.restore();txt(c,t===0?'0':t===1?'1.0':'0.5',xx,y0+h+13,{size:11,col:CL.dim,font:'mono',align:'center'});});
+  txt(c,'Time (s)  →',x0+w/2,y0+h+28,{size:11,col:CL.dim,font:'ui',weight:700,align:'center'});
+  c.save();c.translate(b.x+13,y0+h/2);c.rotate(-Math.PI/2);txt(c,'Amplitude  →',0,0,{size:11,col:CL.dim,font:'ui',weight:700,align:'center'});c.restore();
   const line=(fn,col,wd,dash,al)=>{c.save();c.strokeStyle=col;c.lineWidth=wd;c.globalAlpha=al||1;c.setLineDash(dash||[]);c.beginPath();
     for(let i=0;i<=300;i++){const t=i/300;if(t>sw)break;i?c.lineTo(xm(t),ym(fn(t))):c.moveTo(xm(t),ym(fn(t)));}c.stroke();c.restore();};
-  const stems=(vals,col,dx)=>{vals.forEach((v,k)=>{const t=k/fs;if(t>sw)return;c.strokeStyle=col;c.lineWidth=1.5;c.beginPath();c.moveTo(xm(t)+dx,ym(0));c.lineTo(xm(t)+dx,ym(v));c.stroke();c.fillStyle=col;c.beginPath();c.arc(xm(t)+dx,ym(v),3.5,0,7);c.fill();});};
-  const smp=[...Array(fs)].map((_,k)=>sn(f,k/fs)),Lv=2**bits,q=smp.map(v=>qz(v,Lv));
+  const stems=(vals,col,dx)=>{vals.forEach((v,k)=>{const t=k/s.fs;if(t>sw)return;c.strokeStyle=col;c.lineWidth=1.5;c.beginPath();c.moveTo(xm(t)+dx,ym(0));c.lineTo(xm(t)+dx,ym(v));c.stroke();c.fillStyle=col;c.beginPath();c.arc(xm(t)+dx,ym(v),3.5,0,7);c.fill();});};
+  const smp=[...Array(s.fs)].map((_,k)=>sn(s.f,k/s.fs)),Lv=2**s.bits,q=smp.map(v=>qz(v,Lv));
   let lg=[];
   if(s.kind==='sine'){line(t=>sn(s.f,t),CL.cyan,2.5);lg=[['analog sine',CL.cyan,'line']];}
   if(s.kind==='gain'){line(t=>sn(5,t),CL.cyan,2,[6,4],.7);line(t=>s.g*sn(5,t),CL.pink,2.5);lg=[['original x1',CL.cyan,'dash'],['gain x'+s.g,CL.pink,'line']];}
-  if(s.kind==='samp'){line(t=>sn(s.f,t),CL.dim,1.5,[],.6);stems(smp,s.bad?CL.pink:CL.green,0);lg=[['analog',CL.dim,'line'],['samples',s.bad?CL.pink:CL.green,'stem']];}
-  if(s.kind==='quant'){if(Lv<=16)for(let j=0;j<Lv;j++){c.strokeStyle=gc;c.beginPath();c.moveTo(x0,ym(-1+2*j/(Lv-1)));c.lineTo(x0+w,ym(-1+2*j/(Lv-1)));c.stroke();}
-    stems(smp,CL.cyan,-3);stems(q,CL.amber,3);lg=[['original',CL.cyan,'stem'],['quantized',CL.amber,'stem']];}
+  if(s.kind==='samp'){line(t=>sn(s.f,t),CL.dim,1.5,[],.6);stems(smp,s.bad?CL.pink:CL.green,0);
+    if(sw>.05){const xa=xm(0),xb=xm(1/s.fs),yb=y0+h-12;c.save();c.strokeStyle=CL.amber;c.fillStyle=CL.amber;c.lineWidth=1.6;c.beginPath();c.moveTo(xa,yb);c.lineTo(xb,yb);c.stroke();
+      [[xa,1],[xb,-1]].forEach(a=>{c.beginPath();c.moveTo(a[0],yb);c.lineTo(a[0]+a[1]*5,yb-3.5);c.lineTo(a[0]+a[1]*5,yb+3.5);c.fill();});c.restore();
+      txt(c,'Ts = 1/Fs = '+(1/s.fs).toFixed(2)+' s  (gap between samples)',xb+8,yb,{size:11,col:CL.amber,font:'ui',weight:700,align:'left'});}lg=[['analog',CL.dim,'line'],['samples',s.bad?CL.pink:CL.green,'stem']];}
+  if(s.kind==='quant'){if(Lv<=16)for(let j=0;j<Lv;j++){c.strokeStyle=rgba(CL.amber,.3);c.beginPath();c.moveTo(x0,ym(-1+2*j/(Lv-1)));c.lineTo(x0+w,ym(-1+2*j/(Lv-1)));c.stroke();}
+    txt(c,Lv+' levels'+(Lv<=16?' (horizontal lines)':''),x0+w-8,y0+13,{size:11,col:CL.amber,font:'ui',weight:700,align:'right'});stems(smp,CL.cyan,-3);stems(q,CL.amber,3);lg=[['original',CL.cyan,'stem'],['quantized',CL.amber,'stem']];}
   if(s.kind==='dac'){line(t=>sn(5,t),CL.cyan,1.5,[6,4],.6);c.save();c.strokeStyle=CL.amber;c.lineWidth=2.5;c.beginPath();
     q.forEach((v,k)=>{const t0=k/s.fs,t1=(k+1)/s.fs;if(t0>sw)return;const xa=xm(t0),xb=xm(Math.min(t1,sw));k?c.lineTo(xa,ym(v)):c.moveTo(xa,ym(v));c.lineTo(xb,ym(v));});c.stroke();c.restore();lg=[['original',CL.cyan,'dash'],['DAC output',CL.amber,'step']];}
   let lx=x0;const ly=y0-34,ph=24;
@@ -939,6 +952,18 @@ const SL=[
 {part:'part-fn',lbl:'Recap & Synthesis',h2:'Session 03 — <em>The signal journey</em> and what comes next',sub:'One wave from analog to digital and back, then the pixels of an image.',viz:'recap',next:'Thank you'}
 ];
 const N=SL.length;
+
+function highlight(src){
+  const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const re=/(\/\/[^\n]*)|(#include\s*<[^>\n]+>)|("(?:[^"\\\n]|\\.)*")|('(?:[^'\\\n]|\\.)')|\b(\d+(?:\.\d+)?)\b|\b(long long|int|double|char|bool|void|float|ArrayList|Matrix)\b|\b(return|if|else|for|while|do|using|namespace|true|false|class|public|private|const|new|delete)\b|\b(cout|cin|endl)\b|\b([A-Za-z_]\w*)(?=\()/g;
+  let out='',last=0,m;
+  while((m=re.exec(src))){
+    out+=esc(src.slice(last,m.index));const t=m[0];
+    const cls=m[1]?'c':m[2]?'p':(m[3]||m[4])?'s':m[5]?'n':m[6]?'t':m[7]?'k':m[8]?'o':'f';
+    out+=`<span class="${cls}">${esc(t)}</span>`;last=m.index+t.length;
+  }
+  return out+esc(src.slice(last));
+}
 
 let codeSeq=0;
 function renderCodeWindow(k){
@@ -1129,7 +1154,7 @@ document.addEventListener('touchend', e => {
   const dy = e.changedTouches[0].clientY - ty;
   tx = null; ty = null;
 
-  if(e.target && e.target.closest && e.target.closest('button, .mcq-btn, .copy-btn, .solbtn, .theme-btn, .m-theme-btn, .m-bar, .m-bar-btn, a, input, textarea')) return;
+  if(e.target && e.target.closest && e.target.closest('button, .mcq-btn, .copy-btn, .solbtn, .theme-btn, .m-theme-btn, .m-home-btn, .m-pill, .m-nav-hud, .m-bar, .m-bar-btn, a, input, textarea')) return;
 
   if(Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy)) {
     go(cur + (dx < 0 ? 1 : -1));
@@ -1234,7 +1259,6 @@ if(window.screen&&window.screen.orientation){
 }
 layout();
 
-/* ═══════════════ Ambient Canvas & Master Render Loop ═══════════════ */
 const amb=fit(document.getElementById('amb'));
 const blobs=[[.2,.3,'#6366f1'],[.75,.25,'#a855f7'],[.55,.75,'#ec4899'],[.15,.8,'#6366f1']];
 const specks=Array.from({length:46},(_,i)=>[(i*.6180339)%1,(i*.3819661+.17)%1,i*1.7]);
@@ -1258,25 +1282,13 @@ function aurora(f){
   v.addColorStop(1,isLight?'rgba(235,233,245,.65)':'rgba(5,5,9,.7)');
   ctx.fillStyle=v;ctx.fillRect(0,0,W,H);
 }
-
-let isTabVisible=true;
-document.addEventListener('visibilitychange',()=>{
-  isTabVisible=!document.hidden;
-  if(isTabVisible)requestAnimationFrame(tick);
-});
-
 function tick(){
-  if(!isTabVisible)return;
   frame++;aurora(frame);
   for(const o of live){
     if(o.slide!==cur)continue;
-    try {
-      o.s.rs();const{ctx,W,H}=o.s;if(!W)continue;
-      ctx.clearRect(0,0,W,H);CW=W;
-      o.def.draw(ctx,W,H,(frame-t0)%o.def.cycle,frame,o);
-    } catch(err) {
-      console.error('Render error:', err);
-    }
+    o.s.rs();const{ctx,W,H}=o.s;if(!W)continue;
+    ctx.clearRect(0,0,W,H);CW=W;
+    o.def.draw(ctx,W,H,(frame-t0)%o.def.cycle,frame,o);
   }
   requestAnimationFrame(tick);
 }
