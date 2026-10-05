@@ -267,46 +267,80 @@ pre.code,pre.code *,code{font-variant-ligatures:none!important;font-feature-sett
 .laser-pointer::after{content:'';position:absolute;inset:4px;border-radius:50%;background:#fff}
 body.laser-active,body.laser-active *{cursor:none!important}
 
-/* Mobile Persistent Navigation Bar (Ultra-sleek HUD) */
-.m-bar{display:none}
-.small .m-bar{
+/* Creative Floating Island Navigation (Mobile HUD) */
+.m-nav-hud{display:none}
+.small .m-nav-hud{
   display:flex;align-items:center;justify-content:space-between;
-  position:fixed;top:0;left:0;right:0;height:44px;
-  padding:max(6px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) 0 max(12px, env(safe-area-inset-left));
+  position:fixed;top:max(6px, env(safe-area-inset-top));left:max(8px, env(safe-area-inset-left));right:max(8px, env(safe-area-inset-right));
   z-index:999;pointer-events:none;
 }
-.small .m-bar>*{pointer-events:auto}
-.m-bar-btn{
-  display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px;border-radius:999px;
-  background:rgba(18,16,28,.78);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
-  border:1px solid rgba(255,255,255,.14);color:#f1f0fb;font:700 11.5px Inter,system-ui,sans-serif;
-  text-decoration:none;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.3);
-  transition:transform .15s ease,border-color .2s ease,background .2s ease;
+.small .m-nav-hud>*{pointer-events:auto}
+
+/* The Creative Home Pill */
+.m-pill{
+  display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 11px;border-radius:999px;
+  background:rgba(12,10,22,.68);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+  border:1px solid rgba(255,255,255,.12);color:#f0eeff;font:700 11px/1 Inter,system-ui,sans-serif;
+  text-decoration:none;cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,.35);
+  transition:transform .15s ease,border-color .2s ease,background .2s ease,box-shadow .2s ease;
+  user-select:none;
 }
-.m-bar-btn:active{transform:scale(0.93);border-color:var(--c)}
-.m-bar-icon-btn{width:32px;padding:0;justify-content:center}
-.m-bar-actions{display:flex;align-items:center;gap:6px}
-.m-bar-counter{
-  display:inline-flex;align-items:center;height:26px;padding:0 10px;border-radius:999px;
-  background:rgba(18,16,28,.65);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
-  border:1px solid rgba(255,255,255,.1);font:700 11px var(--mono);color:var(--ts);
-  box-shadow:0 2px 10px rgba(0,0,0,.2);
+.m-pill:active{transform:scale(0.93)}
+.m-pill-home{
+  background:linear-gradient(135deg,rgba(99,102,241,.18),rgba(168,85,247,.22)),rgba(14,12,24,.75);
+  border-color:rgba(168,85,247,.3);
+  box-shadow:0 4px 16px rgba(168,85,247,.18),0 2px 6px rgba(0,0,0,.35);
 }
-body.light-mode .m-bar-btn{
-  background:rgba(255,255,255,.88);border:1px solid rgba(0,0,0,.1);color:#181528;
-  box-shadow:0 4px 14px rgba(0,0,0,.08);
+.m-pill-home:hover{border-color:var(--c);box-shadow:0 6px 20px rgba(168,85,247,.35)}
+.m-pill-home .m-pill-icon svg{width:13px;height:13px;stroke:var(--c);display:block}
+.m-pill-home .m-pill-text{font-weight:800;letter-spacing:.2px;background:linear-gradient(90deg,#fff,#f0eeff);-webkit-background-clip:text;background-clip:text;color:transparent}
+.m-pill-spark{font-size:9px;color:var(--c);animation:pulseSpark 2.4s ease-in-out infinite}
+@keyframes pulseSpark{0%,100%{opacity:.4;transform:scale(.85)}50%{opacity:1;transform:scale(1.2)}}
+
+.m-pill-cluster{display:flex;align-items:center;gap:5px}
+.m-pill-counter{
+  height:26px;padding:0 9px;font:700 10.5px var(--mono);color:var(--ts);
+  background:rgba(14,12,24,.55);border-color:rgba(255,255,255,.08);
 }
-body.light-mode .m-bar-counter{
-  background:rgba(255,255,255,.82);border:1px solid rgba(0,0,0,.08);color:#524d70;
-  box-shadow:0 2px 8px rgba(0,0,0,.04);
+.m-pill-btn{width:30px;height:30px;padding:0;justify-content:center}
+.m-pill-btn svg{width:13px;height:13px;stroke-width:2.2}
+
+/* Light Theme for Pills */
+body.light-mode .m-pill{
+  background:rgba(255,255,255,.82);border-color:rgba(120,110,160,.2);color:#181528;
+  box-shadow:0 4px 14px rgba(100,90,140,.12);
 }
+body.light-mode .m-pill-home{
+  background:linear-gradient(135deg,rgba(99,102,241,.12),rgba(236,72,153,.1)),rgba(255,255,255,.9);
+  border-color:rgba(168,85,247,.35);
+}
+body.light-mode .m-pill-home .m-pill-text{background:none;color:#181528}
+body.light-mode .m-pill-counter{background:rgba(255,255,255,.72);color:#524d70}
 
 .small .slide-counter{display:none}
 .small .brand-bar,.small .controls{display:none}
 .small .vp{border-radius:0!important;border:none!important;box-shadow:none!important}
 .small #fitbox{border-radius:0!important}
-.small .slide{padding:46px 34px 18px!important}
-.small .hero-slide{padding:46px 34px 18px!important}
+
+/* Zero-Overlap Top Clearance for Mobile Slides */
+.small .slide{padding:74px 34px 18px!important}
+.small .hero-slide{padding:68px 34px 18px!important}
+.small .hero-slide h1{font-size:44px!important;line-height:1.1!important;margin:6px 0 10px!important}
+.small .hero-slide .tag{font-size:15px!important;line-height:1.4!important}
+
+/* Desktop Home Link */
+.desktop-home-link{
+  display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:999px;
+  background:rgba(255,255,255,.06);color:var(--tp);font:700 11.5px Inter,sans-serif;
+  text-decoration:none;border:1px solid var(--card-border);transition:all .2s ease;
+  flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,.15);
+}
+.desktop-home-link:hover{
+  background:rgba(255,255,255,.12);border-color:var(--c);color:#fff;
+  transform:translateX(-2px);box-shadow:0 4px 14px rgba(168,85,247,.25);
+}
+.desktop-home-link svg{width:13px;height:13px;stroke:currentColor;transition:transform .2s}
+.desktop-home-link:hover svg{transform:translateX(-2px)}
 
 /* Edge navigation chevrons on mobile */
 .small .mnav{
@@ -334,32 +368,40 @@ body.small.light-mode{background:#ebe9f5}
 </style>
 </head>
 <body>
-<header class="m-bar" role="navigation" aria-label="Mobile Navigation">
-  <a href="../../../index.html" class="m-bar-btn" aria-label="Back to sessions">
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
-    <span>Sessions</span>
+<nav class="m-nav-hud" role="navigation" aria-label="Mobile Navigation">
+  <a href="../../../index.html" class="m-pill m-pill-home" aria-label="Back to Constella Courses" title="Back to Courses">
+    <span class="m-pill-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 10.5L12 3l9 7.5V20a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+        <polyline points="9 22 9 12 15 12 15 22"/>
+      </svg>
+    </span>
+    <span class="m-pill-text">Constella</span>
+    <span class="m-pill-spark">✦</span>
   </a>
 
-  <div class="m-bar-center">
-    <span class="m-bar-counter" id="mCounter">1 / 1</span>
-  </div>
-
-  <div class="m-bar-actions">
-    <a href="Functions_Memory.cpp" download="Functions_Memory.cpp" class="m-bar-btn m-bar-icon-btn" aria-label="Download code" title="Download code">
-      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+  <div class="m-pill-cluster">
+    <span class="m-pill m-pill-counter" id="mCounter">1 / 1</span>
+    <a href="Functions_Memory.cpp" download="Functions_Memory.cpp" class="m-pill m-pill-btn" aria-label="Download C++ Code" title="Download Code">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" width="13" height="13" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
     </a>
-    <button class="m-bar-btn m-bar-icon-btn" id="mThemeToggle" aria-label="Toggle theme" title="Toggle theme">
-      <svg id="mThemeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" width="14" height="14"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+    <button class="m-pill m-pill-btn" id="mThemeToggle" aria-label="Toggle theme" title="Toggle theme">
+      <svg id="mThemeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" width="13" height="13"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
     </button>
-    <button class="m-bar-btn m-bar-icon-btn" id="mFsToggle" aria-label="Fullscreen" title="Toggle fullscreen">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" width="14" height="14" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+    <button class="m-pill m-pill-btn" id="mFsToggle" aria-label="Fullscreen" title="Toggle fullscreen">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" width="13" height="13" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
     </button>
   </div>
-</header>
+</nav>
 <div id="fitbox"><div id="deck">
   <div class="brand-bar">
     <div class="brand-left">
-      <a href="../../../index.html" style="padding:6px 13px;border-radius:999px;background:rgba(255,255,255,.07);color:#e9edff;font:600 12px/1 system-ui,sans-serif;text-decoration:none;border:1px solid rgba(255,255,255,.2);display:inline-flex;align-items:center;gap:6px;transition:background .2s,border-color .2s;flex-shrink:0" onmouseover="this.style.background='rgba(255,255,255,.14)';this.style.borderColor='rgba(255,255,255,.35)'" onmouseout="this.style.background='rgba(255,255,255,.07)';this.style.borderColor='rgba(255,255,255,.2)'">← Back to sessions</a>
+      <a href="../../../index.html" class="desktop-home-link" title="Return to Constella Course Map">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M19 12H5M12 19l-7-7 7-7"/>
+        </svg>
+        <span>Sessions</span>
+      </a>
       <div class="logo">{ }</div>
       <div>
         <div class="brand-name">Data Structures</div>
@@ -1474,7 +1516,7 @@ document.addEventListener('touchstart',e=>{tx=e.touches[0].clientX;ty=e.touches[
 document.addEventListener('touchend',e=>{
   if(tx==null||!modal.hidden){tx=null;return}
   const dx=e.changedTouches[0].clientX-tx,dy=e.changedTouches[0].clientY-ty;tx=null;
-  if(e.target && e.target.closest && e.target.closest('button, .mcq-btn, .copy-btn, .solbtn, .theme-btn, .m-theme-btn, .m-home-btn, .m-bar, .m-bar-btn, a, input, textarea')) return;
+  if(e.target && e.target.closest && e.target.closest('button, .mcq-btn, .copy-btn, .solbtn, .theme-btn, .m-theme-btn, .m-home-btn, .m-pill, .m-nav-hud, .m-bar, .m-bar-btn, a, input, textarea')) return;
   if(Math.abs(dx)>45&&Math.abs(dx)>Math.abs(dy)) go(cur+(dx<0?1:-1));
 },{passive:true});
 document.getElementById('mnext').onclick=e=>{go(cur+1);e.target.blur()};
