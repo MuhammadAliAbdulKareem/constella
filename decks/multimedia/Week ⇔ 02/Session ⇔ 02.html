@@ -1480,6 +1480,19 @@ if(mprev)mprev.onclick=e=>{go(cur-1);e.target.blur()};
 
 /* Laser Pointer Mode */
 let laserActive = false, laserDot = null;
+let lastLaserX = -100, lastLaserY = -100;
+
+function updateLaserPos(clientX, clientY){
+  if(clientX !== undefined && clientY !== undefined){
+    lastLaserX = clientX;
+    lastLaserY = clientY;
+  }
+  if(laserActive && laserDot){
+    laserDot.style.left = lastLaserX + 'px';
+    laserDot.style.top = lastLaserY + 'px';
+  }
+}
+
 function toggleLaser(){
   laserActive = !laserActive;
   if(!laserDot){
@@ -1489,13 +1502,30 @@ function toggleLaser(){
   }
   laserDot.classList.toggle('active', laserActive);
   document.body.classList.toggle('laser-active', laserActive);
-}
-window.addEventListener('mousemove', e => {
-  if(laserActive && laserDot){
-    laserDot.style.left = e.clientX + 'px';
-    laserDot.style.top = e.clientY + 'px';
+  if(laserActive && lastLaserX > 0 && lastLaserY > 0){
+    laserDot.style.left = lastLaserX + 'px';
+    laserDot.style.top = lastLaserY + 'px';
   }
-});
+}
+
+window.addEventListener('pointermove', e => {
+  updateLaserPos(e.clientX, e.clientY);
+}, { passive: true });
+
+window.addEventListener('mousemove', e => {
+  updateLaserPos(e.clientX, e.clientY);
+}, { passive: true });
+
+window.addEventListener('pointerdown', e => {
+  updateLaserPos(e.clientX, e.clientY);
+}, { passive: true });
+
+window.addEventListener('touchmove', e => {
+  if(e.touches && e.touches[0]){
+    updateLaserPos(e.touches[0].clientX, e.touches[0].clientY);
+  }
+}, { passive: true });
+
 
 /* Theme Toggle Listener */
 const themeBtn = document.getElementById('themeToggle');
@@ -1675,8 +1705,36 @@ function redrawPen(){
 }
 
 function drawPenStroke(s){
-  if(s.points.length < 2) return;
+  if(!s.points || s.points.length === 0) return;
   penCtx.save();
+
+  if(s.points.length === 1){
+    const p = s.points[0];
+    if(s.tool === 'eraser'){
+      penCtx.globalCompositeOperation = 'destination-out';
+      penCtx.beginPath();
+      penCtx.arc(p.x, p.y, 14, 0, Math.PI * 2);
+      penCtx.fill();
+    } else if(s.tool === 'highlighter'){
+      penCtx.globalCompositeOperation = 'source-over';
+      penCtx.fillStyle = s.color;
+      penCtx.globalAlpha = 0.35;
+      penCtx.beginPath();
+      penCtx.arc(p.x, p.y, 9, 0, Math.PI * 2);
+      penCtx.fill();
+    } else {
+      penCtx.globalCompositeOperation = 'source-over';
+      penCtx.fillStyle = s.color;
+      penCtx.shadowColor = s.color;
+      penCtx.shadowBlur = 8;
+      penCtx.beginPath();
+      penCtx.arc(p.x, p.y, 2, 0, Math.PI * 2);
+      penCtx.fill();
+    }
+    penCtx.restore();
+    return;
+  }
+
   if(s.tool === 'eraser'){
     penCtx.globalCompositeOperation = 'destination-out';
     penCtx.lineWidth = 28;
@@ -1717,7 +1775,7 @@ function getPenPos(e){
   const scaleX = penCanvas.width / rect.width;
   const scaleY = penCanvas.height / rect.height;
   let cx = e.clientX, cy = e.clientY;
-  if(cx === undefined && e.touches && e.touches.length > 0){
+  if((cx === undefined || cx === null) && e.touches && e.touches.length > 0){
     cx = e.touches[0].clientX;
     cy = e.touches[0].clientY;
   }
@@ -1736,15 +1794,18 @@ function initPen(){
 
   if(penCanvas){
     penCanvas.addEventListener('pointerdown', e => {
+      if(typeof updateLaserPos === 'function') updateLaserPos(e.clientX, e.clientY);
       if(!penActive) return;
       e.preventDefault();
       try{ penCanvas.setPointerCapture(e.pointerId); }catch(_){}
       const p = getPenPos(e);
       currentStroke = { tool: penTool, color: penColor, points: [p] };
       strokes.push(currentStroke);
+      redrawPen();
     });
 
     penCanvas.addEventListener('pointermove', e => {
+      if(typeof updateLaserPos === 'function') updateLaserPos(e.clientX, e.clientY);
       if(!penActive || !currentStroke) return;
       e.preventDefault();
       const p = getPenPos(e);
@@ -1753,6 +1814,7 @@ function initPen(){
     });
 
     const endStroke = e => {
+      if(e && typeof updateLaserPos === 'function') updateLaserPos(e.clientX, e.clientY);
       if(currentStroke){
         currentStroke = null;
         redrawPen();
