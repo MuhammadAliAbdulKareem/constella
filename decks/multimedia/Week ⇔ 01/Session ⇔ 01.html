@@ -177,9 +177,10 @@ code{font-family:var(--mono);font-size:.92em;color:#c7b3ff;background:rgba(255,2
 .trap{padding:12px 14px;border-radius:12px;border:1px solid rgba(251,113,133,.4);background:rgba(251,113,133,.08);font-size:13.5px;line-height:1.55;color:var(--tp)}
 .trap b{color:var(--warn)}
 .tright{position:relative;min-height:0}
-.solbtn{position:absolute;top:30px;right:52px;z-index:7;cursor:pointer;padding:8px 16px;border-radius:999px;border:1px solid var(--c);background:rgba(12,12,20,.85);color:var(--tp);font:800 12.5px Inter,system-ui,sans-serif;letter-spacing:.3px}
+.sol-actions{display:flex;align-items:center;gap:10px;margin-top:6px}
+.solbtn{cursor:pointer;padding:7px 16px;border-radius:999px;border:1px solid var(--c);background:rgba(12,12,20,.85);color:var(--tp);font:800 12px Inter,system-ui,sans-serif;letter-spacing:.3px;align-self:flex-start;transition:all .2s ease;box-shadow:0 2px 10px rgba(0,0,0,.25)}
 .solbtn:hover{background:var(--c);color:#07070d}
-.solbtn kbd{margin-left:6px;padding:1px 6px;border-radius:5px;background:rgba(255,255,255,.1);font:700 11px var(--mono)}
+.solbtn kbd{margin-left:6px;padding:1px 6px;border-radius:5px;background:rgba(255,255,255,.12);font:700 11px var(--mono)}
 .sol{display:none;position:absolute;inset:0;background:rgba(7,7,13,.97);padding:34px 52px 40px;z-index:8;flex-direction:column;gap:14px}
 .sol.open{display:flex}
 .slide>.sol{animation-delay:0s}
@@ -402,6 +403,7 @@ body.light-mode .m-pill-counter{background:rgba(255,255,255,.72);color:#524d70}
 .small .hero-slide{padding:68px 34px 18px!important}
 .small .hero-slide h1{font-size:44px!important;line-height:1.1!important;margin:6px 0 10px!important}
 .small .hero-slide .tag{font-size:15px!important;line-height:1.4!important}
+.small .sol{padding:74px 34px 24px!important;z-index:1000}
 
 /* Desktop Home Link */
 .desktop-home-link{
@@ -1465,7 +1467,7 @@ SL.forEach((s,i)=>{
     else if(s.widget)stage=widgetHTML(s.widget);
     else if(s.task){
       const T=TASKS[s.task];
-      stage=`<div class="task"><div class="tleft"><div class="chip">What to build</div><ul class="req">${T.req.map(r=>`<li>${r}</li>`).join('')}</ul></div><div class="tright"><div class="viz"><canvas data-viz="terminal" data-task="${s.task}"></canvas></div></div></div>`;
+      stage=`<div class="task"><div class="tleft"><div class="chip">What to build</div><ul class="req">${T.req.map(r=>`<li>${r}</li>`).join('')}</ul><div class="sol-actions"><button class="solbtn" data-sol>Show solution<kbd>S</kbd></button></div></div><div class="tright"><div class="viz"><canvas data-viz="terminal" data-task="${s.task}"></canvas></div></div></div>`;
     }else if(s.walk){
       const W=WALK[s.walk];
       stage=`<div class="walk${W.dense?' dense':''}">${edWrap(lineCode(W.code,walkStyle(W.code)),W.file)}<div class="steps">${W.steps.map((p,k)=>`<div class="stp" data-k="${k}"><i>${k+1}</i><div><b>${p.h}</b><span>${p.t}</span></div></div>`).join('')}</div></div>`;
@@ -1478,8 +1480,7 @@ SL.forEach((s,i)=>{
     h=`<div class="lbl">${s.lbl}</div><h2>${s.h2}</h2>${s.sub?`<p class="sub">${s.sub}</p>`:''}<div class="stage">${stage}</div>${footer(i,s.next)}`;
     if(s.task){
       const T=TASKS[s.task];
-      h+=`<button class="solbtn" data-sol>Show solution<kbd>S</kbd></button>
-      <div class="sol"><div class="sol-h"><div class="lbl">Reference solution · Task ${T.n}</div><button class="solbtn" style="position:static" data-sol>Hide<kbd>S</kbd></button></div>
+      h+=`<div class="sol"><div class="sol-h"><div class="lbl">Reference solution · Task ${T.n}</div><button class="solbtn" style="position:static" data-sol>Hide<kbd>S</kbd></button></div>
       <div class="sol-body">${edWrap(lineCode(s.task,'font-size:15px;line-height:1.7'),'task'+T.n+'.py')}<div class="notes"><div class="note-h">What to notice</div>${T.notes.map(n=>`<div class="note">${n}</div>`).join('')}</div></div></div>`;
     }
   }
