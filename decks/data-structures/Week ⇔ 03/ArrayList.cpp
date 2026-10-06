@@ -5,83 +5,32 @@
 // =============================================================================
 
 #include <iostream>
-#include <limits>
 
 using namespace std;
 
 class ArrayList {
 private:
-    int* data;       // Pointer to dynamic heap memory
-    int size;        // Current number of elements stored
-    int capacity;    // Total allocated slots available
+    int* data;       // Dynamic heap storage
+    int size;        // Number of elements currently stored
+    int capacity;    // Total allocated slots
 
 public:
-    // ---------------------------------------------------------
-    // 1. Constructor & Destructor (Memory Lifecycle Management)
-    // ---------------------------------------------------------
+    // Constructor
     ArrayList(int cap = 4) {
-        if (cap <= 0) cap = 4;
         capacity = cap;
         size = 0;
         data = new int[capacity];
     }
 
+    // Destructor (frees heap memory)
     ~ArrayList() {
         delete[] data;
-        data = nullptr;
     }
 
-    // ---------------------------------------------------------
-    // 2. Rule of Three: Deep Copy Constructor & Copy Assignment
-    // ---------------------------------------------------------
-    ArrayList(const ArrayList& other) {
-        capacity = other.capacity;
-        size = other.size;
-        data = new int[capacity];
-        for (int i = 0; i < size; i++) {
-            data[i] = other.data[i];
-        }
-    }
-
-    ArrayList& operator=(const ArrayList& other) {
-        if (this == &other) return *this;
-        delete[] data;
-        capacity = other.capacity;
-        size = other.size;
-        data = new int[capacity];
-        for (int i = 0; i < size; i++) {
-            data[i] = other.data[i];
-        }
-        return *this;
-    }
-
-    // ---------------------------------------------------------
-    // 3. Helper: Safe Numeric Input
-    // ---------------------------------------------------------
-    static int readInt() {
-        int val;
-        while (true) {
-            if (cin >> val) return val;
-            cin.clear();
-            cin.ignore(numeric_limits<streamsize>::max(), '\n');
-            cout << "Invalid input. Please enter a valid integer: ";
-        }
-    }
-
-    // ---------------------------------------------------------
-    // 4. Core Array Operations
-    // ---------------------------------------------------------
-    void fillFromUser(int n) {
-        if (n <= 0 || n > capacity - size) return;
-        for (int i = 0; i < n; i++) {
-            cout << "Enter element " << (size + 1) << ": ";
-            data[size++] = readInt();
-        }
-    }
-
+    // Display all elements
     void display() const {
         if (size == 0) {
-            cout << "[Empty ArrayList]" << endl;
+            cout << "[Empty list]" << endl;
             return;
         }
         for (int i = 0; i < size; i++) {
@@ -89,8 +38,9 @@ public:
         }
     }
 
+    // Insert value at a specific position (shifts right)
     bool insertAt(int pos, int value) {
-        if (pos < 0 || pos > size || size == capacity) {
+        if (size == capacity || pos < 0 || pos > size) {
             return false;
         }
         for (int i = size; i > pos; i--) {
@@ -101,6 +51,7 @@ public:
         return true;
     }
 
+    // Delete value at a specific position (shifts left)
     bool deleteAt(int pos) {
         if (pos < 0 || pos >= size) {
             return false;
@@ -112,24 +63,26 @@ public:
         return true;
     }
 
+    // Search for a value and return its index (-1 if not found)
     int searchByValue(int target) const {
         for (int i = 0; i < size; i++) {
-            if (data[i] == target) return i; // Found at index i
+            if (data[i] == target) {
+                return i;
+            }
         }
-        return -1; // Not found
+        return -1;
     }
 
+    // Update value at a specific position
     bool updateAt(int pos, int value) {
         if (pos < 0 || pos >= size) {
             return false;
         }
-        data[pos] = value; // O(1) direct write
+        data[pos] = value;
         return true;
     }
 
-    // ---------------------------------------------------------
-    // 5. Dynamic Growth (Doubling Strategy)
-    // ---------------------------------------------------------
+    // Double the array capacity when full
     void grow() {
         int newCap = capacity * 2;
         int* bigger = new int[newCap];
@@ -141,6 +94,7 @@ public:
         capacity = newCap;
     }
 
+    // Add value to the end of the array
     void push(int value) {
         if (size == capacity) {
             grow();
@@ -148,10 +102,11 @@ public:
         data[size++] = value;
     }
 
-    // ---------------------------------------------------------
-    // 6. Student Hands-on Tasks
-    // ---------------------------------------------------------
-    // Task 1: findMax() - returns the index of the maximum value
+    // =========================================================
+    // STUDENT TASKS
+    // =========================================================
+
+    // Task 1: Find the index of the maximum value
     int findMax() const {
         if (size == 0) return -1;
         int best = 0;
@@ -163,7 +118,7 @@ public:
         return best;
     }
 
-    // Task 2: reverse() - in-place two-pointer swap: O(n) time, O(1) space
+    // Task 2: Reverse array in-place using two pointers
     void reverse() {
         for (int i = 0, j = size - 1; i < j; i++, j--) {
             int tmp = data[i];
@@ -177,37 +132,53 @@ public:
     int getCapacity() const { return capacity; }
 };
 
-// ---------------------------------------------------------
-// 7. Demonstration Driver Program
-// ---------------------------------------------------------
 int main() {
-    cout << "===========================================" << endl;
-    cout << "  Constella Data Structures — Session 03   " << endl;
-    cout << "  ArrayList Class with OOP in C++          " << endl;
-    cout << "===========================================" << endl;
+    cout << "=== ArrayList Class Demonstration ===" << endl;
 
-    cout << "How many elements would you like to enter initially? ";
-    int n = ArrayList::readInt();
+    // 1. Create list and push elements
+    ArrayList list(4);
+    list.push(10);
+    list.push(20);
+    list.push(30);
+    list.push(40);
 
-    ArrayList list(n + 4); // Extra capacity for insertions
-    list.fillFromUser(n);
-
-    cout << "\n--- Current Elements ---" << endl;
+    cout << "\nInitial List (size = " << list.getSize() << ", capacity = " << list.getCapacity() << "):" << endl;
     list.display();
 
-    cout << "\n[Demo] Inserting 99 at index 1..." << endl;
-    list.insertAt(1, 99);
+    // 2. Insert element at index 2
+    cout << "\nInserting 99 at index 2:" << endl;
+    list.insertAt(2, 99);
     list.display();
 
-    cout << "\n[Demo] Maximum element is at index: " << list.findMax() << endl;
+    // 3. Delete element at index 1
+    cout << "\nDeleting element at index 1:" << endl;
+    list.deleteAt(1);
+    list.display();
 
-    cout << "\n[Demo] Reversing ArrayList in place..." << endl;
+    // 4. Update element at index 0
+    cout << "\nUpdating index 0 to 50:" << endl;
+    list.updateAt(0, 50);
+    list.display();
+
+    // 5. Search for a value
+    int target = 99;
+    cout << "\nSearching for " << target << ": found at index " << list.searchByValue(target) << endl;
+
+    // 6. Task 1: findMax()
+    int maxIdx = list.findMax();
+    cout << "\n[Task 1] Max element index: " << maxIdx << endl;
+
+    // 7. Task 2: reverse()
+    cout << "\n[Task 2] Reversing the array in-place:" << endl;
     list.reverse();
     list.display();
 
-    cout << "\n[Demo] Deleting element at index 0..." << endl;
-    list.deleteAt(0);
+    // 8. Dynamic growth demonstration
+    cout << "\nPushing elements to trigger dynamic grow():" << endl;
+    list.push(100);
+    list.push(200);
+    cout << "New size = " << list.getSize() << ", new capacity = " << list.getCapacity() << endl;
     list.display();
 
-    return 0; // ~ArrayList() destructor frees memory here
+    return 0;
 }
