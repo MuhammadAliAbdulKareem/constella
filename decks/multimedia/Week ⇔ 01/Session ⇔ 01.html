@@ -796,7 +796,7 @@ function table(c,x,y,w,cols,rows,f,o={}){
 
 /** terminal that types out the expected console I/O */
 function terminal(c,x,y,w,h,f,lines,o={}){
-  const{start=26,speed=.5,pause=18,title='Expected output'}=o;
+  const{start=20,speed=.22,pause=42,title='Expected output'}=o;
   const p=ease(at(f,0,30));
   c.save();c.globalAlpha=p;
   rr(c,x,y,w,h,14);c.fillStyle=isLight?'#13111f':'#0b0b14';c.fill();
@@ -1050,7 +1050,7 @@ VIZ.pyassign={cycle:720,draw(c,W,H,f,frame){
 }};
 
 /* terminals for the task slides */
-VIZ.terminal={cycle:560,draw(c,W,H,f,frame,o){
+VIZ.terminal={cycle:100000,draw(c,W,H,f,frame,o){
   const h=Math.min(H-8,Math.max(200,o.data.lines.length*34+90));
   terminal(c,4,(H-h)/2,W-8,h,f,o.data.lines,{title:o.data.title||'Expected output'});
 }};
