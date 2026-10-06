@@ -13,154 +13,6 @@
     if (t === 'light') document.documentElement.classList.add('light-mode');
   } catch(e){}
 
-/* ═══════════════ Live Drawing Pen (Annotation Engine) ═══════════════ */
-const penCanvas = document.getElementById('penCanvas');
-const penCtx = penCanvas ? penCanvas.getContext('2d') : null;
-const penToolbar = document.getElementById('penToolbar');
-const penToggleBtn = document.getElementById('penToggle');
-const mPenToggleBtn = document.getElementById('mPenToggle');
-let penActive = false;
-let penTool = 'pen'; // 'pen', 'highlighter', 'eraser'
-let penColor = '#c084fc';
-let strokes = [];
-let currentStroke = null;
-
-function togglePen(force){
-  penActive = typeof force === 'boolean' ? force : !penActive;
-  document.body.classList.toggle('pen-active', penActive);
-  if(penToolbar) penToolbar.hidden = !penActive;
-  if(penToggleBtn) penToggleBtn.classList.toggle('active', penActive);
-  if(mPenToggleBtn) mPenToggleBtn.classList.toggle('active', penActive);
-}
-
-function clearPen(){
-  strokes = [];
-  if(penCtx && penCanvas) penCtx.clearRect(0, 0, penCanvas.width, penCanvas.height);
-}
-
-function undoPen(){
-  if(strokes.length > 0){
-    strokes.pop();
-    redrawPen();
-  }
-}
-
-function redrawPen(){
-  if(!penCtx || !penCanvas) return;
-  penCtx.clearRect(0, 0, penCanvas.width, penCanvas.height);
-  for(const s of strokes){
-    drawPenStroke(s);
-  }
-}
-
-function drawPenStroke(s){
-  if(s.points.length < 2) return;
-  penCtx.save();
-  if(s.tool === 'eraser'){
-    penCtx.globalCompositeOperation = 'destination-out';
-    penCtx.lineWidth = 26;
-    penCtx.lineCap = 'round';
-    penCtx.lineJoin = 'round';
-  } else if(s.tool === 'highlighter'){
-    penCtx.globalCompositeOperation = 'source-over';
-    penCtx.strokeStyle = s.color;
-    penCtx.globalAlpha = 0.35;
-    penCtx.lineWidth = 18;
-    penCtx.lineCap = 'round';
-    penCtx.lineJoin = 'round';
-  } else {
-    penCtx.globalCompositeOperation = 'source-over';
-    penCtx.strokeStyle = s.color;
-    penCtx.lineWidth = 3.5;
-    penCtx.lineCap = 'round';
-    penCtx.lineJoin = 'round';
-    penCtx.shadowColor = s.color;
-    penCtx.shadowBlur = 8;
-  }
-
-  penCtx.beginPath();
-  penCtx.moveTo(s.points[0].x, s.points[0].y);
-  for(let i = 1; i < s.points.length; i++){
-    const p1 = s.points[i - 1];
-    const p2 = s.points[i];
-    penCtx.quadraticCurveTo(p1.x, p1.y, (p1.x + p2.x) / 2, (p1.y + p2.y) / 2);
-  }
-  const last = s.points[s.points.length - 1];
-  penCtx.lineTo(last.x, last.y);
-  penCtx.stroke();
-  penCtx.restore();
-}
-
-function getPenPos(e){
-  const rect = penCanvas.getBoundingClientRect();
-  const scaleX = penCanvas.width / rect.width;
-  const scaleY = penCanvas.height / rect.height;
-  const cx = e.touches ? e.touches[0].clientX : e.clientX;
-  const cy = e.touches ? e.touches[0].clientY : e.clientY;
-  return {
-    x: (cx - rect.left) * scaleX,
-    y: (cy - rect.top) * scaleY
-  };
-}
-
-if(penCanvas){
-  penCanvas.addEventListener('pointerdown', e => {
-    if(!penActive) return;
-    e.preventDefault();
-    const p = getPenPos(e);
-    currentStroke = { tool: penTool, color: penColor, points: [p] };
-    strokes.push(currentStroke);
-  });
-
-  window.addEventListener('pointermove', e => {
-    if(!penActive || !currentStroke) return;
-    e.preventDefault();
-    const p = getPenPos(e);
-    currentStroke.points.push(p);
-    redrawPen();
-  });
-
-  const endStroke = () => {
-    if(currentStroke){
-      currentStroke = null;
-      redrawPen();
-    }
-  };
-  window.addEventListener('pointerup', endStroke);
-  window.addEventListener('pointercancel', endStroke);
-}
-
-if(penToolbar){
-  penToolbar.querySelectorAll('[data-tool]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      penToolbar.querySelectorAll('[data-tool]').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      penTool = btn.dataset.tool;
-    });
-  });
-
-  penToolbar.querySelectorAll('[data-color]').forEach(dot => {
-    dot.addEventListener('click', () => {
-      penToolbar.querySelectorAll('[data-color]').forEach(d => d.classList.remove('active'));
-      dot.classList.add('active');
-      penColor = dot.dataset.color;
-      if(penTool === 'eraser'){
-        const penBtn = penToolbar.querySelector('[data-tool="pen"]');
-        if(penBtn) penBtn.click();
-      }
-    });
-  });
-
-  const uBtn = document.getElementById('penUndo');
-  if(uBtn) uBtn.addEventListener('click', undoPen);
-  const cBtn = document.getElementById('penClear');
-  if(cBtn) cBtn.addEventListener('click', clearPen);
-  const xBtn = document.getElementById('penClose');
-  if(xBtn) xBtn.addEventListener('click', () => togglePen(false));
-}
-
-if(penToggleBtn) penToggleBtn.addEventListener('click', () => togglePen());
-if(mPenToggleBtn) mPenToggleBtn.addEventListener('click', () => togglePen());
 
 </script>
 <style>
@@ -1989,6 +1841,175 @@ function tick(){
 go(0);tick();
 const bt=document.getElementById('boot');if(bt)bt.remove();
 window.__go=go;
+
+/* ═══════════════ Live Drawing Pen (Annotation Engine) ═══════════════ */
+let penCanvas = null;
+let penCtx = null;
+let penToolbar = null;
+let penToggleBtn = null;
+let mPenToggleBtn = null;
+let penActive = false;
+let penTool = 'pen'; // 'pen', 'highlighter', 'eraser'
+let penColor = '#c084fc';
+let strokes = [];
+let currentStroke = null;
+
+function togglePen(force){
+  penActive = typeof force === 'boolean' ? force : !penActive;
+  document.body.classList.toggle('pen-active', penActive);
+  if(penToolbar) penToolbar.hidden = !penActive;
+  if(penToggleBtn) penToggleBtn.classList.toggle('active', penActive);
+  if(mPenToggleBtn) mPenToggleBtn.classList.toggle('active', penActive);
+}
+
+function clearPen(){
+  strokes = [];
+  if(penCtx && penCanvas) penCtx.clearRect(0, 0, penCanvas.width, penCanvas.height);
+}
+
+function undoPen(){
+  if(strokes.length > 0){
+    strokes.pop();
+    redrawPen();
+  }
+}
+
+function redrawPen(){
+  if(!penCtx || !penCanvas) return;
+  penCtx.clearRect(0, 0, penCanvas.width, penCanvas.height);
+  for(const s of strokes){
+    drawPenStroke(s);
+  }
+}
+
+function drawPenStroke(s){
+  if(s.points.length < 2) return;
+  penCtx.save();
+  if(s.tool === 'eraser'){
+    penCtx.globalCompositeOperation = 'destination-out';
+    penCtx.lineWidth = 28;
+    penCtx.lineCap = 'round';
+    penCtx.lineJoin = 'round';
+  } else if(s.tool === 'highlighter'){
+    penCtx.globalCompositeOperation = 'source-over';
+    penCtx.strokeStyle = s.color;
+    penCtx.globalAlpha = 0.35;
+    penCtx.lineWidth = 18;
+    penCtx.lineCap = 'round';
+    penCtx.lineJoin = 'round';
+  } else {
+    penCtx.globalCompositeOperation = 'source-over';
+    penCtx.strokeStyle = s.color;
+    penCtx.lineWidth = 3.5;
+    penCtx.lineCap = 'round';
+    penCtx.lineJoin = 'round';
+    penCtx.shadowColor = s.color;
+    penCtx.shadowBlur = 8;
+  }
+
+  penCtx.beginPath();
+  penCtx.moveTo(s.points[0].x, s.points[0].y);
+  for(let i = 1; i < s.points.length; i++){
+    const p1 = s.points[i - 1];
+    const p2 = s.points[i];
+    penCtx.quadraticCurveTo(p1.x, p1.y, (p1.x + p2.x) / 2, (p1.y + p2.y) / 2);
+  }
+  const last = s.points[s.points.length - 1];
+  penCtx.lineTo(last.x, last.y);
+  penCtx.stroke();
+  penCtx.restore();
+}
+
+function getPenPos(e){
+  const rect = penCanvas.getBoundingClientRect();
+  const scaleX = penCanvas.width / rect.width;
+  const scaleY = penCanvas.height / rect.height;
+  let cx = e.clientX, cy = e.clientY;
+  if(cx === undefined && e.touches && e.touches.length > 0){
+    cx = e.touches[0].clientX;
+    cy = e.touches[0].clientY;
+  }
+  return {
+    x: (cx - rect.left) * scaleX,
+    y: (cy - rect.top) * scaleY
+  };
+}
+
+function initPen(){
+  penCanvas = document.getElementById('penCanvas');
+  penCtx = penCanvas ? penCanvas.getContext('2d') : null;
+  penToolbar = document.getElementById('penToolbar');
+  penToggleBtn = document.getElementById('penToggle');
+  mPenToggleBtn = document.getElementById('mPenToggle');
+
+  if(penCanvas){
+    penCanvas.addEventListener('pointerdown', e => {
+      if(!penActive) return;
+      e.preventDefault();
+      try{ penCanvas.setPointerCapture(e.pointerId); }catch(_){}
+      const p = getPenPos(e);
+      currentStroke = { tool: penTool, color: penColor, points: [p] };
+      strokes.push(currentStroke);
+    });
+
+    penCanvas.addEventListener('pointermove', e => {
+      if(!penActive || !currentStroke) return;
+      e.preventDefault();
+      const p = getPenPos(e);
+      currentStroke.points.push(p);
+      redrawPen();
+    });
+
+    const endStroke = e => {
+      if(currentStroke){
+        currentStroke = null;
+        redrawPen();
+      }
+    };
+    penCanvas.addEventListener('pointerup', endStroke);
+    penCanvas.addEventListener('pointercancel', endStroke);
+    window.addEventListener('pointerup', endStroke);
+  }
+
+  if(penToolbar){
+    penToolbar.querySelectorAll('[data-tool]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        penToolbar.querySelectorAll('[data-tool]').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        penTool = btn.dataset.tool;
+      });
+    });
+
+    penToolbar.querySelectorAll('[data-color]').forEach(dot => {
+      dot.addEventListener('click', () => {
+        penToolbar.querySelectorAll('[data-color]').forEach(d => d.classList.remove('active'));
+        dot.classList.add('active');
+        penColor = dot.dataset.color;
+        if(penTool === 'eraser'){
+          const penBtn = penToolbar.querySelector('[data-tool="pen"]');
+          if(penBtn) penBtn.click();
+        }
+      });
+    });
+
+    const uBtn = document.getElementById('penUndo');
+    if(uBtn) uBtn.addEventListener('click', undoPen);
+    const cBtn = document.getElementById('penClear');
+    if(cBtn) cBtn.addEventListener('click', clearPen);
+    const xBtn = document.getElementById('penClose');
+    if(xBtn) xBtn.addEventListener('click', () => togglePen(false));
+  }
+
+  if(penToggleBtn) penToggleBtn.addEventListener('click', () => togglePen());
+  if(mPenToggleBtn) mPenToggleBtn.addEventListener('click', () => togglePen());
+}
+
+if(document.readyState === 'loading'){
+  document.addEventListener('DOMContentLoaded', initPen);
+} else {
+  initPen();
+}
+
 </script>
 </body>
 </html>
