@@ -103,7 +103,12 @@ body.small{padding:0!important}
 /* brand bar */
 .brand-bar{height:44px;display:flex;justify-content:space-between;align-items:center}
 .brand-left{display:flex;align-items:center;gap:11px}
-.logo{width:30px;height:30px;border-radius:9px;background:var(--syntax-grad);display:grid;place-items:center;font:800 13px var(--mono);color:#fff;letter-spacing:-1px}
+.brand-icon{
+  width:32px; height:32px; border-radius:9px;
+  background:var(--syntax-grad); display:flex; align-items:center; justify-content:center;
+  box-shadow:0 4px 14px rgba(168,85,247,.4); flex-shrink:0;
+}
+.brand-icon svg{ width:20px; height:20px; fill:none; stroke:#ffffff; stroke-linecap:round; stroke-linejoin:round; }
 .brand-name{font-size:15px;font-weight:900;background:var(--syntax-grad);-webkit-background-clip:text;background-clip:text;color:transparent;line-height:1.2}
 .brand-sub{font-size:11px;color:var(--tm);font-weight:600}
 .brand-right{font-size:11.5px;color:var(--ts);font-weight:700}
@@ -473,7 +478,15 @@ body.small.light-mode{background:#ebe9f5}
         </svg>
         <span>Sessions</span>
       </a>
-      <div class="logo">{ }</div>
+      <!-- Python Language Logo -->
+      <div class="brand-icon" title="Python Fundamentals">
+        <svg viewBox="0 0 24 24">
+          <path d="M12 2.5c-3.6 0-4.6 1.6-4.6 3.4V8h5v.8H4.2C2.5 8.8 1 10.2 1 12.3s1.3 3.5 3.1 3.5h1.9v-2c0-2.1 1.7-3.8 3.9-3.8h5.4V8c0-3.1-2-5.5-3.5-5.5z" stroke-width="1.6"/>
+          <path d="M12 21.5c3.6 0 4.6-1.6 4.6-3.4V16h-5v-.8h8.2c1.7 0 3.2-1.4 3.2-3.5s-1.3-3.5-3.1-3.5h-1.9v2c0 2.1-1.7 3.8-3.9 3.8H8.7V16c0 3.1 2 5.5 3.5 5.5z" stroke-width="1.6"/>
+          <circle cx="9.3" cy="5.4" r="1.2" fill="#ffffff" stroke="none"/>
+          <circle cx="14.7" cy="18.6" r="1.2" fill="#ffffff" stroke="none"/>
+        </svg>
+      </div>
       <div>
         <div class="brand-name">Multimedia</div>
         <div class="brand-sub">Session ⇔ 01 · Introduction to Python · Sinai University</div>

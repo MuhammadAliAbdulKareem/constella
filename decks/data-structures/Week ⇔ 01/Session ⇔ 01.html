@@ -103,7 +103,12 @@ body.small{padding:0!important}
 /* brand bar */
 .brand-bar{height:44px;display:flex;justify-content:space-between;align-items:center}
 .brand-left{display:flex;align-items:center;gap:11px}
-.logo{width:30px;height:30px;border-radius:9px;background:var(--syntax-grad);display:grid;place-items:center;font:800 13px var(--mono);color:#fff;letter-spacing:-1px}
+.brand-icon{
+  width:32px; height:32px; border-radius:9px;
+  background:var(--syntax-grad); display:flex; align-items:center; justify-content:center;
+  box-shadow:0 4px 14px rgba(168,85,247,.4); flex-shrink:0;
+}
+.brand-icon svg{ width:20px; height:20px; fill:none; stroke:#ffffff; stroke-linecap:round; stroke-linejoin:round; }
 .brand-name{font-size:15px;font-weight:900;background:var(--syntax-grad);-webkit-background-clip:text;background-clip:text;color:transparent;line-height:1.2}
 .brand-sub{font-size:11px;color:var(--tm);font-weight:600}
 .brand-right{font-size:11.5px;color:var(--ts);font-weight:700}
@@ -402,7 +407,14 @@ body.small.light-mode{background:#ebe9f5}
         </svg>
         <span>Sessions</span>
       </a>
-      <div class="logo">{ }</div>
+      <!-- C++ Structured Programming & Functions Logo -->
+      <div class="brand-icon" title="C++ Functions">
+        <svg viewBox="0 0 24 24">
+          <path d="M10 7A5.5 5.5 0 1 0 10 17" stroke-width="2.3"/>
+          <path d="M13.2 12h3M14.7 10.5v3" stroke-width="2.1"/>
+          <path d="M18.2 12h3M19.7 10.5v3" stroke-width="2.1"/>
+        </svg>
+      </div>
       <div>
         <div class="brand-name">Data Structures</div>
         <div class="brand-sub">C++ Revision · From Structured Programming to Functions</div>
