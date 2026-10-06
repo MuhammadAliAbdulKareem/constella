@@ -27,10 +27,10 @@ window.SITE = {
   courses: [
     {
       id: "multimedia",
-      title: "Python Fundamentals",
-      titleAr: "أساسيات البرمجة بلغة بايثون",
-      subtitle: "Multimedia course",
-      description: "Programming basics for multimedia students, from your first print() to writing your own functions.",
+      title: "Multimedia Programming",
+      titleAr: "برمجة الوسائط المتعددة",
+      subtitle: "Faculty of IT and CS",
+      description: "Interactive multimedia programming with Python, from core foundations to digital sound synthesis, sampling, and visual computing.",
       hue: 172,
       totalWeeks: 10,
       weeks: [
