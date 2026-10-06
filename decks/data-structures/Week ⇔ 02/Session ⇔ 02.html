@@ -394,8 +394,8 @@ body.small.light-mode{background:#ebe9f5}
 
 /* ═══════════════ Live Presentation Pen & Annotations ═══════════════ */
 #penCanvas{
-  position:absolute;inset:0;width:1100px;height:707px;
-  z-index:90;pointer-events:none;touch-action:none;
+  position:fixed;inset:0;width:100vw;height:100vh;
+  z-index:950;pointer-events:none;touch-action:none;
 }
 body.pen-active #penCanvas{
   pointer-events:auto;cursor:crosshair;
@@ -531,8 +531,9 @@ body.light-mode .pen-action-btn:hover{background:rgba(0,0,0,.1);color:#0f172a}
     <span><kbd>→</kbd> next &nbsp;·&nbsp; <kbd>←</kbd> back &nbsp;·&nbsp; <kbd>S</kbd> solution &nbsp;·&nbsp; <kbd>L</kbd> laser &nbsp;·&nbsp; <kbd>F</kbd> fullscreen</span>
     <button id="next" tabindex="-1">Next ›</button>
   </div>
-  <canvas id="penCanvas" width="1100" height="707"></canvas>
 </div></div>
+
+<canvas id="penCanvas"></canvas>
 
 <!-- Live Presentation Pen Studio Toolbar -->
 <div id="penToolbar" class="pen-toolbar" hidden>
@@ -1625,17 +1626,54 @@ let penColor = '#c084fc';
 let strokes = [];
 let currentStroke = null;
 
+function resizePenCanvas(){
+  if(!penCanvas) return;
+  if(!penCtx) penCtx = penCanvas.getContext('2d');
+  if(!penCtx) return;
+  const dpr = window.devicePixelRatio || 1;
+  const w = window.innerWidth;
+  const h = window.innerHeight;
+  const oldW = penCanvas.dataset.cssW ? parseFloat(penCanvas.dataset.cssW) : w;
+  const oldH = penCanvas.dataset.cssH ? parseFloat(penCanvas.dataset.cssH) : h;
+  if(oldW > 0 && oldH > 0 && (oldW !== w || oldH !== h) && strokes.length > 0){
+    const rx = w / oldW;
+    const ry = h / oldH;
+    for(const s of strokes){
+      if(s.points){
+        for(const p of s.points){
+          p.x *= rx;
+          p.y *= ry;
+        }
+      }
+    }
+  }
+  penCanvas.dataset.cssW = w;
+  penCanvas.dataset.cssH = h;
+  penCanvas.width = Math.round(w * dpr);
+  penCanvas.height = Math.round(h * dpr);
+  penCanvas.style.width = w + 'px';
+  penCanvas.style.height = h + 'px';
+  penCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  redrawPen();
+}
+
 function togglePen(force){
   penActive = typeof force === 'boolean' ? force : !penActive;
   document.body.classList.toggle('pen-active', penActive);
   if(penToolbar) penToolbar.hidden = !penActive;
   if(penToggleBtn) penToggleBtn.classList.toggle('active', penActive);
   if(mPenToggleBtn) mPenToggleBtn.classList.toggle('active', penActive);
+  if(penActive) resizePenCanvas();
 }
 
 function clearPen(){
   strokes = [];
-  if(penCtx && penCanvas) penCtx.clearRect(0, 0, penCanvas.width, penCanvas.height);
+  if(penCtx && penCanvas){
+    penCtx.save();
+    penCtx.setTransform(1, 0, 0, 1, 0, 0);
+    penCtx.clearRect(0, 0, penCanvas.width, penCanvas.height);
+    penCtx.restore();
+  }
 }
 
 function undoPen(){
@@ -1647,7 +1685,10 @@ function undoPen(){
 
 function redrawPen(){
   if(!penCtx || !penCanvas) return;
+  penCtx.save();
+  penCtx.setTransform(1, 0, 0, 1, 0, 0);
   penCtx.clearRect(0, 0, penCanvas.width, penCanvas.height);
+  penCtx.restore();
   for(const s of strokes){
     drawPenStroke(s);
   }
@@ -1677,7 +1718,7 @@ function drawPenStroke(s){
       penCtx.shadowColor = s.color;
       penCtx.shadowBlur = 8;
       penCtx.beginPath();
-      penCtx.arc(p.x, p.y, 2, 0, Math.PI * 2);
+      penCtx.arc(p.x, p.y, 2.2, 0, Math.PI * 2);
       penCtx.fill();
     }
     penCtx.restore();
@@ -1720,18 +1761,12 @@ function drawPenStroke(s){
 }
 
 function getPenPos(e){
-  const rect = penCanvas.getBoundingClientRect();
-  const scaleX = penCanvas.width / rect.width;
-  const scaleY = penCanvas.height / rect.height;
   let cx = e.clientX, cy = e.clientY;
   if((cx === undefined || cx === null) && e.touches && e.touches.length > 0){
     cx = e.touches[0].clientX;
     cy = e.touches[0].clientY;
   }
-  return {
-    x: (cx - rect.left) * scaleX,
-    y: (cy - rect.top) * scaleY
-  };
+  return { x: cx, y: cy };
 }
 
 function initPen(){
@@ -1740,6 +1775,7 @@ function initPen(){
   penToolbar = document.getElementById('penToolbar');
   penToggleBtn = document.getElementById('penToggle');
   mPenToggleBtn = document.getElementById('mPenToggle');
+  resizePenCanvas();
 
   if(penCanvas){
     penCanvas.addEventListener('pointerdown', e => {
@@ -1806,6 +1842,9 @@ function initPen(){
   if(penToggleBtn) penToggleBtn.addEventListener('click', () => togglePen());
   if(mPenToggleBtn) mPenToggleBtn.addEventListener('click', () => togglePen());
 }
+
+window.addEventListener('resize', resizePenCanvas);
+window.addEventListener('orientationchange', () => setTimeout(resizePenCanvas, 100));
 
 if(document.readyState === 'loading'){
   document.addEventListener('DOMContentLoaded', initPen);
