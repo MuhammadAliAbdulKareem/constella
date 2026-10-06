@@ -2,7 +2,7 @@
    Constella Service Worker — Offline Course Portal & PWA Engine
    ===================================================================== */
 
-const CACHE_NAME = 'constella-v2.0.0';
+const CACHE_NAME = 'constella-v2.1.0';
 
 // Core application shell assets to pre-cache on install
 const CORE_ASSETS = [

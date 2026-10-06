@@ -13,6 +13,156 @@
     var t = localStorage.getItem('cs:theme') || localStorage.getItem('deck_theme');
     if (t === 'light') document.documentElement.classList.add('light-mode');
   } catch(e){}
+
+/* ═══════════════ Live Drawing Pen (Annotation Engine) ═══════════════ */
+const penCanvas = document.getElementById('penCanvas');
+const penCtx = penCanvas ? penCanvas.getContext('2d') : null;
+const penToolbar = document.getElementById('penToolbar');
+const penToggleBtn = document.getElementById('penToggle');
+const mPenToggleBtn = document.getElementById('mPenToggle');
+let penActive = false;
+let penTool = 'pen'; // 'pen', 'highlighter', 'eraser'
+let penColor = '#c084fc';
+let strokes = [];
+let currentStroke = null;
+
+function togglePen(force){
+  penActive = typeof force === 'boolean' ? force : !penActive;
+  document.body.classList.toggle('pen-active', penActive);
+  if(penToolbar) penToolbar.hidden = !penActive;
+  if(penToggleBtn) penToggleBtn.classList.toggle('active', penActive);
+  if(mPenToggleBtn) mPenToggleBtn.classList.toggle('active', penActive);
+}
+
+function clearPen(){
+  strokes = [];
+  if(penCtx && penCanvas) penCtx.clearRect(0, 0, penCanvas.width, penCanvas.height);
+}
+
+function undoPen(){
+  if(strokes.length > 0){
+    strokes.pop();
+    redrawPen();
+  }
+}
+
+function redrawPen(){
+  if(!penCtx || !penCanvas) return;
+  penCtx.clearRect(0, 0, penCanvas.width, penCanvas.height);
+  for(const s of strokes){
+    drawPenStroke(s);
+  }
+}
+
+function drawPenStroke(s){
+  if(s.points.length < 2) return;
+  penCtx.save();
+  if(s.tool === 'eraser'){
+    penCtx.globalCompositeOperation = 'destination-out';
+    penCtx.lineWidth = 26;
+    penCtx.lineCap = 'round';
+    penCtx.lineJoin = 'round';
+  } else if(s.tool === 'highlighter'){
+    penCtx.globalCompositeOperation = 'source-over';
+    penCtx.strokeStyle = s.color;
+    penCtx.globalAlpha = 0.35;
+    penCtx.lineWidth = 18;
+    penCtx.lineCap = 'round';
+    penCtx.lineJoin = 'round';
+  } else {
+    penCtx.globalCompositeOperation = 'source-over';
+    penCtx.strokeStyle = s.color;
+    penCtx.lineWidth = 3.5;
+    penCtx.lineCap = 'round';
+    penCtx.lineJoin = 'round';
+    penCtx.shadowColor = s.color;
+    penCtx.shadowBlur = 8;
+  }
+
+  penCtx.beginPath();
+  penCtx.moveTo(s.points[0].x, s.points[0].y);
+  for(let i = 1; i < s.points.length; i++){
+    const p1 = s.points[i - 1];
+    const p2 = s.points[i];
+    penCtx.quadraticCurveTo(p1.x, p1.y, (p1.x + p2.x) / 2, (p1.y + p2.y) / 2);
+  }
+  const last = s.points[s.points.length - 1];
+  penCtx.lineTo(last.x, last.y);
+  penCtx.stroke();
+  penCtx.restore();
+}
+
+function getPenPos(e){
+  const rect = penCanvas.getBoundingClientRect();
+  const scaleX = penCanvas.width / rect.width;
+  const scaleY = penCanvas.height / rect.height;
+  const cx = e.touches ? e.touches[0].clientX : e.clientX;
+  const cy = e.touches ? e.touches[0].clientY : e.clientY;
+  return {
+    x: (cx - rect.left) * scaleX,
+    y: (cy - rect.top) * scaleY
+  };
+}
+
+if(penCanvas){
+  penCanvas.addEventListener('pointerdown', e => {
+    if(!penActive) return;
+    e.preventDefault();
+    const p = getPenPos(e);
+    currentStroke = { tool: penTool, color: penColor, points: [p] };
+    strokes.push(currentStroke);
+  });
+
+  window.addEventListener('pointermove', e => {
+    if(!penActive || !currentStroke) return;
+    e.preventDefault();
+    const p = getPenPos(e);
+    currentStroke.points.push(p);
+    redrawPen();
+  });
+
+  const endStroke = () => {
+    if(currentStroke){
+      currentStroke = null;
+      redrawPen();
+    }
+  };
+  window.addEventListener('pointerup', endStroke);
+  window.addEventListener('pointercancel', endStroke);
+}
+
+if(penToolbar){
+  penToolbar.querySelectorAll('[data-tool]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      penToolbar.querySelectorAll('[data-tool]').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      penTool = btn.dataset.tool;
+    });
+  });
+
+  penToolbar.querySelectorAll('[data-color]').forEach(dot => {
+    dot.addEventListener('click', () => {
+      penToolbar.querySelectorAll('[data-color]').forEach(d => d.classList.remove('active'));
+      dot.classList.add('active');
+      penColor = dot.dataset.color;
+      if(penTool === 'eraser'){
+        const penBtn = penToolbar.querySelector('[data-tool="pen"]');
+        if(penBtn) penBtn.click();
+      }
+    });
+  });
+
+  const uBtn = document.getElementById('penUndo');
+  if(uBtn) uBtn.addEventListener('click', undoPen);
+  const cBtn = document.getElementById('penClear');
+  if(cBtn) cBtn.addEventListener('click', clearPen);
+  const xBtn = document.getElementById('penClose');
+  if(xBtn) xBtn.addEventListener('click', () => togglePen(false));
+}
+
+if(penToggleBtn) penToggleBtn.addEventListener('click', () => togglePen());
+if(mPenToggleBtn) mPenToggleBtn.addEventListener('click', () => togglePen());
+
 </script>
 <style>
 :root{
@@ -372,6 +522,66 @@ body.small{
   min-height:100vh;min-height:100dvh;background:#07070d;
 }
 body.small.light-mode{background:#ebe9f5}
+
+/* ═══════════════ Live Presentation Pen & Annotations ═══════════════ */
+#penCanvas{
+  position:absolute;inset:0;width:1100px;height:707px;
+  z-index:90;pointer-events:none;touch-action:none;
+}
+body.pen-active #penCanvas{
+  pointer-events:auto;cursor:crosshair;
+}
+.pen-toolbar{
+  position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+  z-index:1001;display:inline-flex;align-items:center;gap:7px;
+  padding:6px 12px;border-radius:999px;
+  background:rgba(14,12,24,.92);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);
+  border:1px solid rgba(255,255,255,.16);box-shadow:0 12px 34px rgba(0,0,0,.55),0 0 24px rgba(168,85,247,.22);
+  transition:all .25s cubic-bezier(.16,1,.3,1);user-select:none;
+}
+.pen-toolbar[hidden]{display:none!important}
+.pen-badge{display:flex;align-items:center;gap:6px;font:800 11px Inter,system-ui;letter-spacing:.5px;color:#f1f0fb;padding:0 4px}
+.pen-pulse{width:7px;height:7px;border-radius:50%;background:#34d399;box-shadow:0 0 10px #34d399;animation:penBlink 1.5s infinite}
+@keyframes penBlink{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.8)}}
+.pen-btn-group{display:flex;align-items:center;gap:4px}
+.pen-btn{
+  width:30px;height:30px;border-radius:50%;border:1px solid rgba(255,255,255,.1);
+  background:rgba(255,255,255,.05);color:#c4c2dc;cursor:pointer;
+  display:grid;place-items:center;transition:all .15s ease;padding:0;
+}
+.pen-btn:hover{background:rgba(255,255,255,.14);color:#fff;transform:scale(1.06)}
+.pen-btn.active{
+  background:var(--c-grad);color:#fff;border-color:transparent;
+  box-shadow:0 0 14px rgba(168,85,247,.5);transform:scale(1.08);
+}
+.pen-sep{width:1px;height:16px;background:rgba(255,255,255,.14);margin:0 2px}
+.pen-color-dot{
+  width:18px;height:18px;border-radius:50%;border:2px solid transparent;
+  background:var(--dot-c);cursor:pointer;transition:transform .15s ease,box-shadow .15s ease;
+  padding:0;box-shadow:0 2px 6px rgba(0,0,0,.3);
+}
+.pen-color-dot:hover{transform:scale(1.22)}
+.pen-color-dot.active{border-color:#fff;transform:scale(1.28);box-shadow:0 0 12px var(--dot-c),0 0 2px #fff}
+.pen-action-btn{
+  height:28px;padding:0 8px;border-radius:999px;border:1px solid rgba(255,255,255,.1);
+  background:rgba(255,255,255,.06);color:#e1e0f0;font:700 11px Inter,system-ui;
+  display:inline-flex;align-items:center;gap:4px;cursor:pointer;transition:all .15s ease;
+}
+.pen-action-btn:hover{background:rgba(255,255,255,.14);color:#fff}
+.pen-clear-btn:hover{border-color:#fb7185;color:#fb7185}
+.pen-close-btn{width:28px;height:28px;padding:0;border-radius:50%;justify-content:center}
+.pen-close-btn:hover{background:rgba(251,113,133,.2);border-color:#fb7185;color:#fb7185}
+body.light-mode .pen-toolbar{
+  background:rgba(255,255,255,.94);border-color:rgba(0,0,0,.14);
+  box-shadow:0 12px 34px rgba(0,0,0,.15),0 0 20px rgba(168,85,247,.15);
+}
+body.light-mode .pen-badge{color:#1e1b4b}
+body.light-mode .pen-btn{background:rgba(0,0,0,.04);border-color:rgba(0,0,0,.08);color:#475569}
+body.light-mode .pen-btn:hover{background:rgba(0,0,0,.08);color:#0f172a}
+body.light-mode .pen-sep{background:rgba(0,0,0,.1)}
+body.light-mode .pen-action-btn{background:rgba(0,0,0,.05);border-color:rgba(0,0,0,.08);color:#334155}
+body.light-mode .pen-action-btn:hover{background:rgba(0,0,0,.1);color:#0f172a}
+
 </style>
 </head>
 <body>
@@ -392,6 +602,9 @@ body.small.light-mode{background:#ebe9f5}
     <a href="Functions_Memory.cpp" download="Functions_Memory.cpp" class="m-pill m-pill-btn" aria-label="Download C++ Code" title="Download Code">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" width="13" height="13" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
     </a>
+    <button class="m-pill m-pill-btn" id="mPenToggle" aria-label="Toggle drawing pen" title="Draw on slide (D)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" width="13" height="13" stroke-width="2.2"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>
+    </button>
     <button class="m-pill m-pill-btn" id="mThemeToggle" aria-label="Toggle theme" title="Toggle theme">
       <svg id="mThemeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" width="13" height="13"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
     </button>
@@ -428,6 +641,9 @@ body.small.light-mode{background:#ebe9f5}
         <span>Download Code</span>
       </a>
       <span>Instructor · Muhammad Ali Abdul Kareem</span>
+      <button class="theme-btn" id="penToggle" title="Draw on slides · قلم الشرح (D / P)" aria-label="Toggle drawing pen">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" width="13" height="13" stroke-width="2.2"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>
+      </button>
       <button class="theme-btn" id="themeToggle" title="Switch to light theme" aria-label="Toggle theme">
         <svg id="themeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
           <circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
@@ -445,9 +661,48 @@ body.small.light-mode{background:#ebe9f5}
   <div class="controls">
     <button id="prev" tabindex="-1">‹ Prev</button>
     <span><kbd>→</kbd> next &nbsp;·&nbsp; <kbd>←</kbd> back &nbsp;·&nbsp; <kbd>S</kbd> solution &nbsp;·&nbsp; <kbd>L</kbd> laser &nbsp;·&nbsp; <kbd>F</kbd> fullscreen</span>
-    <button id="next" tabindex="-1">Next ›</button>
-  </div>
+    <button id="next" tabindex="-1">Next ›</button>  </div>
+  <canvas id="penCanvas" width="1100" height="707"></canvas>
 </div></div>
+
+<!-- Live Presentation Pen Studio Toolbar -->
+<div id="penToolbar" class="pen-toolbar" hidden>
+  <div class="pen-badge"><span class="pen-pulse"></span><span>DRAW</span></div>
+  <div class="pen-sep"></div>
+  <div class="pen-btn-group">
+    <button class="pen-btn active" data-tool="pen" title="Pen · قلم (P)">
+      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>
+    </button>
+    <button class="pen-btn" data-tool="highlighter" title="Highlighter · قلم التمييز (H)">
+      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 11l-6 6v3h3l6-6m-3-3l6.5-6.5a2.121 2.121 0 0 1 3 3L12 14"/></svg>
+    </button>
+    <button class="pen-btn" data-tool="eraser" title="Eraser · مساحة (E)">
+      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20 20H7L3 16c-.8-.8-.8-2 0-2.8L13.8 2.4c.8-.8 2-.8 2.8 0l4.8 4.8c.8.8.8 2 0 2.8L11 20"/></svg>
+    </button>
+  </div>
+  <div class="pen-sep"></div>
+  <div class="pen-btn-group pen-colors">
+    <button class="pen-color-dot active" data-color="#c084fc" style="--dot-c:#c084fc" title="Purple"></button>
+    <button class="pen-color-dot" data-color="#38bdf8" style="--dot-c:#38bdf8" title="Cyan"></button>
+    <button class="pen-color-dot" data-color="#34d399" style="--dot-c:#34d399" title="Green"></button>
+    <button class="pen-color-dot" data-color="#fbbf24" style="--dot-c:#fbbf24" title="Amber"></button>
+    <button class="pen-color-dot" data-color="#fb7185" style="--dot-c:#fb7185" title="Rose"></button>
+    <button class="pen-color-dot" data-color="#ffffff" style="--dot-c:#ffffff" title="White"></button>
+  </div>
+  <div class="pen-sep"></div>
+  <div class="pen-btn-group">
+    <button class="pen-action-btn" id="penUndo" title="Undo Stroke · تراجع (Ctrl+Z / U)">
+      <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/></svg>
+    </button>
+    <button class="pen-action-btn pen-clear-btn" id="penClear" title="Clear Slide Drawings · مسح الرسم (C)">
+      <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+    </button>
+    <button class="pen-btn pen-close-btn" id="penClose" title="Exit Draw Mode · إغلاق وضع الرسم (D / Esc)">
+      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+</div>
+
 <div class="ansmodal" id="ansmodal" hidden>
   <div class="ans-card">
     <div class="ans-h">What is the final console output?</div>
@@ -1495,7 +1750,7 @@ function walkStart(i){
 }
 function go(i){
   i=Math.max(0,Math.min(N-1,i));if(i===cur)return;
-  if(cur>=0){SL[cur].el.classList.remove('active');closeSol()}
+  if(cur>=0){SL[cur].el.classList.remove('active');closeSol();if(typeof clearPen==='function')clearPen();}
   cur=i;SL[i].el.classList.add('active');
   vp.className='vp '+SL[i].part;
   const cs=getComputedStyle(vp);PC=cs.getPropertyValue('--c').trim();PC2=cs.getPropertyValue('--c-2').trim();
@@ -1514,7 +1769,10 @@ document.addEventListener('keydown',e=>{
   else if((k==='a'||k==='A')&&SL[cur].chal)openAns();
   else if(k==='f'||k==='F'||k==='ب'){try{document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen()}catch(_){}}
   else if(k==='l'||k==='L'||k==='م'){toggleLaser()}
-  else if(k==='Escape'){if(laserActive)toggleLaser();closeSol()}
+  else if(k==='d'||k==='D'||k==='ي'||k==='p'||k==='P'||k==='ح'){togglePen()}
+  else if(typeof penActive!=='undefined'&&penActive&&(k==='c'||k==='C'||k==='ؤ')){clearPen()}
+  else if(typeof penActive!=='undefined'&&penActive&&(k==='u'||k==='U'||k==='ع'||(e.ctrlKey&&k==='z'))){undoPen()}
+  else if(k==='Escape'){if(laserActive) toggleLaser(); if(typeof penActive!=='undefined' && penActive) togglePen(false);closeSol()}
 });
 document.getElementById('next').onclick=e=>{go(cur+1);e.target.blur()};
 document.getElementById('prev').onclick=e=>{go(cur-1);e.target.blur()};
