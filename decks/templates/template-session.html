@@ -320,11 +320,56 @@ body.light-mode .top-compiler-btn:hover{
 }
 
 .m-compiler-btn{
+  height:30px;
+  padding:0 8px !important;
   font-size:11px;
   font-weight:700;
   color:#38bdf8 !important;
-  border-color:rgba(56,189,248,.3) !important;
+  border-color:rgba(56,189,248,.35) !important;
+  background:rgba(56,189,248,.08) !important;
   text-decoration:none;
+  white-space:nowrap !important;
+  display:inline-flex !important;
+  align-items:center;
+  gap:4px;
+  border-radius:999px;
+  width:auto !important;
+  box-shadow:0 4px 14px rgba(56,189,248,.15);
+  transition:all .2s ease;
+}
+.m-compiler-btn:hover{
+  background:rgba(56,189,248,.2) !important;
+  border-color:#38bdf8 !important;
+  color:#fff !important;
+}
+.m-compiler-btn svg{
+  width:11px;
+  height:11px;
+  flex-shrink:0;
+}
+body.light-mode .m-compiler-btn{
+  color:#0284c7 !important;
+  border-color:rgba(2,132,199,.3) !important;
+  background:rgba(2,132,199,.08) !important;
+}
+body.light-mode .m-compiler-btn:hover{
+  background:rgba(2,132,199,.16) !important;
+  border-color:#0284c7 !important;
+  color:#0369a1 !important;
+}
+@media (max-width: 480px){
+  .m-compiler-btn{
+    width:30px !important;
+    padding:0 !important;
+    justify-content:center;
+  }
+  .m-compiler-btn span{
+    display:none;
+  }
+  .m-compiler-btn svg{
+    width:13px;
+    height:13px;
+  }
 }
 
 .controls-addons{
@@ -826,7 +871,8 @@ body.light-mode .constella-toast{
 
   <div class="m-pill-cluster">
     <span class="m-pill m-pill-counter" id="mCounter">1 / 1</span>
-        <a href="https://www.online-cpp.com/" target="_blank" rel="noopener noreferrer" class="m-pill m-pill-btn m-compiler-btn" aria-label="Online C++" title="Online C++">
+    <a href="https://www.online-cpp.com/" target="_blank" rel="noopener noreferrer" class="m-pill m-compiler-btn" aria-label="Online C++" title="Online C++">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" width="11" height="11" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
       <span>C++ ↗</span>
     </a>
 <button class="m-pill m-pill-btn" id="mPenToggle" aria-label="Toggle drawing pen" title="Draw on slide (D)">
