@@ -624,12 +624,52 @@
     courseEls.forEach(enter);
   }
 
-  /* ---------- scroll progress bar ---------- */
+  /* ---------- scroll progress bar & smart auto-hide header ---------- */
   var bar = $('#bar');
+  var topHeader = $('.top');
+  var searchInput = $('#q');
+  var lastScrollY = window.scrollY || 0;
   var scrollScheduled = false;
+
+  function updateHeaderOnScroll(sy, max) {
+    if (!topHeader) return;
+    // Always show near top or when search input is focused
+    if (sy <= 30 || (searchInput && document.activeElement === searchInput)) {
+      topHeader.classList.remove('top--hidden');
+      topHeader.classList.toggle('top--scrolled', sy > 10);
+      lastScrollY = sy;
+      return;
+    }
+
+    // Ignore bounce / rubber-band past page bottom
+    if (max > 0 && sy > max - 15) return;
+
+    var delta = sy - lastScrollY;
+    // Minimal movement delta of 6px to avoid micro-tremor
+    if (Math.abs(delta) > 6) {
+      if (delta > 0 && sy > 70) {
+        // Scrolling down -> hide header smoothly
+        topHeader.classList.add('top--hidden');
+      } else if (delta < 0) {
+        // Scrolling up -> reveal header smoothly
+        topHeader.classList.remove('top--hidden');
+      }
+      lastScrollY = sy;
+    }
+    topHeader.classList.toggle('top--scrolled', sy > 10);
+  }
+
+  if (searchInput && topHeader) {
+    searchInput.addEventListener('focus', function () {
+      topHeader.classList.remove('top--hidden');
+    });
+  }
+
   function updateScroll() {
+    var sy = window.scrollY || 0;
     var max = document.documentElement.scrollHeight - innerHeight;
-    bar.style.transform = 'scaleX(' + (max > 0 ? Math.min(1, scrollY / max) : 0).toFixed(4) + ')';
+    if (bar) bar.style.transform = 'scaleX(' + (max > 0 ? Math.min(1, sy / max) : 0).toFixed(4) + ')';
+    updateHeaderOnScroll(sy, max);
     scrollScheduled = false;
   }
   function onScroll() {
