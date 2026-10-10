@@ -2,9 +2,9 @@
    Constella Service Worker — Offline Course Portal & PWA Engine
    ===================================================================== */
 
-const CACHE_NAME = 'constella-v2.1.9';
+const CACHE_NAME = 'constella-v2.2.0';
 
-// Core application shell assets to pre-cache on install
+// Core application shell assets and session decks to pre-cache on install
 const CORE_ASSETS = [
   './',
   './index.html',
@@ -16,7 +16,19 @@ const CORE_ASSETS = [
   './icon-192.png',
   './icon-512.png',
   './icon-maskable-512.png',
-  './apple-touch-icon.png'
+  './apple-touch-icon.png',
+  './decks/multimedia/Week ⇔ 01/Session ⇔ 01.html',
+  './decks/multimedia/Week ⇔ 01/session01_fundamentals.py',
+  './decks/multimedia/Week ⇔ 02/Session ⇔ 02.html',
+  './decks/multimedia/Week ⇔ 02/session02_oop.py',
+  './decks/multimedia/Week ⇔ 03/Session ⇔ 03.html',
+  './decks/multimedia/Week ⇔ 03/session03_digital_sound.py',
+  './decks/data-structures/Week ⇔ 01/Session ⇔ 01.html',
+  './decks/data-structures/Week ⇔ 01/Functions_Memory.cpp',
+  './decks/data-structures/Week ⇔ 02/Session ⇔ 02.html',
+  './decks/data-structures/Week ⇔ 02/Complexity_BigO.cpp',
+  './decks/data-structures/Week ⇔ 03/Session ⇔ 03.html',
+  './decks/data-structures/Week ⇔ 03/ArrayList.cpp'
 ];
 
 // Pre-cache core assets

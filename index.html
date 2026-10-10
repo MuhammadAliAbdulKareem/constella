@@ -116,6 +116,24 @@
     </section>
   </div>
 
+  <div class="wrap course-filter-wrap">
+    <div class="rotation-hint" id="rotationHint" role="status" hidden>
+      <span>📱 <strong>Tip:</strong> Rotate phone to landscape for the best interactive experience with slide decks &amp; code labs.</span>
+      <button class="rotation-hint-close" id="rotationHintClose" type="button" aria-label="Dismiss">✕</button>
+    </div>
+    <div class="course-tabs" id="courseTabs" role="tablist" aria-label="Filter Courses">
+      <button class="course-tab active" data-filter="all" role="tab" aria-selected="true" type="button">
+        <span class="tab-dot"></span> All Courses <span class="tab-count" id="countAll">2</span>
+      </button>
+      <button class="course-tab" data-filter="multimedia" role="tab" aria-selected="false" type="button">
+        <span class="tab-dot" style="background:#38bdf8"></span> Multimedia <span class="tab-count" id="countMm">3</span>
+      </button>
+      <button class="course-tab" data-filter="data-structures" role="tab" aria-selected="false" type="button">
+        <span class="tab-dot" style="background:#a855f7"></span> Data Structures <span class="tab-count" id="countDs">3</span>
+      </button>
+    </div>
+  </div>
+
   <div id="courses"></div>
 
   <div class="wrap">

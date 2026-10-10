@@ -499,11 +499,17 @@
   /* ---------- search with clear button & bilingual support ---------- */
   var input = $('#q');
   var clearBtn = $('#searchClear');
+  var activeCourseTab = 'all';
+
   function applyFilter() {
     var raw = input.value.trim();
     var q = normAr(raw), any = false;
     if (clearBtn) clearBtn.hidden = !raw;
     courseEls.forEach(function (ce) {
+      if (activeCourseTab !== 'all' && ce.course.id !== activeCourseTab) {
+        ce.el.hidden = true;
+        return;
+      }
       var courseSearch = normAr((ce.course.title || '') + ' ' + (ce.course.titleAr || '') + ' ' + (ce.course.subtitle || ''));
       var courseMatch = !q || courseSearch.indexOf(q) > -1;
       var shown = 0;
@@ -533,6 +539,39 @@
     if (e.key === '/' && document.activeElement !== input && !/input|textarea/i.test(document.activeElement.tagName)) { e.preventDefault(); input.focus(); }
     if (e.key === 'Escape' && document.activeElement === input) { input.value = ''; applyFilter(); input.blur(); }
   });
+
+  /* ---------- Course Filter Tabs ---------- */
+  var courseTabs = $$('.course-tab');
+  if (courseTabs.length) {
+    courseTabs.forEach(function (tab) {
+      tab.addEventListener('click', function () {
+        activeCourseTab = tab.dataset.filter || 'all';
+        courseTabs.forEach(function (t) {
+          var isCurrent = t === tab;
+          t.classList.toggle('active', isCurrent);
+          t.setAttribute('aria-selected', isCurrent ? 'true' : 'false');
+        });
+        applyFilter();
+      });
+    });
+  }
+
+  /* ---------- Mobile Rotation Hint ---------- */
+  var rotationHint = $('#rotationHint');
+  var rotationHintClose = $('#rotationHintClose');
+  if (rotationHint) {
+    try {
+      if (!localStorage.getItem('cs:hideRotationTip') && window.matchMedia('(max-width: 768px) and (orientation: portrait)').matches) {
+        rotationHint.hidden = false;
+      }
+    } catch (e) {}
+    if (rotationHintClose) {
+      rotationHintClose.addEventListener('click', function () {
+        rotationHint.hidden = true;
+        try { localStorage.setItem('cs:hideRotationTip', '1'); } catch (e) {}
+      });
+    }
+  }
 
   /* ---------- theme, with a circular reveal where supported ---------- */
   var isLight = document.documentElement.dataset.theme === 'light';

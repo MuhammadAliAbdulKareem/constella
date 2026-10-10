@@ -440,6 +440,530 @@ body.light-mode .pen-sep{background:rgba(0,0,0,.1)}
 body.light-mode .pen-action-btn{background:rgba(0,0,0,.05);border-color:rgba(0,0,0,.08);color:#334155}
 body.light-mode .pen-action-btn:hover{background:rgba(0,0,0,.1);color:#0f172a}
 
+
+/* ═══════════════ CONSTELLA SUITE: Overview Drawer, Boards, Shortcuts & Online Compiler ═══════════════ */
+.top-compiler-btn{
+  padding:5px 11px;
+  border-radius:6px;
+  border:1px solid rgba(56,189,248,.35);
+  background:rgba(56,189,248,.08);
+  color:#38bdf8;
+  cursor:pointer;
+  font:600 11.5px Inter,sans-serif;
+  text-decoration:none;
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  transition:all .2s ease;
+}
+.top-compiler-btn:hover{
+  background:rgba(56,189,248,.18);
+  border-color:#38bdf8;
+  transform:translateY(-1px);
+  box-shadow:0 0 12px rgba(56,189,248,.25);
+  color:#fff;
+}
+body.light-mode .top-compiler-btn{
+  background:rgba(2,132,199,.08);
+  border-color:rgba(2,132,199,.3);
+  color:#0284c7;
+}
+body.light-mode .top-compiler-btn:hover{
+  background:rgba(2,132,199,.15);
+  border-color:#0284c7;
+  color:#0369a1;
+}
+
+.m-compiler-btn{
+  font-size:11px;
+  font-weight:700;
+  color:#38bdf8 !important;
+  border-color:rgba(56,189,248,.3) !important;
+  text-decoration:none;
+}
+
+.controls-addons{
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+}
+.toolbar-icon-btn{
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.14);
+  color:var(--ts);
+  width:26px;
+  height:26px;
+  border-radius:6px;
+  cursor:pointer;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  font-family:Inter,sans-serif;
+  font-size:11px;
+  font-weight:700;
+  transition:all .15s ease;
+  padding:0;
+}
+.toolbar-icon-btn:hover{
+  background:rgba(255,255,255,.14);
+  color:#fff;
+  border-color:var(--c, #38bdf8);
+}
+body.light-mode .toolbar-icon-btn{
+  background:rgba(0,0,0,.04);
+  border-color:rgba(0,0,0,.1);
+}
+body.light-mode .toolbar-icon-btn:hover{
+  background:rgba(0,0,0,.08);
+  color:#000;
+}
+
+.slide-counter{
+  cursor:pointer;
+  user-select:none;
+  transition:transform .15s ease, border-color .2s;
+}
+.slide-counter:hover{
+  transform:scale(1.05);
+  border-color:var(--c, #38bdf8) !important;
+}
+
+.run-online-btn{
+  background:rgba(56,189,248,.12);
+  border:1px solid rgba(56,189,248,.35);
+  color:#38bdf8;
+  padding:3px 9px;
+  border-radius:5px;
+  font-size:11px;
+  font-weight:600;
+  cursor:pointer;
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+  transition:all .15s;
+}
+.run-online-btn:hover{
+  background:rgba(56,189,248,.24);
+  border-color:#38bdf8;
+  color:#fff;
+  transform:translateY(-1px);
+}
+
+/* Slide Overview Drawer */
+.slide-drawer-overlay{
+  position:fixed;
+  inset:0;
+  z-index:9000;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:24px;
+}
+.slide-drawer-overlay[hidden]{
+  display:none;
+}
+.slide-drawer-backdrop{
+  position:absolute;
+  inset:0;
+  background:rgba(7,10,19,.75);
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
+}
+.slide-drawer-panel{
+  position:relative;
+  z-index:1;
+  width:100%;
+  max-width:1000px;
+  max-height:86vh;
+  background:#0c1020;
+  background:linear-gradient(180deg, rgba(16,22,44,.95) 0%, rgba(10,14,28,.98) 100%);
+  border:1px solid rgba(130,160,255,.2);
+  border-radius:18px;
+  box-shadow:0 24px 80px rgba(0,0,0,.6), 0 0 40px rgba(56,189,248,.15);
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+}
+body.light-mode .slide-drawer-panel{
+  background:#ffffff;
+  background:linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);
+  border-color:rgba(0,0,0,.15);
+  box-shadow:0 24px 80px rgba(0,0,0,.2), 0 0 30px rgba(2,132,199,.1);
+}
+.slide-drawer-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  padding:16px 22px;
+  border-bottom:1px solid rgba(255,255,255,.08);
+  flex-wrap:wrap;
+}
+body.light-mode .slide-drawer-header{
+  border-bottom-color:rgba(0,0,0,.08);
+}
+.slide-drawer-title{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-size:15px;
+  font-weight:700;
+  color:#fff;
+}
+body.light-mode .slide-drawer-title{
+  color:#0f172a;
+}
+.slide-drawer-badge{
+  font-size:11px;
+  font-weight:600;
+  padding:2px 8px;
+  border-radius:12px;
+  background:rgba(255,255,255,.1);
+  color:var(--ts);
+}
+.slide-drawer-actions{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  flex:1;
+  max-width:450px;
+  justify-content:flex-end;
+}
+.drawer-search-input{
+  width:100%;
+  max-width:320px;
+  padding:7px 12px;
+  border-radius:8px;
+  border:1px solid rgba(255,255,255,.15);
+  background:rgba(255,255,255,.06);
+  color:#fff;
+  font-size:12.5px;
+  outline:none;
+  transition:all .15s;
+}
+body.light-mode .drawer-search-input{
+  background:rgba(0,0,0,.04);
+  border-color:rgba(0,0,0,.15);
+  color:#0f172a;
+}
+.drawer-search-input:focus{
+  border-color:var(--c, #38bdf8);
+  box-shadow:0 0 0 3px rgba(56,189,248,.2);
+}
+.drawer-close-btn{
+  background:transparent;
+  border:none;
+  color:var(--ts);
+  font-size:16px;
+  cursor:pointer;
+  width:32px;
+  height:32px;
+  border-radius:6px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  transition:all .15s;
+}
+.drawer-close-btn:hover{
+  background:rgba(255,255,255,.1);
+  color:#fff;
+}
+body.light-mode .drawer-close-btn:hover{
+  background:rgba(0,0,0,.08);
+  color:#000;
+}
+.slide-drawer-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill, minmax(210px, 1fr));
+  gap:14px;
+  padding:20px;
+  overflow-y:auto;
+  max-height:calc(86vh - 80px);
+}
+.slide-card{
+  background:rgba(255,255,255,.03);
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:12px;
+  padding:14px;
+  cursor:pointer;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  transition:all .2s ease;
+  position:relative;
+  text-align:left;
+}
+body.light-mode .slide-card{
+  background:rgba(0,0,0,.02);
+  border-color:rgba(0,0,0,.08);
+}
+.slide-card:hover{
+  transform:translateY(-2px);
+  border-color:var(--c, #38bdf8);
+  background:rgba(255,255,255,.06);
+  box-shadow:0 6px 20px rgba(0,0,0,.3);
+}
+body.light-mode .slide-card:hover{
+  background:rgba(0,0,0,.04);
+}
+.slide-card.active{
+  border-color:var(--c, #38bdf8);
+  background:rgba(56,189,248,.08);
+  box-shadow:0 0 0 2px var(--c, #38bdf8);
+}
+.slide-card-top{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+.slide-card-num{
+  font-size:11px;
+  font-weight:700;
+  color:var(--ts);
+  font-family:monospace;
+}
+.slide-card-tag{
+  font-size:10px;
+  font-weight:600;
+  padding:2px 6px;
+  border-radius:4px;
+  background:rgba(255,255,255,.08);
+  color:var(--c, #38bdf8);
+  max-width:130px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.slide-card-title{
+  font-size:12.5px;
+  font-weight:600;
+  line-height:1.4;
+  color:#fff;
+  display:-webkit-box;
+  -webkit-line-clamp:2;
+  -webkit-box-orient:vertical;
+  overflow:hidden;
+}
+body.light-mode .slide-card-title{
+  color:#0f172a;
+}
+.slide-card-snippet{
+  font-size:11px;
+  line-height:1.4;
+  color:var(--ts);
+  display:-webkit-box;
+  -webkit-line-clamp:2;
+  -webkit-box-orient:vertical;
+  overflow:hidden;
+}
+
+/* Blackboard & Whiteboard Modes */
+.board-overlay{
+  position:fixed;
+  inset:0;
+  z-index:900;
+  display:flex;
+  flex-direction:column;
+  transition:opacity .2s;
+}
+.board-overlay[hidden]{
+  display:none;
+}
+.board-overlay[data-mode="blackboard"]{
+  background:#0c111c;
+  background-image:radial-gradient(rgba(255,255,255,.06) 1px, transparent 0);
+  background-size:24px 24px;
+}
+.board-overlay[data-mode="whiteboard"]{
+  background:#f8fafc;
+  background-image:radial-gradient(rgba(0,0,0,.08) 1px, transparent 0);
+  background-size:24px 24px;
+}
+.board-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:12px 24px;
+  background:rgba(0,0,0,.3);
+  backdrop-filter:blur(8px);
+  border-bottom:1px solid rgba(255,255,255,.1);
+  color:#fff;
+  z-index:2;
+}
+.board-overlay[data-mode="whiteboard"] .board-header{
+  background:rgba(255,255,255,.8);
+  border-bottom-color:rgba(0,0,0,.1);
+  color:#0f172a;
+}
+.board-status{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-size:13px;
+  font-weight:700;
+}
+.board-indicator{
+  width:8px;
+  height:8px;
+  border-radius:50%;
+  background:#22c55e;
+  box-shadow:0 0 8px #22c55e;
+}
+.board-tip{
+  font-size:12px;
+  color:var(--ts);
+}
+.board-tip kbd{
+  background:rgba(255,255,255,.15);
+  padding:2px 5px;
+  border-radius:4px;
+  border:1px solid rgba(255,255,255,.2);
+  color:#fff;
+  font-size:11px;
+}
+.board-overlay[data-mode="whiteboard"] .board-tip kbd{
+  background:rgba(0,0,0,.08);
+  border-color:rgba(0,0,0,.15);
+  color:#000;
+}
+.board-exit-btn{
+  background:rgba(239,68,68,.15);
+  border:1px solid rgba(239,68,68,.35);
+  color:#ef4444;
+  padding:5px 12px;
+  border-radius:6px;
+  cursor:pointer;
+  font-size:12px;
+  font-weight:600;
+  transition:all .15s;
+}
+.board-exit-btn:hover{
+  background:#ef4444;
+  color:#fff;
+}
+
+/* Shortcuts Modal */
+.shortcuts-modal-overlay{
+  position:fixed;
+  inset:0;
+  z-index:9100;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+}
+.shortcuts-modal-overlay[hidden]{
+  display:none;
+}
+.shortcuts-modal-backdrop{
+  position:absolute;
+  inset:0;
+  background:rgba(7,10,19,.75);
+  backdrop-filter:blur(8px);
+}
+.shortcuts-modal-panel{
+  position:relative;
+  z-index:1;
+  width:100%;
+  max-width:580px;
+  background:#0d1224;
+  border:1px solid rgba(130,160,255,.25);
+  border-radius:16px;
+  box-shadow:0 20px 60px rgba(0,0,0,.6);
+  padding:20px 24px;
+}
+body.light-mode .shortcuts-modal-panel{
+  background:#ffffff;
+  border-color:rgba(0,0,0,.15);
+  box-shadow:0 20px 60px rgba(0,0,0,.15);
+}
+.shortcuts-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:18px;
+}
+.shortcuts-title{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-size:15px;
+  font-weight:700;
+  color:#fff;
+}
+body.light-mode .shortcuts-title{
+  color:#0f172a;
+}
+.shortcuts-grid{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:8px;
+  max-height:60vh;
+  overflow-y:auto;
+}
+.shortcut-item{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:7px 10px;
+  border-radius:8px;
+  background:rgba(255,255,255,.03);
+  font-size:12.5px;
+  color:var(--ts);
+}
+body.light-mode .shortcut-item{
+  background:rgba(0,0,0,.03);
+  color:#334155;
+}
+.shortcut-item kbd{
+  display:inline-block;
+  min-width:22px;
+  text-align:center;
+  padding:2px 6px;
+  border-radius:4px;
+  background:rgba(255,255,255,.1);
+  border:1px solid rgba(255,255,255,.2);
+  color:#fff;
+  font-size:11px;
+  font-weight:700;
+}
+body.light-mode .shortcut-item kbd{
+  background:rgba(0,0,0,.08);
+  border-color:rgba(0,0,0,.15);
+  color:#0f172a;
+}
+
+/* Constella Toast Notification */
+.constella-toast{
+  position:fixed;
+  bottom:28px;
+  left:50%;
+  transform:translateX(-50%) translateY(20px);
+  background:rgba(12,18,36,.92);
+  border:1px solid rgba(56,189,248,.4);
+  box-shadow:0 10px 30px rgba(0,0,0,.5), 0 0 20px rgba(56,189,248,.2);
+  color:#fff;
+  font-size:13px;
+  font-weight:600;
+  padding:10px 18px;
+  border-radius:10px;
+  backdrop-filter:blur(8px);
+  z-index:9999;
+  opacity:0;
+  pointer-events:none;
+  transition:all .25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.constella-toast.visible{
+  opacity:1;
+  transform:translateX(-50%) translateY(0);
+}
+body.light-mode .constella-toast{
+  background:rgba(255,255,255,.95);
+  border-color:rgba(2,132,199,.4);
+  color:#0f172a;
+  box-shadow:0 10px 30px rgba(0,0,0,.15);
+}
+
 </style>
 </head>
 <body>
@@ -460,7 +984,10 @@ body.light-mode .pen-action-btn:hover{background:rgba(0,0,0,.1);color:#0f172a}
     <a href="session02_oop.py" download="session02_oop.py" class="m-pill m-pill-btn" aria-label="Download Python Code" title="Download Code">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" width="13" height="13" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
     </a>
-    <button class="m-pill m-pill-btn" id="mPenToggle" aria-label="Toggle drawing pen" title="Draw on slide (D)">
+        <a href="https://www.online-python.com/" target="_blank" rel="noopener noreferrer" class="m-pill m-pill-btn m-compiler-btn" aria-label="Online Python" title="Online Python">
+      <span>Py ↗</span>
+    </a>
+<button class="m-pill m-pill-btn" id="mPenToggle" aria-label="Toggle drawing pen" title="Draw on slide (D)">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" width="13" height="13" stroke-width="2.2"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>
     </button>
     <button class="m-pill m-pill-btn" id="mThemeToggle" aria-label="Toggle theme" title="Toggle theme">
@@ -500,7 +1027,11 @@ body.light-mode .pen-action-btn:hover{background:rgba(0,0,0,.1);color:#0f172a}
         <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
         <span>Download Code</span>
       </a>
-      <span>Instructor · Muhammad Ali Abdul Kareem</span>
+            <a href="https://www.online-python.com/" target="_blank" rel="noopener noreferrer" class="top-compiler-btn" title="Open Online Python (online-python.com)">
+        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        <span>Online Python ↗</span>
+      </a>
+<span>Instructor · Muhammad Ali Abdul Kareem</span>
       <button class="theme-btn" id="penToggle" title="Draw on slides · قلم الشرح (D / P)" aria-label="Toggle drawing pen">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" width="13" height="13" stroke-width="2.2"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>
       </button>
@@ -521,7 +1052,11 @@ body.light-mode .pen-action-btn:hover{background:rgba(0,0,0,.1);color:#0f172a}
   <div class="controls">
     <button id="prev" tabindex="-1">‹ Prev</button>
     <span><kbd>→</kbd> next &nbsp;·&nbsp; <kbd>←</kbd> back &nbsp;·&nbsp; <kbd>S</kbd> solution &nbsp;·&nbsp; <kbd>L</kbd> laser &nbsp;·&nbsp; <kbd>F</kbd> fullscreen</span>
-    <button id="next" tabindex="-1">Next ›</button>
+        <div class="controls-addons">
+      <button class="toolbar-icon-btn" id="gridToggleBtn" title="Slide Index · فهرس الشرائح (G / O)" aria-label="Slide Overview">▦</button>
+      <button class="toolbar-icon-btn" id="shortcutsBtn" title="Keyboard Shortcuts · دليل الاختصارات (?)" aria-label="Shortcuts">?</button>
+    </div>
+<button id="next" tabindex="-1">Next ›</button>
   </div>
 </div></div>
 
@@ -1422,7 +1957,7 @@ function go(i){
   const cs=getComputedStyle(vp);PC=cs.getPropertyValue('--c').trim();PC2=cs.getPropertyValue('--c-2').trim();
   walkStart(i);counter.textContent=(i+1)+' / '+N;
   const mc=document.getElementById('mCounter');if(mc)mc.textContent=(i+1)+' / '+N;
-  prog.style.width=((i+1)/N*100)+'%';t0=frame;
+  prog.style.width=((i+1)/N*100)+'%';t0=frame;if(typeof onSlideChange==='function')onSlideChange(i);
 }
 
 const isKey=(e,latin,arabic)=>e.code==='Key'+latin||e.key===latin.toLowerCase()||e.key===latin||e.key===arabic;
@@ -1903,6 +2438,417 @@ if(document.readyState === 'loading'){
   initPen();
 }
 
+
+/* ═══════════════ CONSTELLA SUITE ENGINE ═══════════════ */
+(function() {
+  const compilerUrl = "https://www.online-python.com/";
+  const compilerName = "Online Python";
+  const compilerLang = "Python";
+
+  function getEl(id) {
+    return document.getElementById(id);
+  }
+
+  // Toast notifications
+  window.showToast = function(msg, duration = 2800) {
+    const toast = getEl('constellaToast');
+    if (!toast) return;
+    toast.innerHTML = msg;
+    toast.classList.add('visible');
+    clearTimeout(toast._timer);
+    toast._timer = setTimeout(() => toast.classList.remove('visible'), duration);
+  };
+
+  // URL Hash Deep Linking
+  window.syncSlideHash = function(i) {
+    try {
+      const hash = '#slide-' + (i + 1);
+      if (window.location.hash !== hash) {
+        history.replaceState(null, '', hash);
+      }
+    } catch(e) {}
+  };
+
+  function parseHashSlide() {
+    const h = window.location.hash;
+    const m = h.match(/#(?:slide-)?(\d+)/i);
+    if (m) {
+      const idx = parseInt(m[1], 10) - 1;
+      const total = typeof N !== 'undefined' ? N : (typeof SL !== 'undefined' ? SL.length : (typeof slides !== 'undefined' ? slides.length : 0));
+      if (!isNaN(idx) && idx >= 0 && idx < total) return idx;
+    }
+    return -1;
+  }
+
+  function stripHtml(str) {
+    if (!str) return '';
+    return str.replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim();
+  }
+
+  let drawerBuilt = false;
+
+  function buildDrawerGrid() {
+    const drawerGrid = getEl('drawerGrid');
+    const drawerCount = getEl('drawerSlideCount');
+    if (!drawerGrid) return;
+
+    let list = [];
+    if (typeof SL !== 'undefined' && Array.isArray(SL) && SL.length > 0) {
+      list = SL;
+    } else {
+      const domSlides = document.querySelectorAll('.slide');
+      if (domSlides.length > 0) {
+        list = Array.from(domSlides).map((el, i) => ({
+          el: el,
+          h2: (el.querySelector('h2') || el.querySelector('h1') || el.querySelector('.s-title'))?.innerHTML || ('Slide ' + (i + 1)),
+          sub: (el.querySelector('.sub') || el.querySelector('.s-sub') || el.querySelector('p'))?.innerHTML || ''
+        }));
+      }
+    }
+
+    if (!list.length) return;
+    if (drawerCount) drawerCount.textContent = list.length + ' slides';
+    drawerGrid.innerHTML = '';
+
+    list.forEach((s, idx) => {
+      let title = '';
+      let tag = s.lbl || '';
+      if (s.hero) {
+        title = 'Overview & Goals';
+        tag = tag || 'Welcome';
+      } else if (s.h2) {
+        title = stripHtml(s.h2);
+      } else if (s.title) {
+        title = stripHtml(s.title);
+      } else if (s.lbl) {
+        title = s.lbl;
+      }
+      if (!title && s.el) {
+        const h = s.el.querySelector('h1, h2, h3, .s-title, .title');
+        if (h) title = stripHtml(h.textContent);
+      }
+      if (!title) title = 'Slide ' + (idx + 1);
+
+      let sub = stripHtml(s.sub || s.desc || '');
+      if (!sub && s.el) {
+        const p = s.el.querySelector('.sub, .s-sub, p, .lead');
+        if (p) sub = stripHtml(p.textContent);
+      }
+
+      const card = document.createElement('div');
+      card.className = 'slide-card' + (typeof cur !== 'undefined' && idx === cur ? ' active' : '');
+      card.dataset.index = idx;
+      card.dataset.search = (idx + 1 + ' ' + title + ' ' + tag + ' ' + sub).toLowerCase();
+      card.innerHTML = `
+        <div class="slide-card-top">
+          <span class="slide-card-num">#${idx + 1}</span>
+          ${tag ? `<span class="slide-card-tag">${tag}</span>` : ''}
+        </div>
+        <div class="slide-card-title">${title}</div>
+        ${sub ? `<div class="slide-card-snippet">${sub}</div>` : ''}
+      `;
+      card.addEventListener('click', () => {
+        closeSlideDrawer();
+        if (typeof go === 'function') go(idx);
+      });
+      drawerGrid.appendChild(card);
+    });
+    drawerBuilt = true;
+  }
+
+  window.openSlideDrawer = function() {
+    const drawer = getEl('slideDrawer');
+    if (!drawer) return;
+    if (!drawerBuilt) buildDrawerGrid();
+    drawer.hidden = false;
+    window.updateDrawerHighlight(typeof cur !== 'undefined' ? cur : 0);
+    const drawerSearch = getEl('drawerSearch');
+    if (drawerSearch) {
+      drawerSearch.value = '';
+      filterDrawerCards('');
+      setTimeout(() => drawerSearch.focus(), 50);
+    }
+  };
+
+  window.closeSlideDrawer = function() {
+    const drawer = getEl('slideDrawer');
+    if (drawer) drawer.hidden = true;
+  };
+
+  window.toggleSlideDrawer = function() {
+    const drawer = getEl('slideDrawer');
+    if (drawer && !drawer.hidden) closeSlideDrawer();
+    else openSlideDrawer();
+  };
+
+  window.updateDrawerHighlight = function(idx) {
+    const drawerGrid = getEl('drawerGrid');
+    const drawer = getEl('slideDrawer');
+    if (!drawerGrid) return;
+    const cards = drawerGrid.querySelectorAll('.slide-card');
+    cards.forEach(c => {
+      const isCur = parseInt(c.dataset.index, 10) === idx;
+      c.classList.toggle('active', isCur);
+      if (isCur && drawer && !drawer.hidden) {
+        c.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      }
+    });
+  };
+
+  function filterDrawerCards(query) {
+    const drawerGrid = getEl('drawerGrid');
+    if (!drawerGrid) return;
+    const q = query.trim().toLowerCase();
+    const cards = drawerGrid.querySelectorAll('.slide-card');
+    cards.forEach(c => {
+      if (!q) {
+        c.style.display = '';
+      } else {
+        const searchStr = c.dataset.search || '';
+        c.style.display = searchStr.includes(q) ? '' : 'none';
+      }
+    });
+  }
+
+  // Blackboard & Whiteboard
+  window.toggleBoard = function(mode) {
+    const boardOverlay = getEl('boardOverlay');
+    const boardModeName = getEl('boardModeName');
+    if (!boardOverlay) return;
+    if (!boardOverlay.hidden && boardOverlay.dataset.mode === mode) {
+      boardOverlay.hidden = true;
+    } else {
+      boardOverlay.dataset.mode = mode;
+      boardOverlay.hidden = false;
+      if (boardModeName) {
+        boardModeName.textContent = mode === 'whiteboard' ? 'Whiteboard · السبورة البيضاء' : 'Blackboard · السبورة';
+      }
+      if (typeof togglePen === 'function' && typeof penActive !== 'undefined' && !penActive) {
+        togglePen(true);
+      }
+      showToast(mode === 'whiteboard' ? 'Whiteboard Mode (W / Esc)' : 'Blackboard Mode (B / Esc)');
+    }
+  };
+
+  // Keyboard Shortcuts Modal
+  window.toggleShortcuts = function() {
+    const shortcutsModal = getEl('shortcutsModal');
+    if (!shortcutsModal) return;
+    shortcutsModal.hidden = !shortcutsModal.hidden;
+  };
+
+  // Global Keydown Listeners (supporting English & Arabic keyboard layouts)
+  document.addEventListener('keydown', function(e) {
+    if (e.target && /^(INPUT|TEXTAREA)$/.test(e.target.tagName)) {
+      if (e.key === 'Escape') {
+        e.target.blur();
+        closeSlideDrawer();
+      }
+      return;
+    }
+
+    const k = e.key;
+    const code = e.code;
+
+    // Esc: close any open overlay
+    if (k === 'Escape' || code === 'Escape') {
+      const drawer = getEl('slideDrawer');
+      const board = getEl('boardOverlay');
+      const shortcuts = getEl('shortcutsModal');
+      if (drawer && !drawer.hidden) { closeSlideDrawer(); return; }
+      if (board && !board.hidden) { board.hidden = true; return; }
+      if (shortcuts && !shortcuts.hidden) { shortcuts.hidden = true; return; }
+    }
+
+    // ? : Shortcuts modal
+    if (k === '?' || (e.shiftKey && (code === 'Slash' || k === '/'))) {
+      e.preventDefault();
+      toggleShortcuts();
+      return;
+    }
+
+    // G / O / ل / خ : Overview Drawer
+    if (code === 'KeyG' || code === 'KeyO' || k === 'g' || k === 'G' || k === 'o' || k === 'O' || k === 'ل' || k === 'خ') {
+      e.preventDefault();
+      toggleSlideDrawer();
+      return;
+    }
+
+    // B / لا : Blackboard
+    if (code === 'KeyB' || k === 'b' || k === 'B' || k === 'لا') {
+      e.preventDefault();
+      toggleBoard('blackboard');
+      return;
+    }
+
+    // W / ص : Whiteboard
+    if (code === 'KeyW' || k === 'w' || k === 'W' || k === 'ص') {
+      e.preventDefault();
+      toggleBoard('whiteboard');
+      return;
+    }
+  });
+
+  // Unified click delegation for all buttons
+  document.addEventListener('click', function(e) {
+    if (e.target.closest('#gridToggleBtn') || e.target.closest('#counter') || e.target.closest('#mCounter')) {
+      e.preventDefault();
+      toggleSlideDrawer();
+      return;
+    }
+    if (e.target.closest('#shortcutsBtn')) {
+      e.preventDefault();
+      toggleShortcuts();
+      return;
+    }
+    if (e.target.closest('#drawerCloseBtn') || e.target.closest('#slideDrawerBackdrop')) {
+      closeSlideDrawer();
+      return;
+    }
+    if (e.target.closest('#boardExitBtn')) {
+      const board = getEl('boardOverlay');
+      if (board) board.hidden = true;
+      return;
+    }
+    if (e.target.closest('#shortcutsCloseBtn') || e.target.closest('#shortcutsBackdrop')) {
+      const shortcuts = getEl('shortcutsModal');
+      if (shortcuts) shortcuts.hidden = true;
+      return;
+    }
+
+    // Online Compiler button click
+    const runBtn = e.target.closest('.run-online-btn');
+    if (runBtn) {
+      e.preventDefault();
+      const targetId = runBtn.dataset.target;
+      const targetUrl = runBtn.dataset.compiler || compilerUrl;
+      const targetLang = runBtn.dataset.lang || compilerLang;
+      let code = '';
+      if (targetId) {
+        const el = getEl(targetId);
+        if (el) code = el.innerText || el.textContent || '';
+      }
+      if (!code && typeof CODE !== 'undefined') {
+        const codeKey = runBtn.dataset.code;
+        if (codeKey && CODE[codeKey]) code = CODE[codeKey];
+      }
+      if (code) {
+        navigator.clipboard.writeText(code).then(() => {
+          showToast(`✓ ${targetLang} code copied! Opening ${targetLang === 'C++' ? 'Online C++' : 'Online Python'}...`);
+        }).catch(() => {
+          showToast(`Opening ${targetLang === 'C++' ? 'Online C++' : 'Online Python'}...`);
+        });
+      } else {
+        showToast(`Opening ${targetLang === 'C++' ? 'Online C++' : 'Online Python'}...`);
+      }
+      window.open(targetUrl, '_blank', 'noopener,noreferrer');
+    }
+  });
+
+  // Live Drawer Search handler
+  document.addEventListener('input', function(e) {
+    if (e.target && e.target.id === 'drawerSearch') {
+      filterDrawerCards(e.target.value);
+    }
+  });
+  document.addEventListener('keydown', function(e) {
+    if (e.target && e.target.id === 'drawerSearch' && e.key === 'Enter') {
+      const drawerGrid = getEl('drawerGrid');
+      if (drawerGrid) {
+        const firstVisible = drawerGrid.querySelector('.slide-card:not([style*="display: none"])');
+        if (firstVisible) firstVisible.click();
+      }
+    }
+  });
+
+  // Hash syncing hook on slide change
+  window.onSlideChange = function(i) {
+    syncSlideHash(i);
+    updateDrawerHighlight(i);
+  };
+
+  // Initial Hash Check
+  function checkInitialHash() {
+    const targetIdx = parseHashSlide();
+    if (targetIdx > 0 && typeof go === 'function') {
+      setTimeout(() => go(targetIdx), 20);
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', checkInitialHash);
+  } else {
+    checkInitialHash();
+  }
+
+  window.addEventListener('hashchange', () => {
+    const targetIdx = parseHashSlide();
+    if (targetIdx >= 0 && typeof cur !== 'undefined' && targetIdx !== cur && typeof go === 'function') {
+      go(targetIdx);
+    }
+  });
+})();
+
 </script>
+
+<!-- ═══════════════ Constella Suite: Drawer, Boards & Shortcuts ═══════════════ -->
+<div class="slide-drawer-overlay" id="slideDrawer" hidden aria-modal="true" role="dialog" aria-label="Slide Overview">
+  <div class="slide-drawer-backdrop" id="slideDrawerBackdrop"></div>
+  <div class="slide-drawer-panel">
+    <div class="slide-drawer-header">
+      <div class="slide-drawer-title">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+        <span>Slide Index · فهرس الشرائح</span>
+        <span class="slide-drawer-badge" id="drawerSlideCount">0 slides</span>
+      </div>
+      <div class="slide-drawer-actions">
+        <input type="text" id="drawerSearch" class="drawer-search-input" placeholder="Search slides / بحث بالشرائح (G / O)..." autocomplete="off" />
+        <button class="drawer-close-btn" id="drawerCloseBtn" aria-label="Close overview">✕</button>
+      </div>
+    </div>
+    <div class="slide-drawer-grid" id="drawerGrid"></div>
+  </div>
+</div>
+
+<div class="board-overlay" id="boardOverlay" hidden data-mode="blackboard">
+  <div class="board-header">
+    <div class="board-status">
+      <span class="board-indicator"></span>
+      <span class="board-mode-name" id="boardModeName">Blackboard · السبورة</span>
+    </div>
+    <div class="board-tip">Press <kbd>B</kbd> / <kbd>W</kbd> or <kbd>Esc</kbd> to exit · Use pen tool to draw</div>
+    <button class="board-exit-btn" id="boardExitBtn">Exit Board ✕</button>
+  </div>
+</div>
+
+<div class="shortcuts-modal-overlay" id="shortcutsModal" hidden aria-modal="true" role="dialog" aria-label="Keyboard Shortcuts">
+  <div class="shortcuts-modal-backdrop" id="shortcutsBackdrop"></div>
+  <div class="shortcuts-modal-panel">
+    <div class="shortcuts-header">
+      <div class="shortcuts-title">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        <span>Keyboard Shortcuts · دليل الاختصارات</span>
+      </div>
+      <button class="drawer-close-btn" id="shortcutsCloseBtn">✕</button>
+    </div>
+    <div class="shortcuts-grid">
+      <div class="shortcut-item"><kbd>→</kbd> <kbd>Space</kbd> <span>Next slide / الشريحة التالية</span></div>
+      <div class="shortcut-item"><kbd>←</kbd> <span>Previous slide / الشريحة السابقة</span></div>
+      <div class="shortcut-item"><kbd>G</kbd> <kbd>O</kbd> <span>Slide Overview Drawer / فهرس الشرائح</span></div>
+      <div class="shortcut-item"><kbd>B</kbd> <span>Blackboard Mode / لوحة سوداء للشرح</span></div>
+      <div class="shortcut-item"><kbd>W</kbd> <span>Whiteboard Mode / لوحة بيضاء للشرح</span></div>
+      <div class="shortcut-item"><kbd>D</kbd> <kbd>P</kbd> <span>Drawing Pen Tool / قلم الشرح</span></div>
+      <div class="shortcut-item"><kbd>C</kbd> <span>Clear pen drawings / مسح الرسم</span></div>
+      <div class="shortcut-item"><kbd>S</kbd> <span>Show quiz solution / إظهار الحل</span></div>
+      <div class="shortcut-item"><kbd>L</kbd> <span>Laser Pointer / مؤشر الليزر</span></div>
+      <div class="shortcut-item"><kbd>F</kbd> <span>Fullscreen / ملء الشاشة</span></div>
+      <div class="shortcut-item"><kbd>?</kbd> <span>Keyboard shortcuts HUD / نافذة المساعدة</span></div>
+      <div class="shortcut-item"><kbd>Esc</kbd> <span>Close drawer or exit blackboard</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="constella-toast" id="constellaToast"></div>
+
 </body>
 </html>
