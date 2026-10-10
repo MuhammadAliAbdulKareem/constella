@@ -407,19 +407,32 @@ body.light-mode .m-pill-counter{background:rgba(255,255,255,.72);color:#524d70}
 .small .hero-slide .tag{font-size:15px!important;line-height:1.4!important}
 .small .sol{padding:74px 34px 24px!important;z-index:1000}
 
-/* Desktop Home Link */
+/* Desktop Home Link — Unified with Constella Cosmic Identity */
 .desktop-home-link{
-  display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:999px;
-  background:rgba(255,255,255,.06);color:var(--tp);font:700 11.5px Inter,sans-serif;
-  text-decoration:none;border:1px solid var(--card-border);transition:all .2s ease;
-  flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,.15);
+  display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 12px;border-radius:999px;
+  background:linear-gradient(135deg,rgba(99,102,241,.18),rgba(168,85,247,.22)),rgba(14,12,24,.75);
+  backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+  border:1px solid rgba(168,85,247,.3);color:#f0eeff;font:800 11.5px/1 Inter,system-ui,sans-serif;
+  text-decoration:none;cursor:pointer;flex-shrink:0;
+  box-shadow:0 4px 16px rgba(168,85,247,.18),0 2px 6px rgba(0,0,0,.35);
+  transition:transform .15s ease,border-color .2s ease,box-shadow .2s ease,background .2s ease;
+  user-select:none;
 }
 .desktop-home-link:hover{
-  background:rgba(255,255,255,.12);border-color:var(--c);color:#fff;
-  transform:translateX(-2px);box-shadow:0 4px 14px rgba(168,85,247,.25);
+  border-color:var(--c);box-shadow:0 6px 20px rgba(168,85,247,.35);
+  transform:translateX(-2px);
 }
-.desktop-home-link svg{width:13px;height:13px;stroke:currentColor;transition:transform .2s}
-.desktop-home-link:hover svg{transform:translateX(-2px)}
+.desktop-home-link:active{transform:scale(0.95)}
+.desktop-home-link .m-pill-icon svg{width:13px;height:13px;stroke:var(--c);display:block}
+.desktop-home-link .m-pill-text{font-weight:800;letter-spacing:.2px;background:linear-gradient(90deg,#fff,#f0eeff);-webkit-background-clip:text;background-clip:text;color:transparent}
+.desktop-home-link .m-pill-spark{font-size:9px;color:var(--c);animation:pulseSpark 2.4s ease-in-out infinite}
+
+body.light-mode .desktop-home-link{
+  background:linear-gradient(135deg,rgba(99,102,241,.12),rgba(236,72,153,.1)),rgba(255,255,255,.9);
+  border-color:rgba(168,85,247,.35);
+  box-shadow:0 4px 14px rgba(100,90,140,.12);
+}
+body.light-mode .desktop-home-link .m-pill-text{background:none;color:#181528}
 
 /* Edge navigation chevrons on mobile */
 .small .mnav{
@@ -1112,11 +1125,15 @@ body.light-mode .constella-toast{
 <div id="fitbox"><div id="deck">
   <div class="brand-bar">
     <div class="brand-left">
-      <a href="../../../index.html" class="desktop-home-link" title="Return to Constella Course Map">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M19 12H5M12 19l-7-7 7-7"/>
-        </svg>
-        <span>Sessions</span>
+      <a href="../../../index.html" class="desktop-home-link" title="Return to Constella Portal" aria-label="Return to Constella Portal">
+        <span class="m-pill-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+            <polyline points="9 22 9 12 15 12 15 22"/>
+          </svg>
+        </span>
+        <span class="m-pill-text">Constella</span>
+        <span class="m-pill-spark">✦</span>
       </a>
       <!-- Python Language Logo -->
       <div class="brand-icon" title="Python Fundamentals">
