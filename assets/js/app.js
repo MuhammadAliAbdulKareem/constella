@@ -1003,4 +1003,53 @@
   window.addEventListener('offline', updateOnlineStatus);
   updateOnlineStatus();
 
+  /* =====================================================================
+     Constella Cosmic PWA Splash & Boot Screen Controller
+     ===================================================================== */
+  var pwaSplash = document.getElementById('pwaSplash');
+  var splashStatus = document.getElementById('splashStatus');
+  if (pwaSplash) {
+    var isStandaloneMode = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+    var lastBoot = 0;
+    try { lastBoot = parseInt(sessionStorage.getItem('cs:boot_time') || '0', 10); } catch (e) {}
+    var nowTime = Date.now();
+    var isFastResume = (nowTime - lastBoot) < 600000;
+
+    if (splashStatus && !isFastResume) {
+      setTimeout(function () {
+        if (splashStatus && !pwaSplash.classList.contains('splash-leaving')) {
+          splashStatus.textContent = 'Aligning Learning Constellations…';
+        }
+      }, 400);
+      setTimeout(function () {
+        if (splashStatus && !pwaSplash.classList.contains('splash-leaving')) {
+          splashStatus.textContent = 'Welcome to Constella';
+        }
+      }, 850);
+    }
+
+    var dismissDelay = isFastResume ? 260 : (isStandaloneMode ? 1150 : 850);
+
+    function dismissSplash() {
+      if (!pwaSplash || pwaSplash.classList.contains('splash-leaving')) return;
+      pwaSplash.classList.add('splash-leaving');
+      try { sessionStorage.setItem('cs:boot_time', Date.now().toString()); } catch (e) {}
+      setTimeout(function () {
+        if (pwaSplash && pwaSplash.parentNode) {
+          pwaSplash.parentNode.removeChild(pwaSplash);
+        }
+      }, 700);
+    }
+
+    if (document.readyState === 'complete') {
+      setTimeout(dismissSplash, dismissDelay);
+    } else {
+      window.addEventListener('load', function () {
+        setTimeout(dismissSplash, dismissDelay);
+      });
+      setTimeout(dismissSplash, isFastResume ? 600 : 2500);
+    }
+  }
+
 })();
+

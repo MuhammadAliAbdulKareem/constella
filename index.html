@@ -7,6 +7,7 @@
 <link rel="canonical" href="https://constella.web.app/">
 <link rel="icon" type="image/svg+xml" href="assets/icons/favicon.svg">
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+<link rel="apple-touch-startup-image" href="assets/icons/icon-maskable-512.png">
 <link rel="manifest" href="manifest.json">
 <meta name="description" content="Constella — Interactive weekly university course sessions, presentation decks, and learning paths by Eng. Muhammad Ali Abdul Kareem, Faculty of Computer Science &amp; Information Technology, Sinai University.">
 <meta name="author" content="Muhammad Ali Abdul Kareem">
@@ -70,9 +71,93 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/css/app.css">
+<style>
+  /* Critical Instant PWA Boot Splash - 0ms Paint */
+  #pwaSplash{position:fixed;inset:0;width:100vw;height:100vh;height:100dvh;z-index:9999999;background:#070b17;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;user-select:none;-webkit-user-select:none;pointer-events:auto;contain:strict;transform:scale(1);opacity:1;filter:blur(0px);will-change:opacity,transform,filter}
+</style>
 
 </head>
 <body>
+<!-- =====================================================================
+     Constella Cosmic PWA Splash & Boot Screen
+     ===================================================================== -->
+<div id="pwaSplash" class="pwa-splash" aria-hidden="true">
+  <div class="splash-ambient">
+    <div class="splash-glow splash-glow-gold"></div>
+    <div class="splash-glow splash-glow-purple"></div>
+    <div class="splash-glow splash-glow-cyan"></div>
+  </div>
+  <div class="splash-core">
+    <div class="splash-emblem-cluster">
+      <div class="splash-orbit-ring splash-orbit-1"></div>
+      <div class="splash-orbit-ring splash-orbit-2"></div>
+      <div class="splash-pulse-halo"></div>
+      <svg viewBox="0 0 120 120" class="splash-logo-svg" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <radialGradient id="spNebula" cx="60" cy="60" r="46" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#ffd479" stop-opacity="0.95"/>
+            <stop offset="25%" stop-color="#c084fc" stop-opacity="0.5"/>
+            <stop offset="55%" stop-color="#38bdf8" stop-opacity="0.25"/>
+            <stop offset="100%" stop-color="#6366f1" stop-opacity="0"/>
+          </radialGradient>
+          <linearGradient id="spGoldStar" x1="38" y1="38" x2="82" y2="82" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#ffffff"/>
+            <stop offset="25%" stop-color="#fffbeb"/>
+            <stop offset="50%" stop-color="#ffd479"/>
+            <stop offset="85%" stop-color="#f59e0b"/>
+            <stop offset="100%" stop-color="#d97706"/>
+          </linearGradient>
+          <linearGradient id="spRing" x1="20" y1="20" x2="100" y2="100" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#c084fc" stop-opacity="0.8"/>
+            <stop offset="35%" stop-color="#ffd479" stop-opacity="0.95"/>
+            <stop offset="70%" stop-color="#38bdf8" stop-opacity="0.85"/>
+            <stop offset="100%" stop-color="#ec4899" stop-opacity="0.75"/>
+          </linearGradient>
+        </defs>
+        <circle cx="60" cy="60" r="44" fill="url(#spNebula)"/>
+        <circle cx="60" cy="60" r="42" stroke="url(#spRing)" stroke-width="1.2" stroke-opacity="0.6"/>
+        <circle cx="60" cy="60" r="42" stroke="#ffffff" stroke-width="0.8" stroke-opacity="0.3" stroke-dasharray="2 4"/>
+        <polygon points="60,18 94,48 80,92 40,92 26,48" stroke="rgba(192,132,252,0.5)" stroke-width="1" stroke-dasharray="3 3"/>
+        <path d="M26,48 L94,48 M40,92 L60,18 M80,92 L60,18" stroke="rgba(255,212,121,0.35)" stroke-width="0.9"/>
+        <circle cx="60" cy="18" r="6" fill="#ffd479" opacity="0.35"/>
+        <circle cx="60" cy="18" r="2.8" fill="#ffd479"/>
+        <circle cx="60" cy="18" r="1.1" fill="#ffffff"/>
+        <circle cx="94" cy="48" r="6" fill="#38bdf8" opacity="0.35"/>
+        <circle cx="94" cy="48" r="2.8" fill="#38bdf8"/>
+        <circle cx="94" cy="48" r="1.1" fill="#ffffff"/>
+        <circle cx="80" cy="92" r="6" fill="#f43f5e" opacity="0.35"/>
+        <circle cx="80" cy="92" r="2.8" fill="#f43f5e"/>
+        <circle cx="80" cy="92" r="1.1" fill="#ffffff"/>
+        <circle cx="40" cy="92" r="6" fill="#a855f7" opacity="0.35"/>
+        <circle cx="40" cy="92" r="2.8" fill="#a855f7"/>
+        <circle cx="40" cy="92" r="1.1" fill="#ffffff"/>
+        <circle cx="26" cy="48" r="6" fill="#10b981" opacity="0.35"/>
+        <circle cx="26" cy="48" r="2.8" fill="#10b981"/>
+        <circle cx="26" cy="48" r="1.1" fill="#ffffff"/>
+        <g transform="translate(60, 60) scale(1.65) translate(-32, -32)">
+          <path d="M32 23 L34 30 L41 32 L34 34 L32 41 L30 34 L23 32 L30 30 Z" fill="#ffd479" opacity="0.8" transform="rotate(45 32 32)"/>
+          <path d="M32 15 C32 26 33 31 38 31 C40.5 31 46 31.5 49 32 C46 32.5 40.5 33 38 33 C33 33 32 38 32 49 C32 38 31 33 26 33 C23.5 33 18 32.5 15 32 C18 31.5 23.5 31 26 31 C31 31 32 26 32 15 Z" fill="url(#spGoldStar)"/>
+          <circle cx="32" cy="32" r="2" fill="#ffffff"/>
+        </g>
+      </svg>
+    </div>
+    <div class="splash-typography">
+      <div class="splash-title">CONSTELLA</div>
+      <div class="splash-subtitle">Interactive Course Sessions</div>
+      <div class="splash-institution">
+        <span class="splash-univ-dot"></span>
+        Faculty of Computers &amp; AI &bull; Sinai University
+      </div>
+    </div>
+    <div class="splash-progress-container">
+      <div class="splash-progress-track">
+        <div class="splash-progress-beam"></div>
+      </div>
+      <div class="splash-status-text" id="splashStatus">Initializing Learning Constellations&hellip;</div>
+    </div>
+  </div>
+</div>
+
 <div id="aurora" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
 <div id="grid" aria-hidden="true"></div>
 <canvas id="stars" aria-hidden="true"></canvas>
