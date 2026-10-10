@@ -713,7 +713,7 @@ function table(c,x,y,w,cols,rows,f,o={}){
 }
 
 function terminal(c,x,y,w,h,f,lines,o={}){
-  const{start=20,speed=.22,pause=42,title='Expected Console Output'}=o;
+  const{start=20,speed=.55,pause=18,title='Expected Console Output'}=o;
   const p=ease(at(f,0,30));
   c.save();c.globalAlpha=p;
   rr(c,x,y,w,h,14);c.fillStyle=isLight?'#13111f':'#090912';c.fill();
@@ -770,7 +770,7 @@ VIZ.tokens={cycle:100000,draw(c,W,H,f){
   });
 }};
 
-VIZ.terminal={cycle:100000,draw(c,W,H,f,frame,o){
+VIZ.terminal={cycle:600,draw(c,W,H,f,frame,o){
   const h=Math.min(H-10,Math.max(210,o.data.lines.length*34+80));
   terminal(c,4,(H-h)/2,W-8,h,f,o.data.lines,{title:o.data.title||'Expected Console Output'});
 }};
@@ -793,9 +793,9 @@ const gmk=(st,hr,hk,hc,m,t,x)=>Object.assign({g:1,rows:st.rows,cols:st.cols,a:[.
 const OPS={};
 
 /* ===== lab engine ===== */
-function newLab(op){const L={op,mode:'auto',frames:[],idx:0,playing:true,last:-1,speed:160,hold:600,speedRate:1,demo:0,st:null,ui:null};labReset(L);return L}
+function newLab(op){const L={op,mode:'auto',frames:[],idx:0,playing:true,last:-1,speed:55,hold:95,demo:0,st:null,ui:null};labReset(L);return L}
 function labIdle(L){const O=OPS[L.op],s=L.st;return s.rows?gmk(s,null,null,null,O.idle,O.title):mk(s.a,s.n,{},O.idle,O.title)}
-function labReset(L){const O=OPS[L.op];L.st=O.init();L.speed=O.speed||160;L.hold=O.hold||600;L.demo=0;
+function labReset(L){const O=OPS[L.op];L.st=O.init();L.speed=O.speed||55;L.demo=0;
  if(L.mode==='auto'){L.frames=O.run(O.init(),O.demos[0]).frames;L.playing=true}
  else{L.frames=[labIdle(L)];L.playing=false}
  L.idx=0;L.last=-1;if(L.ui)L.ui.k=''}
@@ -805,18 +805,14 @@ function labRun(L){const O=OPS[L.op],p={};
  if(O.clear){const i=L.ui.inp[O.fields[0].k];i.value='';i.focus()}}
 function labTick(L,fr){
  if(L.last<0)L.last=fr;
- const rate=L.speedRate||1;
- const curSpeed=Math.round((L.speed||160)/rate);
- const curHold=Math.round((L.hold||600)/rate);
  if(L.playing){
   const end=L.idx>=L.frames.length-1;
-  if(!end){if(fr-L.last>=curSpeed){L.idx++;L.last=fr}}
-  else if(L.mode==='auto'){if(fr-L.last>=curHold){const O=OPS[L.op];L.demo++;L.st=O.init();L.frames=O.run(O.init(),O.demos[L.demo%O.demos.length]).frames;L.idx=0;L.last=fr}}
+  if(!end){if(fr-L.last>=L.speed){L.idx++;L.last=fr}}
+  else if(L.mode==='auto'){if(fr-L.last>=L.hold){const O=OPS[L.op];L.demo++;L.st=O.init();L.frames=O.run(O.init(),O.demos[L.demo%O.demos.length]).frames;L.idx=0;L.last=fr}}
   else L.playing=false;
  }
- if(L.ui){const s=L.frames[L.idx],k=L.idx+'/'+L.frames.length+(L.playing?'p':'s')+'|'+(s.ln||'')+'|'+L.st.n+'|'+rate;
+ if(L.ui){const s=L.frames[L.idx],k=L.idx+'/'+L.frames.length+(L.playing?'p':'s')+'|'+(s.ln||'')+'|'+L.st.n;
   if(L.ui.k!==k){L.ui.k=k;L.ui.cnt.textContent=(L.idx+1)+' / '+L.frames.length;L.ui.play.textContent=L.playing?'⏸':'▶';
-   if(L.ui.speed)L.ui.speed.textContent=rate===1?'1x':rate===0.5?'0.5x':rate===0.25?'0.25x':rate+'x';
    L.ui.bar.style.width=((L.idx+1)/L.frames.length*100)+'%';
    if(L.ui.code){const on=s.ln||[];Array.from(L.ui.code.children).forEach((e,j)=>e.classList.toggle('hot',on.includes(j)))}
    if(L.ui.lbl)L.ui.lbl.textContent=OPS[L.op].lbl(L.st)}}
@@ -824,10 +820,10 @@ function labTick(L,fr){
 function ctlHTML(L){const O=OPS[L.op];
  const f=(O.fields||[]).map(fd=>`<label class="fld"><span class="fl">${fd.l}</span><input data-k="${fd.k}" class="${fd.cls||''}" value="${fd.d===undefined?'':fd.d}" placeholder="${fd.ph||''}" autocomplete="off" spellcheck="false"></label>`).join('');
  return `<div class="ctl"><div class="ctl-row"><div class="seg"><button data-m="auto" class="on">▶ Auto demo</button><button data-m="manual">✍ Manual</button></div>${f}<button class="runbtn" data-run>${O.btn||'Run ▶'}</button></div>
- <div class="ctl-row"><button class="tbtn" data-t="reset" title="Reset">⟲</button><button class="tbtn" data-t="prev" title="Previous step">‹</button><button class="tbtn" data-t="play" title="Play / Pause">⏸</button><button class="tbtn" data-t="next" title="Next step">›</button><div class="stp"><i></i></div><span class="cnt"></span><button class="tbtn speed-btn" data-t="speed" title="Animation speed · سرعة الرسم (1x / 0.5x / 0.25x)">1x</button><button class="sound-btn" data-t="sound" title="Listen to real audio waveform">🔊 Listen</button></div></div>`}
+ <div class="ctl-row"><button class="tbtn" data-t="reset" title="Reset">⟲</button><button class="tbtn" data-t="prev" title="Previous step">‹</button><button class="tbtn" data-t="play" title="Play / Pause">⏸</button><button class="tbtn" data-t="next" title="Next step">›</button><div class="stp"><i></i></div><span class="cnt"></span><button class="sound-btn" data-t="sound" title="Listen to real audio waveform">🔊 Listen</button></div></div>`}
 function bindLab(L,el){
  const ctl=el.querySelector('.ctl'),O=OPS[L.op];
- L.ui={ctl,cnt:ctl.querySelector('.cnt'),play:ctl.querySelector('[data-t=play]'),speed:ctl.querySelector('[data-t=speed]'),bar:ctl.querySelector('.stp i'),code:el.querySelector('.tleft pre.code'),lbl:O.lbl?ctl.querySelector('.fl'):null,inp:{},k:''};
+ L.ui={ctl,cnt:ctl.querySelector('.cnt'),play:ctl.querySelector('[data-t=play]'),bar:ctl.querySelector('.stp i'),code:el.querySelector('.tleft pre.code'),lbl:O.lbl?ctl.querySelector('.fl'):null,inp:{},k:''};
  ctl.querySelectorAll('input[data-k]').forEach(i=>{L.ui.inp[i.dataset.k]=i;i.addEventListener('keydown',ev=>{if(ev.key==='Enter'){ev.preventDefault();labRun(L)}})});
  ctl.addEventListener('click',ev=>{const b=ev.target.closest('button');if(!b)return;
   if(b.dataset.m){L.mode=b.dataset.m;ctl.classList.toggle('manual',L.mode==='manual');ctl.querySelectorAll('.seg button').forEach(x=>x.classList.toggle('on',x===b));labReset(L);b.blur();if(L.mode==='manual'){const first=ctl.querySelector('input[data-k]');if(first)first.focus()}return}
@@ -836,12 +832,6 @@ function bindLab(L,el){
   else if(b.dataset.t==='prev'){L.playing=false;L.idx=Math.max(0,L.idx-1)}
   else if(b.dataset.t==='next'){L.playing=false;L.idx=Math.min(L.frames.length-1,L.idx+1)}
   else if(b.dataset.t==='play'){if(L.playing)L.playing=false;else{if(L.idx>=L.frames.length-1)L.idx=0;L.playing=true;L.last=-1}}
-  else if(b.dataset.t==='speed'){
-   const cur=L.speedRate||1;
-   const next=cur===1?0.5:cur===0.5?0.25:cur===0.25?1.5:1;
-   L.speedRate=next;
-   b.textContent=next===1?'1x':next===0.5?'0.5x':next===0.25?'0.25x':next+'x';
-  }
   else if(b.dataset.t==='sound'){toggleAudioTone(L, b);}
   L.ui.k='';b.blur()});
 }
@@ -963,7 +953,7 @@ OPS.dac={title:'DAC (ZOH)',idle:'Choose bit depth and Fs, then Run.',fields:[{k:
 VIZ.sig={cycle:1e9,draw(c,W,H,tick,frame,o){
   const L=o.data;labTick(L,frame);const s=L.frames[L.idx];const b=board(c,W,H,{title:s.t||'',frame});
   const x0=b.x+50,y0=b.y+82,w=b.w-84,h=b.h-82-128,R=s.R,ym=v=>y0+h/2-(v/R)*h/2,xm=t=>x0+t*w;
-  const rate=L.speedRate||1;L.hold=Math.round(600/rate);const drawDur=Math.round(260/rate);const sw=s.kind==='none'?1:ease(at(frame-L.last,0,drawDur)),gc=isLight?'rgba(0,0,0,.18)':'rgba(255,255,255,.16)';
+  L.hold=420;const sw=s.kind==='none'?1:ease(at(frame-L.last,0,240)),gc=isLight?'rgba(0,0,0,.18)':'rgba(255,255,255,.16)';
   c.lineWidth=1;c.strokeStyle=gc;c.strokeRect(x0,y0,w,h);c.beginPath();c.moveTo(x0,ym(0));c.lineTo(x0+w,ym(0));c.stroke();
   const yt=[-1,0,1];if(s.kind==='gain')[s.g,-s.g].forEach(v=>{if(Math.abs(Math.abs(v)-1)>.15&&v!==0)yt.push(v);});
   const fmt=v=>v===0?'0':(v>0?'+':'−')+(Math.abs(v)%1?Math.abs(v).toFixed(1):Math.abs(v));
@@ -1562,21 +1552,9 @@ document.addEventListener('visibilitychange', () => {
   isTabVisible = !document.hidden;
   if(isTabVisible) requestAnimationFrame(tick);
 });
-let lastTickTime = 0, frameFrac = 0;
-function tick(nowTime){
-  if(!isTabVisible) { lastTickTime = 0; return; }
-  if(!nowTime) nowTime = performance.now();
-  if(!lastTickTime) lastTickTime = nowTime;
-  const elapsed = Math.min(100, Math.max(0, nowTime - lastTickTime));
-  lastTickTime = nowTime;
-
-  // Frame normalization: 60 FPS baseline (16.667ms per frame)
-  // Ensures 90Hz, 120Hz, and 144Hz screens run at the exact same natural speed as 60Hz
-  frameFrac += elapsed / (1000 / 60);
-  const steps = Math.floor(frameFrac);
-  frameFrac -= steps;
-  frame += steps;
-
+function tick(){
+  if(!isTabVisible) return;
+  frame++;
   const isSmall = document.body.classList.contains('small');
   if(!isSmall || frame % 2 === 0){ aurora(frame); }
   for(const o of live){
