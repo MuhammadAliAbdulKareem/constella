@@ -9,24 +9,40 @@
 ```
 course-site/
 ├── index.html                   # هيكل الصفحة الرئيسية (Semantic HTML & PWA)
-├── app.css                      # ملف التصميم وأنظمة الألوان (Dark & Light tokens)
-├── app.js                       # محرك الكوكبات، البحث، والـ PWA Service Worker
-├── courses.js                   # ملف بيانات الكورسات والسكاشن (الوحيد المُعدَّل أسبوعياً)
-├── sw.js                        # محرك التخزين المؤقت للعمل بدون إنترنت (PWA Cache)
-├── manifest.json                # إعدادات تثبيت التطبيق على الموبايل والكمبيوتر
-├── favicon.svg & icon-*.png     # أيقونات التطبيق بدقة عالية ومقاسات متعددة
+├── manifest.json                # إعدادات تثبيت التطبيق على الموبايل والكمبيوتر (PWA Manifest)
+├── sw.js                        # محرك التخزين المؤقت للعمل بدون إنترنت (PWA Service Worker)
 ├── firebase.json                # إعدادات الاستضافة وCache-Control
-├── Start Site.bat               # تشغيل سيرفر محلي بنقرة واحدة (PowerShell مدمج)
-├── Start-Site.ps1               # سكريبت السيرفر المحلي الخفيف
+├── Start Site.bat               # تشغيل سيرفر محلي بنقرة واحدة (1-Click Local Server)
+│
+├── assets/                      # كافة الأصول الثابتة مصنفة حسب النوع
+│   ├── css/
+│   │   └── app.css              # ملف التصميم والأنظمة اللونية (Dark & Light tokens)
+│   ├── js/
+│   │   └── app.js               # محرك الكوكبات، البحث، والـ PWA Engine
+│   └── icons/                   # كافة أيقونات وتطبيقات الموقع (PWA Icons & Favicon)
+│       ├── favicon.svg
+│       ├── apple-touch-icon.png
+│       ├── icon-192.png
+│       ├── icon-512.png
+│       └── icon-maskable-512.png
+│
+├── data/                        # فصل بيانات السكاشن عن منطق الكود
+│   └── courses.js               # ملف بيانات الكورسات والسكاشن (الوحيد المُعدَّل أسبوعياً)
+│
+├── scripts/                     # سكريبتات وأدوات التشغيل المحلية
+│   └── Start-Site.ps1           # سكريبت السيرفر المحلي الخفيف
+│
 └── decks/                       # مجلد سلايدات وجلسات الكورسات
-    ├── template-session.html    # قالب معياري جاهز لإنشاء أي سكشن جديد بسهولة
+    ├── templates/               # القوالب المعيارية للسكاشن
+    │   └── template-session.html# قالب جاهز لإنشاء أي سكشن جديد بسهولة
     ├── data-structures/         # كورس هياكل البيانات (C++)
     │   ├── Week ⇔ 01/
     │   ├── Week ⇔ 02/
     │   └── Week ⇔ 03/
     └── multimedia/              # كورس الوسائط المتعددة (Python)
         ├── Week ⇔ 01/
-        └── Week ⇔ 02/
+        ├── Week ⇔ 02/
+        └── Week ⇔ 03/
 ```
 
 ---
@@ -46,8 +62,8 @@ course-site/
 ---
 
 ## ⚡ إضافة سكشن جديد (دقيقة واحدة)
-1. انسخ ملف `decks/template-session.html` إلى مجلد الكورس (مثلاً `decks/multimedia/Week ⇔ 03/Session ⇔ 03.html`).
-2. افتح `courses.js`، وانسخ عنصر `week` في الكورس المطلوب مع تعديل:
+1. انسخ ملف `decks/templates/template-session.html` إلى مجلد الكورس (مثلاً `decks/multimedia/Week ⇔ 04/Session ⇔ 04.html`).
+2. افتح `data/courses.js`، وانسخ عنصر `week` في الكورس المطلوب مع تعديل:
    - رقم الأسبوع (`week`)
    - العنوان والمواضيع (`title`, `topics`)
    - مسار الملف (`file`)

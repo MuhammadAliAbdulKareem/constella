@@ -1,5 +1,5 @@
-﻿$ErrorActionPreference = "SilentlyContinue"
-$root = $PSScriptRoot
+$ErrorActionPreference = "SilentlyContinue"
+$root = Split-Path -Parent $PSScriptRoot
 $port = 8000
 $listener = New-Object System.Net.HttpListener
 $listener.Prefixes.Add("http://localhost:$port/")
@@ -15,7 +15,8 @@ try {
 $mime = @{
     ".html"="text/html; charset=utf-8"; ".js"="application/javascript"; ".css"="text/css";
     ".json"="application/json"; ".png"="image/png"; ".jpg"="image/jpeg"; ".jpeg"="image/jpeg";
-    ".svg"="image/svg+xml"; ".ico"="image/x-icon"; ".woff"="font/woff"; ".woff2"="font/woff2"
+    ".svg"="image/svg+xml"; ".ico"="image/x-icon"; ".woff"="font/woff"; ".woff2"="font/woff2";
+    ".py"="text/plain; charset=utf-8"; ".cpp"="text/plain; charset=utf-8"
 }
 
 Write-Host ""
