@@ -1049,7 +1049,19 @@
   var pwaSplash = document.getElementById('pwaSplash');
   var splashStatus = document.getElementById('splashStatus');
   if (pwaSplash) {
-    var isStandaloneMode = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+    var isStandaloneMode = window.matchMedia('(display-mode: standalone)').matches || 
+                           window.matchMedia('(display-mode: fullscreen)').matches || 
+                           window.navigator.standalone === true;
+
+    // In standalone / installed PWA mode, the OS natively displays the launch splash screen.
+    // Immediately remove the secondary web splash to eliminate any double splash on mobile:
+    if (isStandaloneMode) {
+      if (pwaSplash.parentNode) {
+        pwaSplash.parentNode.removeChild(pwaSplash);
+      }
+      return;
+    }
+
     var lastBoot = 0;
     try { lastBoot = parseInt(sessionStorage.getItem('cs:boot_time') || '0', 10); } catch (e) {}
     var nowTime = Date.now();
