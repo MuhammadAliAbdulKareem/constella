@@ -798,11 +798,6 @@ html[data-theme="light"] .update-toast{
   filter: blur(0px);
   will-change: opacity, transform, filter;
 }
-@media (display-mode: standalone), (display-mode: fullscreen) {
-  .pwa-splash {
-    display: none !important;
-  }
-}
 
 /* Ambient cosmic nebula layers behind the emblem */
 .splash-ambient {
