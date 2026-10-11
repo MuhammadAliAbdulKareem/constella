@@ -1068,7 +1068,7 @@
       }, 850);
     }
 
-    var dismissDelay = isFastResume ? 260 : (isStandaloneMode ? 1150 : 850);
+    var dismissDelay = isFastResume ? 260 : (isStandaloneMode ? 750 : 850);
 
     function dismissSplash() {
       if (!pwaSplash || pwaSplash.classList.contains('splash-leaving')) return;
