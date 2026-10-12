@@ -261,8 +261,83 @@
   }
   refresh();
 
-  $('#reset').addEventListener('click', function () {
-    if (!opened.size || confirm('Clear the list of sessions you opened on this device?')) { opened.clear(); saveOpened(); refresh(); }
+  /* ---------- cosmic confirmation modal & progress reset ---------- */
+  var resetModal = $('#resetModal');
+  var resetModalBackdrop = $('#resetModalBackdrop');
+  var resetModalClose = $('#resetModalClose');
+  var resetModalCancel = $('#resetModalCancel');
+  var resetModalConfirm = $('#resetModalConfirm');
+  var resetModalStatText = $('#resetModalStatText');
+  var cosmicToast = $('#cosmicToast');
+  var cosmicToastText = $('#cosmicToastText');
+  var toastTimer = null;
+
+  function showCosmicToast(msg) {
+    if (!cosmicToast) return;
+    if (toastTimer) clearTimeout(toastTimer);
+    if (cosmicToastText) cosmicToastText.textContent = msg;
+    cosmicToast.hidden = false;
+    toastTimer = setTimeout(function () {
+      cosmicToast.hidden = true;
+    }, 3200);
+  }
+
+  function closeResetModal() {
+    if (!resetModal || resetModal.hidden) return;
+    var card = $('.cosmic-modal-card', resetModal);
+    if (card) {
+      card.classList.add('is-closing');
+      setTimeout(function () {
+        card.classList.remove('is-closing');
+        resetModal.hidden = true;
+      }, 180);
+    } else {
+      resetModal.hidden = true;
+    }
+  }
+
+  function openResetModal() {
+    if (!resetModal) return;
+    var count = opened.size;
+    if (!count) {
+      showCosmicToast('✨ No opened sessions recorded yet!');
+      return;
+    }
+    if (resetModalStatText) {
+      resetModalStatText.textContent = count + (count === 1 ? ' session currently marked as opened' : ' sessions currently marked as opened');
+    }
+    resetModal.hidden = false;
+    var card = $('.cosmic-modal-card', resetModal);
+    if (card) card.classList.remove('is-closing');
+    if (resetModalCancel) {
+      setTimeout(function () { resetModalCancel.focus(); }, 40);
+    }
+  }
+
+  if ($('#reset')) {
+    $('#reset').addEventListener('click', function () {
+      openResetModal();
+    });
+  }
+
+  if (resetModalConfirm) {
+    resetModalConfirm.addEventListener('click', function () {
+      opened.clear();
+      saveOpened();
+      refresh();
+      closeResetModal();
+      showCosmicToast('✦ Session progress cleared successfully');
+    });
+  }
+
+  if (resetModalCancel) resetModalCancel.addEventListener('click', closeResetModal);
+  if (resetModalClose) resetModalClose.addEventListener('click', closeResetModal);
+  if (resetModalBackdrop) resetModalBackdrop.addEventListener('click', closeResetModal);
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && resetModal && !resetModal.hidden) {
+      closeResetModal();
+    }
   });
 
   /* ---------- creative cosmic session transition ---------- */

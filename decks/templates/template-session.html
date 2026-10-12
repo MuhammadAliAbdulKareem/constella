@@ -103,7 +103,9 @@ body.small{padding:0!important}
 }
 
 /* Slides */
-.slide{position:absolute;inset:0;padding:48px 56px;display:none;flex-direction:column;z-index:10}
+.slide{position:absolute;inset:0;padding:48px 56px;display:none;flex-direction:column;z-index:10;overflow-y:auto;overflow-x:hidden}
+.slide::-webkit-scrollbar{width:4px}
+.slide::-webkit-scrollbar-thumb{background:rgba(168,85,247,.25);border-radius:99px}
 .slide.active{display:flex}
 .s-title{font-family:Syne,sans-serif;font-size:38px;font-weight:900;margin:0 0 8px;letter-spacing:-.02em}
 .s-sub{font-size:16px;color:var(--ts);margin:0 0 24px}
@@ -1186,10 +1188,11 @@ document.addEventListener('touchend', e => {
 const deck = document.getElementById('deck'), fitbox = document.getElementById('fitbox'), vp = document.getElementById('vp');
 function layout(){
   const W = window.innerWidth, H = window.innerHeight;
-  const small = Math.min(W, H) < 768 || W < 992;
+  const isLandscape = W >= H;
+  const small = W < 768 || (!isLandscape && W < 900);
   document.body.classList.toggle('small', small);
   if(!small){
-    const s = Math.min((W - 20) / 1100, (H - 24) / 707);
+    const s = Math.min((W - 16) / 1100, (H - 16) / 707);
     vp.style.width = '1100px'; vp.style.height = '619px';
     deck.style.width = '1100px'; deck.style.height = '707px';
     fitbox.style.width = Math.round(1100 * s) + 'px';
@@ -1197,14 +1200,15 @@ function layout(){
     deck.style.transformOrigin = 'top left'; deck.style.transform = `scale(${s})`;
     return;
   }
-  const isLandscape = W >= H;
   let s, dw, dh;
   if(isLandscape){
     s = H / 619;
-    if(W / s < 1100){ s = W / 1100; dw = 1100; dh = Math.round(H / s); }
-    else { dw = Math.round(W / s); dh = 619; }
+    dw = Math.max(1100, Math.round(W / s));
+    dh = 619;
   } else {
-    s = W / 1100; dw = 1100; dh = 619;
+    s = W / 1100;
+    dw = 1100;
+    dh = Math.max(619, Math.round(H / s));
   }
   vp.style.width = dw + 'px'; vp.style.height = dh + 'px';
   deck.style.width = dw + 'px'; deck.style.height = dh + 'px';

@@ -638,6 +638,164 @@ html[data-theme="light"] .update-toast{
 }
 .foot-btn:hover{color:var(--ink)}
 
+/* ---------- Cosmic Confirmation Modal ---------- */
+.cosmic-modal-overlay{
+  position:fixed;inset:0;z-index:200;
+  display:flex;align-items:center;justify-content:center;
+  padding:16px;
+  opacity:1;transition:opacity .25s ease;
+}
+.cosmic-modal-overlay[hidden]{display:none!important}
+.cosmic-modal-backdrop{
+  position:absolute;inset:0;
+  background:rgba(4,7,18,.76);
+  backdrop-filter:blur(12px) saturate(140%);
+  -webkit-backdrop-filter:blur(12px) saturate(140%);
+  animation:fadeBackdrop .24s ease forwards;
+}
+html[data-theme="light"] .cosmic-modal-backdrop{
+  background:rgba(15,22,60,.42);
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
+}
+@keyframes fadeBackdrop{from{opacity:0}to{opacity:1}}
+
+.cosmic-modal-card{
+  position:relative;width:min(440px,100%);
+  background:var(--panel);
+  border-radius:24px;
+  padding:24px 22px 20px;
+  border:1px solid var(--line);
+  box-shadow:0 24px 60px rgba(0,0,0,.68), 0 0 35px rgba(99,102,241,.18);
+  animation:cosmicModalIn .3s cubic-bezier(.16,1,.3,1) forwards;
+  z-index:1;
+  overflow:hidden;
+}
+html[data-theme="light"] .cosmic-modal-card{
+  box-shadow:0 20px 50px rgba(15,22,60,.16), 0 0 25px rgba(99,102,241,.1);
+}
+
+/* Subtle cosmic gradient light accent line at top of modal */
+.cosmic-modal-card::before{
+  content:"";position:absolute;top:0;left:0;right:0;height:2.5px;
+  background:linear-gradient(90deg, #6366f1, var(--gold), #ec4899);
+}
+
+@keyframes cosmicModalIn{
+  from{transform:scale(.92) translateY(16px);opacity:0}
+  to{transform:scale(1) translateY(0);opacity:1}
+}
+.cosmic-modal-card.is-closing{
+  animation:cosmicModalOut .2s cubic-bezier(.2,0,1,.8) forwards;
+}
+@keyframes cosmicModalOut{
+  from{transform:scale(1) translateY(0);opacity:1}
+  to{transform:scale(.94) translateY(12px);opacity:0}
+}
+
+.cosmic-modal-close{
+  position:absolute;top:16px;right:16px;
+  width:32px;height:32px;border-radius:50%;border:0;
+  background:var(--hover);color:var(--faint);font-size:20px;line-height:1;
+  cursor:pointer;display:grid;place-items:center;padding:0;
+  transition:all .18s ease;
+}
+.cosmic-modal-close:hover{background:var(--line);color:var(--ink);transform:scale(1.05)}
+
+.cosmic-modal-header{
+  display:flex;align-items:flex-start;gap:14px;margin-bottom:14px;
+}
+.cosmic-modal-icon-wrap{
+  position:relative;width:46px;height:46px;border-radius:14px;
+  background:color-mix(in srgb,var(--gold) 15%,var(--panel));
+  border:1px solid color-mix(in srgb,var(--gold) 38%,transparent);
+  display:grid;place-items:center;flex-shrink:0;
+  box-shadow:0 4px 16px color-mix(in srgb,var(--gold) 20%,transparent);
+}
+.cosmic-modal-icon{
+  width:22px;height:22px;color:var(--gold);
+}
+.cosmic-modal-title{
+  margin:0 0 3px;font:700 1.15rem/1.3 var(--display);color:var(--ink);
+  letter-spacing:-.015em;
+}
+.cosmic-modal-title-ar{
+  display:block;font:600 .82rem/1.3 "Lemonada",var(--body);color:var(--dim);
+  margin-top:2px;direction:rtl;
+}
+.cosmic-modal-desc{
+  margin:0;font-size:.88rem;color:var(--dim);line-height:1.48;
+}
+
+.cosmic-modal-stat{
+  display:inline-flex;align-items:center;gap:8px;
+  background:color-mix(in srgb,var(--gold) 12%,var(--panel));
+  border:1px solid color-mix(in srgb,var(--gold) 30%,transparent);
+  color:var(--gold);
+  border-radius:10px;padding:7px 12px;font:600 .82rem var(--body);
+  margin-bottom:12px;
+}
+.cosmic-modal-stat-dot{
+  width:7px;height:7px;border-radius:50%;background:var(--gold);
+  animation:ping 2.5s ease-out infinite;flex-shrink:0;
+}
+
+.cosmic-modal-hint{
+  display:flex;align-items:flex-start;gap:8px;
+  font-size:.78rem;color:var(--faint);line-height:1.42;margin-bottom:20px;
+}
+.cosmic-modal-hint svg{flex-shrink:0;margin-top:1.5px;color:var(--faint)}
+
+.cosmic-modal-actions{
+  display:flex;align-items:center;justify-content:flex-end;gap:10px;
+}
+.cosmic-modal-btn{
+  height:40px;padding:0 18px;border-radius:999px;
+  font:600 .86rem var(--body);cursor:pointer;
+  display:inline-flex;align-items:center;justify-content:center;gap:7px;
+  border:0;transition:all .18s cubic-bezier(.16,1,.3,1);
+  -webkit-tap-highlight-color:transparent;
+}
+.cosmic-modal-btn--secondary{
+  background:var(--hover);border:1px solid var(--line);color:var(--ink);
+}
+.cosmic-modal-btn--secondary:hover{
+  background:color-mix(in srgb,var(--line) 40%,transparent);color:var(--ink);
+  transform:translateY(-1px);
+}
+.cosmic-modal-btn--danger{
+  background:linear-gradient(135deg,#f43f5e,#e11d48);color:#fff;
+  box-shadow:0 4px 14px rgba(225,29,72,.35);
+}
+.cosmic-modal-btn--danger:hover{
+  filter:brightness(1.1);transform:translateY(-1.5px) scale(1.02);
+  box-shadow:0 6px 18px rgba(225,29,72,.48);
+}
+.cosmic-modal-btn--danger:active{transform:scale(.97)}
+
+@media (max-width:440px){
+  .cosmic-modal-actions{flex-direction:column-reverse;gap:8px}
+  .cosmic-modal-btn{width:100%}
+  .cosmic-modal-header{align-items:flex-start}
+}
+
+/* ---------- Cosmic Floating Toast ---------- */
+.cosmic-toast{
+  position:fixed;bottom:max(22px,calc(var(--safe-bottom) + 12px));left:50%;transform:translateX(-50%);
+  z-index:210;background:rgba(14,20,40,.96);border:1px solid rgba(160,175,255,.32);
+  color:#e9edff;padding:9px 18px;border-radius:999px;font:600 .86rem var(--body);
+  display:inline-flex;align-items:center;gap:9px;white-space:nowrap;
+  box-shadow:0 12px 34px rgba(0,0,0,.6),0 0 22px rgba(99,102,241,.24);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  animation:promptIn .3s cubic-bezier(.16,1,.3,1);
+  pointer-events:none;
+}
+html[data-theme="light"] .cosmic-toast{
+  background:rgba(255,255,255,.98);border-color:rgba(15,22,60,.16);color:#0f1633;
+  box-shadow:0 12px 30px rgba(15,22,60,.16),0 0 18px rgba(99,102,241,.12);
+}
+.cosmic-toast-icon{color:var(--gold);font-size:.92rem}
+
 /* ---------- Course Filter Tabs ---------- */
 .course-filter-wrap{
   margin-top:24px;

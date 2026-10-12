@@ -72,6 +72,19 @@ window.SITE = {
           date: "2026-10-06",
           duration: "75 min",
           slides: 12
+        },
+        {
+          week: 4,
+          title: "Digital Images in Python",
+          titleAr: "معالجة وتوليد الصور الرقمية (Digital Images)",
+          topics: ["input image & matrix grid", "show image & RGB vs BGR trap", "orthogonal & affine rotation", "resizing & interpolation filters", "RGB to gray level luminance", "gray to binary thresholding", "2D pixel labs"],
+          keywordsAr: ["صور رقمية", "بكسل", "قراءة الصور", "أوبن سي في", "بايثون صور", "تدوير الصورة", "تغيير الحجم", "تدرج رمادي", "صورة ثنائية", "عتبة", "مصفوفة بكسل"],
+          file: "decks/multimedia/Week ⇔ 04/Session ⇔ 04.html",
+          codeFile: "decks/multimedia/Week ⇔ 04/session04_digital_images.py",
+          codeName: "session04_digital_images.py",
+          date: "2026-10-13",
+          duration: "75 min",
+          slides: 15
         }
       ]
     },

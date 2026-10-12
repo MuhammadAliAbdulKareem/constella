@@ -2,7 +2,7 @@
    Constella Service Worker — Offline Course Portal & PWA Engine
    ===================================================================== */
 
-const CACHE_NAME = 'constella-v2.4.7';
+const CACHE_NAME = 'constella-v2.4.9';
 
 // Core application shell assets and session decks to pre-cache on install
 const CORE_ASSETS = [
@@ -23,6 +23,8 @@ const CORE_ASSETS = [
   './decks/multimedia/Week ⇔ 02/session02_oop.py',
   './decks/multimedia/Week ⇔ 03/Session ⇔ 03.html',
   './decks/multimedia/Week ⇔ 03/session03_digital_sound.py',
+  './decks/multimedia/Week ⇔ 04/Session ⇔ 04.html',
+  './decks/multimedia/Week ⇔ 04/session04_digital_images.py',
   './decks/data-structures/Week ⇔ 01/Session ⇔ 01.html',
   './decks/data-structures/Week ⇔ 01/Functions_Memory.cpp',
   './decks/data-structures/Week ⇔ 02/Session ⇔ 02.html',

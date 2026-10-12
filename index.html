@@ -210,7 +210,7 @@
         <span class="tab-dot"></span> All Courses <span class="tab-count" id="countAll">2</span>
       </button>
       <button class="course-tab" data-filter="multimedia" role="tab" aria-selected="false" type="button">
-        <span class="tab-dot" style="background:#38bdf8"></span> Multimedia <span class="tab-count" id="countMm">3</span>
+        <span class="tab-dot" style="background:#38bdf8"></span> Multimedia <span class="tab-count" id="countMm">4</span>
       </button>
       <button class="course-tab" data-filter="data-structures" role="tab" aria-selected="false" type="button">
         <span class="tab-dot" style="background:#a855f7"></span> Data Structures <span class="tab-count" id="countDs">3</span>
@@ -271,6 +271,65 @@
     </div>
     <button class="btn btn-full" id="iosGotIt" type="button">Got it</button>
   </div>
+</div>
+
+<!-- Reset Progress Confirmation Modal -->
+<div class="cosmic-modal-overlay" id="resetModal" hidden role="dialog" aria-modal="true" aria-labelledby="resetModalTitle" aria-describedby="resetModalDesc">
+  <div class="cosmic-modal-backdrop" id="resetModalBackdrop"></div>
+  <div class="cosmic-modal-card">
+    <button class="cosmic-modal-close" id="resetModalClose" type="button" aria-label="Close dialog">&times;</button>
+    
+    <div class="cosmic-modal-header">
+      <div class="cosmic-modal-icon-wrap">
+        <svg class="cosmic-modal-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+          <path d="M3 3v5h5"/>
+          <path d="M12 7v5l3 3"/>
+        </svg>
+      </div>
+      <div>
+        <h3 id="resetModalTitle" class="cosmic-modal-title">
+          Clear Opened Sessions?
+          <span class="cosmic-modal-title-ar">إعادة ضبط سجل الجلسات المفتوحة</span>
+        </h3>
+        <p id="resetModalDesc" class="cosmic-modal-desc">
+          Are you sure you want to clear the list of sessions you opened on this device?
+        </p>
+      </div>
+    </div>
+
+    <div class="cosmic-modal-stat" id="resetModalStat">
+      <span class="cosmic-modal-stat-dot"></span>
+      <span id="resetModalStatText">0 sessions currently marked as opened</span>
+    </div>
+
+    <div class="cosmic-modal-hint">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15">
+        <circle cx="12" cy="12" r="10"/>
+        <line x1="12" y1="16" x2="12" y2="12"/>
+        <line x1="12" y1="8" x2="12.01" y2="8"/>
+      </svg>
+      <span>This resets your constellation rings on this browser. Your downloaded codes and files are not affected.</span>
+    </div>
+
+    <div class="cosmic-modal-actions">
+      <button type="button" class="cosmic-modal-btn cosmic-modal-btn--secondary" id="resetModalCancel">Keep Progress</button>
+      <button type="button" class="cosmic-modal-btn cosmic-modal-btn--danger" id="resetModalConfirm">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+          <path d="M3 6h18"/>
+          <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/>
+          <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
+        </svg>
+        <span>Clear Progress</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Cosmic Toast Notification -->
+<div class="cosmic-toast" id="cosmicToast" hidden role="status" aria-live="polite">
+  <span class="cosmic-toast-icon">✦</span>
+  <span id="cosmicToastText">Session progress reset successfully</span>
 </div>
 
 <!-- Offline Toast -->
