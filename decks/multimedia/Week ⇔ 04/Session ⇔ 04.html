@@ -1560,6 +1560,8 @@ const GV=(()=>{const d=IMG.getContext('2d').getImageData(0,0,IMW,IMH).data,v=new
 function toCv(fn){const o=document.createElement('canvas');o.width=IMW;o.height=IMH;const c=o.getContext('2d'),id=c.createImageData(IMW,IMH);
   for(let i=0;i<GV.length;i++){const v=fn(GV[i]);id.data[i*4]=id.data[i*4+1]=id.data[i*4+2]=v;id.data[i*4+3]=255}c.putImageData(id,0,0);return o}
 const GRAYC=toCv(v=>v),BINC=toCv(v=>v>127?255:0),_tc=toCv(v=>v);
+const ROTC=(()=>{const o=document.createElement('canvas');o.width=IMH;o.height=IMW;const c=o.getContext('2d');c.translate(IMH,0);c.rotate(Math.PI/2);c.drawImage(IMG,0,0);return o})();
+const RESIZEC=(()=>{const o=document.createElement('canvas');o.width=IMW;o.height=IMW;const c=o.getContext('2d');c.drawImage(IMG,0,0,IMW,IMW);return o})();
 const _thrCache=new Map();
 function thr(T){
   T=Math.max(0,Math.min(255,Math.round(T)));
@@ -1788,25 +1790,302 @@ VIZ.win={cycle:1e9,draw(c,W,H,f){
   txt(c,msg,W/2,yy+60,{size:12.5,col:PC,font:'mono',weight:700});
 }};
 
-VIZ.recap={cycle:1e9,draw(c,W,H,f){
-  c.imageSmoothingEnabled=false;
-  const n=5,gap=14,tw=Math.min((W-gap*(n-1)-16)/n,128),th=tw/AR,x0=(W-(n*tw+(n-1)*gap))/2,y=H/2-tw/2-26,on=Math.floor(f/140)%n;
-  const L=['imread','cvtColor','threshold','resize','rotate'];
-  for(let i=0;i<n;i++){
-    const x=x0+i*(tw+gap),act=i===on;
-    c.save();c.globalAlpha=act?1:.7;rr(c,x,y,tw,tw,12);c.fillStyle=rgba(act?PC:CL.dim,act?.14:.06);c.fill();
-    c.strokeStyle=act?PC:CL.axis;c.lineWidth=act?2.4:1.2;if(act){c.shadowColor=PC;c.shadowBlur=12}c.stroke();c.restore();
-    c.save();rr(c,x,y,tw,tw,12);c.clip();
-    if(i<3)c.drawImage([IMG,GRAYC,BINC][i],x,y+(tw-th)/2,tw,th);
-    else if(i===3)c.drawImage(IMG,x,y,tw,tw);
-    else{c.translate(x+tw/2,y+tw/2);c.rotate(Math.PI/2);c.drawImage(IMG,-tw/2,-th/2,tw,th)}
+VIZ.recap={
+  cycle:1e9,
+  draw(c,W,H,f,frame,o){
+    const BW=980,BH=420;
+    const sc=Math.min(W/BW,H/BH,1.06);
+    c.save();
+    c.translate((W-BW*sc)/2,(H-BH*sc)/2);
+    c.scale(sc,sc);
+
+    const b=board(c,BW,BH,{
+      title:'Complete OpenCV Pipeline  ·  Session 04 Synthesis & Architecture',
+      frame
+    });
+    const tc=isLight?'#1b1535':CL.chalk;
+    const fade=ease(at(f,0,30));
+    c.save();
+    c.globalAlpha=fade;
+
+    // --- TOP SECTION: 5 PIPELINE HERO CARDS ---
+    txt(c,'TRANSFORMATION PIPELINE · FROM RAW IMAGE TO PIXEL TRANSFORMATIONS',b.x+22,b.y+44,{
+      size:10.5,col:CL.dim,font:'mono',weight:700,align:'left'
+    });
+
+    const act=Math.floor((f%750)/150);
+    const n=5;
+    const gap=13;
+    const totalW=b.w-44;
+    const cw=Math.floor((totalW-(n-1)*gap)/n);
+    const ch=136;
+    const cy=b.y+56;
+
+    const cards=[
+      {name:'cv2.imread',tag:'01 · INPUT',col:CL.cyan,sub:'BGR  ·  (H, W, 3)',note:'uint8 [0..255]',cv:IMG},
+      {name:'cv2.cvtColor',tag:'02 · COLOR',col:CL.violet,sub:'Gray  ·  (H, W)',note:'0.299R + 0.587G + 0.114B',cv:GRAYC},
+      {name:'cv2.threshold',tag:'03 · BINARY',col:CL.green,sub:'Mask  ·  {0, 255}',note:'T = 127 · Black/White',cv:BINC},
+      {name:'cv2.resize',tag:'04 · RESIZE',col:CL.amber,sub:'dsize = (W, H)',note:'Width first in tuple',cv:RESIZEC},
+      {name:'cv2.rotate',tag:'05 · ROTATE',col:CL.pink,sub:'ROTATE_90_CW',note:'Swaps Shape (W, H)',cv:ROTC}
+    ];
+
+    cards.forEach((cd,k)=>{
+      const x=b.x+22+k*(cw+gap);
+      const on=k===act;
+
+      // Card Container
+      c.save();
+      rr(c,x,cy,cw,ch,10);
+      c.fillStyle=rgba(on?cd.col:CL.dim,on?(isLight?0.14:0.16):(isLight?0.04:0.06));
+      c.fill();
+      c.strokeStyle=on?cd.col:(isLight?'rgba(0,0,0,0.1)':'rgba(255,255,255,0.12)');
+      c.lineWidth=on?2.4:1.2;
+      if(on&&!isLight){
+        c.shadowColor=cd.col;
+        c.shadowBlur=14;
+      }
+      c.stroke();
+      c.restore();
+
+      // Card Header: Step Tag & Function Name
+      c.save();
+      rr(c,x+8,cy+7,36,16,4);
+      c.fillStyle=rgba(cd.col,on?0.35:0.16);
+      c.fill();
+      txt(c,'0'+(k+1),x+26,cy+15,{size:9,col:on?cd.col:CL.dim,font:'mono',weight:800});
+      txt(c,cd.name,x+48,cy+15,{size:10.5,col:on?cd.col:(isLight?'#334155':CL.chalk),font:'mono',weight:on?800:600,align:'left'});
+      c.restore();
+
+      // Card Thumbnail Frame
+      const iw=cw-16;
+      const ih=58;
+      const ix=x+8,iy=cy+28;
+
+      c.save();
+      rr(c,ix,iy,iw,ih,6);
+      c.fillStyle=isLight?'#f1f5f9':'#030308';
+      c.fill();
+      c.strokeStyle=on?rgba(cd.col,0.6):(isLight?'#cbd5e1':'rgba(255,255,255,0.08)');
+      c.lineWidth=1;
+      c.stroke();
+      c.clip();
+
+      if(k===3){
+        c.drawImage(RESIZEC,ix+(iw-ih)/2,iy,ih,ih);
+        if(on){
+          c.strokeStyle=cd.col;
+          c.lineWidth=1.2;
+          c.setLineDash([2,2]);
+          c.strokeRect(ix+(iw-ih)/2,iy,ih,ih);
+        }
+      }else if(k===4){
+        const rw=ih*(IMH/IMW);
+        c.drawImage(ROTC,ix+(iw-rw)/2,iy,rw,ih);
+      }else{
+        const ar=IMW/IMH;
+        const dw=ih*ar;
+        c.drawImage(cd.cv,ix+(iw-dw)/2,iy,dw,ih);
+      }
+
+      // Animated threshold scanner on card 2
+      if(k===2&&on){
+        const sx=ix+((f*1.5)%iw);
+        c.save();
+        c.strokeStyle=CL.green;
+        c.lineWidth=1.5;
+        if(!isLight){c.shadowColor=CL.green;c.shadowBlur=6;}
+        c.beginPath();
+        c.moveTo(sx,iy);
+        c.lineTo(sx,iy+ih);
+        c.stroke();
+        c.restore();
+      }
+      c.restore();
+
+      // Card Footer: Specs & Subtext
+      const textY1=iy+ih+14;
+      const textY2=textY1+14;
+      txt(c,cd.sub,x+cw/2,textY1,{size:10,col:on?(isLight?'#0f172a':CL.chalk):(isLight?'#64748b':CL.dim),font:'mono',weight:on?700:500});
+      txt(c,cd.note,x+cw/2,textY2,{size:9,col:on?cd.col:(isLight?'#94a3b8':'rgba(255,255,255,0.38)'),font:'ui',weight:600});
+
+      // Connecting Arrow to Next Card
+      if(k<n-1){
+        const x1=x+cw+2;
+        const x2=x+cw+gap-2;
+        const ym=cy+28+ih/2;
+        c.save();
+        c.strokeStyle=on?cd.col:(isLight?'rgba(0,0,0,0.18)':'rgba(255,255,255,0.2)');
+        c.lineWidth=on?2:1.2;
+        c.setLineDash([4,3]);
+        c.lineDashOffset=-f*0.8;
+        c.beginPath();
+        c.moveTo(x1,ym);
+        c.lineTo(x2-5,ym);
+        c.stroke();
+        c.setLineDash([]);
+        c.fillStyle=on?cd.col:(isLight?'rgba(0,0,0,0.22)':'rgba(255,255,255,0.25)');
+        c.beginPath();
+        c.moveTo(x2,ym);
+        c.lineTo(x2-5,ym-3.5);
+        c.lineTo(x2-5,ym+3.5);
+        c.fill();
+        c.restore();
+      }
+    });
+
+    // --- MIDDLE DIVIDER ---
+    const divY=cy+ch+14;
+    c.save();
+    c.strokeStyle=isLight?'rgba(99,102,241,0.2)':'rgba(168,85,247,0.25)';
+    c.lineWidth=1.2;
+    c.setLineDash([4,6]);
+    c.beginPath();
+    c.moveTo(b.x+22,divY);
+    c.lineTo(b.x+b.w-22,divY);
+    c.stroke();
     c.restore();
-    txt(c,'cv2.'+L[i],x+tw/2,y+tw+16,{size:10.5,col:act?PC:CL.dim,font:'mono',weight:act?800:600});
-    if(i<n-1)txt(c,'›',x+tw+gap/2,y+tw/2,{size:18,col:CL.dim});
+
+    // --- BOTTOM SECTION: TWO RICH PANELS ---
+    const by=divY+12;
+    const bh=184;
+    const pw=Math.floor((b.w-44-14)/2);
+    const px1=b.x+22;
+    const px2=px1+pw+14;
+
+    // LEFT PANEL: Window Management & Display Lifecycle
+    c.save();
+    rr(c,px1,by,pw,bh,12);
+    c.fillStyle=rgba(CL.cyan,isLight?0.05:0.08);
+    c.fill();
+    c.strokeStyle=rgba(CL.cyan,isLight?0.25:0.35);
+    c.lineWidth=1.2;
+    c.stroke();
+    c.restore();
+
+    // Left Panel Header
+    c.save();
+    rr(c,px1+14,by+10,205,18,4);
+    c.fillStyle=rgba(CL.cyan,isLight?0.15:0.2);
+    c.fill();
+    txt(c,'DISPLAY & WINDOW LIFECYCLE',px1+116,by+19,{size:9.5,col:CL.cyan,font:'mono',weight:800});
+    c.restore();
+
+    // Left Panel: 3 Interactive Steps
+    const wstep=Math.floor((f%360)/120);
+    const wchips=[
+      {fn:'cv2.imshow(win, img)',desc:'Opens OS raster GUI window'},
+      {fn:'cv2.waitKey(0)',desc:'Blocks CPU; waits for key (0 = ∞)'},
+      {fn:'cv2.destroyAllWindows()',desc:'Destroys GUI handles & frees RAM'}
+    ];
+    const chipW=pw-28;
+    const chipH=26;
+    wchips.forEach((wc,i)=>{
+      const cyy=by+34+i*(chipH+6);
+      const won=i===wstep;
+      c.save();
+      rr(c,px1+14,cyy,chipW,chipH,6);
+      c.fillStyle=rgba(won?CL.cyan:CL.dim,won?(isLight?0.15:0.18):(isLight?0.04:0.06));
+      c.fill();
+      c.strokeStyle=won?CL.cyan:(isLight?'rgba(0,0,0,0.08)':'rgba(255,255,255,0.08)');
+      c.lineWidth=won?1.6:1;
+      if(won&&!isLight){c.shadowColor=CL.cyan;c.shadowBlur=8;}
+      c.stroke();
+      c.restore();
+
+      txt(c,(won?'▶ ':'  ')+wc.fn,px1+22,cyy+chipH/2,{
+        size:10,col:won?(isLight?'#0284c7':CL.cyan):(isLight?'#475569':CL.chalk),font:'mono',weight:700,align:'left'
+      });
+      txt(c,wc.desc,px1+chipW+6,cyy+chipH/2,{
+        size:9.5,col:isLight?'#64748b':CL.dim,font:'ui',weight:500,align:'right'
+      });
+    });
+
+    // Colab Note at bottom of Left Panel
+    const colabY=by+bh-16;
+    txt(c,'⚡ Google Colab: GUI windows blocked → use from google.colab.patches import cv2_imshow',px1+14,colabY,{
+      size:9.5,col:isLight?'#b45309':CL.amber,font:'ui',weight:600,align:'left'
+    });
+
+    // RIGHT PANEL: NumPy Foundation & Session 05 Preview
+    c.save();
+    rr(c,px2,by,pw,bh,12);
+    c.fillStyle=rgba(CL.violet,isLight?0.05:0.08);
+    c.fill();
+    c.strokeStyle=rgba(CL.violet,isLight?0.25:0.35);
+    c.lineWidth=1.2;
+    c.stroke();
+    c.restore();
+
+    // Right Panel Header
+    c.save();
+    rr(c,px2+14,by+10,225,18,4);
+    c.fillStyle=rgba(CL.violet,isLight?0.15:0.2);
+    c.fill();
+    txt(c,'NUMPY CORE & NEXT SESSION 05',px2+126,by+19,{size:9.5,col:CL.violet,font:'mono',weight:800});
+    c.restore();
+
+    // Core Foundation Box
+    const coreBoxY=by+34;
+    const coreBoxH=38;
+    c.save();
+    rr(c,px2+14,coreBoxY,pw-28,coreBoxH,6);
+    c.fillStyle=isLight?'#f3e8ff':'rgba(168,85,247,0.12)';
+    c.fill();
+    c.strokeStyle=rgba(CL.violet,0.4);
+    c.lineWidth=1;
+    c.stroke();
+    c.restore();
+
+    txt(c,'“Every image is fundamentally a NumPy ndarray of numbers.”',px2+pw/2,coreBoxY+13,{
+      size:11,col:isLight?'#6b21a8':CL.chalk,font:'ui',weight:800
+    });
+    txt(c,'img[y, x] = [B, G, R]   ·   dtype = uint8 [0..255]   ·   origin: top-left (0, 0)',px2+pw/2,coreBoxY+28,{
+      size:9.5,col:isLight?'#7e22ce':CL.pink,font:'mono',weight:600
+    });
+
+    // Session 05 Preview Box
+    const nxtY=coreBoxY+coreBoxH+8;
+    const nxtH=bh-(nxtY-by)-8;
+    c.save();
+    rr(c,px2+14,nxtY,pw-28,nxtH,6);
+    c.fillStyle=rgba(CL.pink,isLight?0.08:0.1);
+    c.fill();
+    c.strokeStyle=rgba(CL.pink,isLight?0.3:0.4);
+    c.lineWidth=1;
+    c.stroke();
+    c.restore();
+
+    // Mini 3x3 Kernel Matrix Graphic
+    const kx=px2+24,ky=nxtY+8;
+    const ks=13;
+    const kvals=['-1','-1','-1','-1',' 8','-1','-1','-1','-1'];
+    for(let kr=0;kr<3;kr++){
+      for(let kc=0;kc<3;kc++){
+        const kxx=kx+kc*ks,kyy=ky+kr*ks;
+        const isCenter=kr===1&&kc===1;
+        c.fillStyle=isCenter?rgba(CL.pink,0.45):(isLight?'#e2e8f0':'rgba(255,255,255,0.08)');
+        c.fillRect(kxx,kyy,ks-1.5,ks-1.5);
+        txt(c,kvals[kr*3+kc],kxx+ks/2-0.5,kyy+ks/2+3,{
+          size:7,col:isCenter?CL.pink:(isLight?'#475569':CL.dim),font:'mono',weight:700
+        });
+      }
+    }
+
+    const infoX=kx+3*ks+12;
+    txt(c,'NEXT UP: Image Filtering & 2D Convolutions',infoX,ky+10,{
+      size:10.5,col:isLight?'#9d174d':CL.pink,font:'ui',weight:800,align:'left'
+    });
+    txt(c,'Because images are arrays, future operations (blur, sharpen, edge detection)',infoX,ky+23,{
+      size:9.5,col:isLight?'#475569':CL.dim,font:'ui',weight:500,align:'left'
+    });
+    txt(c,'are simply sliding 3×3 matrix kernels over the pixel grid!',infoX,ky+35,{
+      size:9.5,col:isLight?'#475569':CL.chalk,font:'ui',weight:600,align:'left'
+    });
+
+    c.restore();
+    c.restore();
   }
-  txt(c,'imshow  ·  waitKey  ·  destroyAllWindows',W/2,y+tw+50,{size:12.5,col:CL.chalk,font:'mono'});
-  txt(c,'Every image is just a NumPy array of numbers.',W/2,y+tw+76,{size:12,col:CL.dim,font:'ui'});
-}};
+};
 
 let _ad=null;
 VIZ.arr={cycle:1e9,draw(c,W,H,f){
@@ -1942,7 +2221,7 @@ const HERO=`
 <div class="chips"><span>imread</span><span>Grayscale</span><span>Binary</span><span>Resize</span><span>Rotate</span><span>imshow</span><span>3 MCQs</span><span>Student Task</span></div>`;
 /* Responsive: every visual is drawn on a fixed 520x430 board that is scaled to fit its container */
 const DW=520,DH=430;
-['read','gray','thresh','resize','rotate','win','arr','recap'].forEach(n=>{
+['read','gray','thresh','resize','rotate','win','arr'].forEach(n=>{
   const d=VIZ[n].draw;
   VIZ[n].draw=function(c,W,H,f,fr,o){
     const k=Math.min(W/DW,H/DH,1.3),oc=CW;
