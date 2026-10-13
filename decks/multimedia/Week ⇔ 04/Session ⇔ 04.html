@@ -69,7 +69,8 @@ html.light-mode, body.light-mode, html.light-mode body{
 *{box-sizing:border-box}
 html,body{margin:0;height:100%;height:100dvh;background:var(--bg);color:var(--tp);font-family:Inter,system-ui,"Segoe UI",Roboto,Arial,sans-serif;overflow:hidden;transition:background .3s ease, color .3s ease;}
 body{padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px);display:flex;align-items:center;justify-content:center}
-#fitbox{position:relative;flex:none}
+#fitbox{position:relative;flex:none;opacity:0;visibility:hidden;transition:opacity .22s cubic-bezier(.16,1,.3,1), visibility .22s;will-change:opacity}
+.deck-ready #fitbox{opacity:1;visibility:visible}
 #deck{width:1100px;height:707px;position:absolute;left:0;top:0;transform-origin:top left}
 
 /* Brand Bar */
@@ -1088,6 +1089,7 @@ body.light-mode .constella-toast{
 .hero-slide .chips{max-width:540px}
 .hero-slide .inst{margin-top:22px}
 </style>
+<noscript><style>#fitbox{opacity:1!important;visibility:visible!important}</style></noscript>
 </head>
 <body>
 <nav class="m-nav-hud" role="navigation" aria-label="Mobile Navigation">
@@ -1103,7 +1105,7 @@ body.light-mode .constella-toast{
   </a>
 
   <div class="m-pill-cluster">
-    <span class="m-pill m-pill-counter" id="mCounter">1 / 1</span>
+    <span class="m-pill m-pill-counter" id="mCounter">1 / 15</span>
     <a href="session04_digital_images.py" download="session04_digital_images.py" class="m-pill m-pill-btn" aria-label="Download Python Code" title="Download Code">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" width="13" height="13" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
     </a>
@@ -1123,6 +1125,34 @@ body.light-mode .constella-toast{
   </div>
 </nav>
 <div id="fitbox"><div id="deck">
+<script>
+(function(){
+  try{
+    var W=window.innerWidth,H=window.innerHeight;
+    var isLandscape=W>=H;
+    var small=W<768||(!isLandscape&&W<900);
+    var fit=document.getElementById('fitbox'),d=document.getElementById('deck');
+    if(fit&&d){
+      if(!small){
+        var s=Math.min((W-16)/1100,(H-16)/707);
+        fit.style.width=Math.round(1100*s)+'px';
+        fit.style.height=Math.round(707*s)+'px';
+        d.style.transformOrigin='top left';
+        d.style.transform='scale('+s+')';
+      }else{
+        var s=isLandscape?(H/619):(W/1100);
+        var dw=isLandscape?Math.max(1100,Math.round(W/s)):1100;
+        var dh=isLandscape?619:Math.max(619,Math.round(H/s));
+        d.style.width=dw+'px';d.style.height=dh+'px';
+        fit.style.width=(isLandscape?W:Math.round(dw*s))+'px';
+        fit.style.height=(isLandscape?H:Math.round(dh*s))+'px';
+        d.style.transformOrigin='top left';
+        d.style.transform='scale('+s+')';
+      }
+    }
+  }catch(_){}
+})();
+</script>
   <div class="brand-bar">
     <div class="brand-left">
       <a href="../../../index.html" class="desktop-home-link" title="Return to Constella Portal" aria-label="Return to Constella Portal">
@@ -1168,7 +1198,7 @@ body.light-mode .constella-toast{
   <div class="vp part-intro" id="vp">
     <canvas class="vp-bg" id="amb"></canvas>
     <div class="vp-progress"><span id="prog"></span></div>
-    <div class="slide-counter" id="counter">1 / 1</div>
+    <div class="slide-counter" id="counter">1 / 15</div>
     <button class="mnav mp" id="mprev" aria-label="Previous slide">‹</button>
     <button class="mnav mn" id="mnext" aria-label="Next slide">›</button>
   </div>
@@ -2865,6 +2895,8 @@ function tick(){
   requestAnimationFrame(tick);
 }
 go(0);tick();
+document.body.classList.add('deck-ready');
+setTimeout(function(){ document.body.classList.add('deck-ready'); }, 200);
 
 /* ═══════════════ Live Drawing Pen (Annotation Engine) ═══════════════ */
 let penCanvas = null;
