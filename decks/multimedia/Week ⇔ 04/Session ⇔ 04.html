@@ -1583,7 +1583,7 @@ VIZ.read={cycle:1e9,draw(c,W,H,f){
   c.imageSmoothingEnabled=false;
   const iw=Math.min(W*.44,250),ih=iw/AR,x=6,y=Math.max(10,H/2-ih/2-40);
   pic(c,IMG,x,y,iw,ih,'img = cv2.imread(...)',PC);
-  const P=[[30,57],[124,26],[75,72],[50,40]],k=Math.floor(f/90)%4,p=P[k];
+  const P=[[30,57],[124,26],[75,72],[50,40]],k=Math.floor(f/150)%4,p=P[k];
   if(k!==_rk){_rk=k;_rm=IMG.getContext('2d').getImageData(p[0]-1,p[1]-1,3,3).data}
   const s=iw/IMW;
   c.save();c.strokeStyle='#fff';c.lineWidth=2;c.shadowColor=PC;c.shadowBlur=8;c.strokeRect(x+(p[0]-1.5)*s,y+(p[1]-1.5)*s,3*s,3*s);c.restore();
@@ -1601,69 +1601,92 @@ VIZ.read={cycle:1e9,draw(c,W,H,f){
 VIZ.gray={cycle:1e9,draw(c,W,H,f){
   c.imageSmoothingEnabled=false;
   const iw=Math.min((W-70)/2,250),ih=iw/AR,y=H/2-ih/2-34,x1=8,x2=W-iw-8;
-  const cycle=210,ph=f%cycle;
+  const cycle=360,ph=f%cycle;
   pic(c,IMG,x1,y,iw,ih,'3 channels (B, G, R)',CL.cyan);
-  const p=ease(at(ph,20,75));
+  const p=ease(at(ph,25,95));
   c.save();c.beginPath();c.rect(x2,y,iw*p,ih);c.clip();c.drawImage(GRAYC,x2,y,iw,ih);c.restore();
   c.save();c.strokeStyle=rgba(PC,.75);c.lineWidth=1.6;rr(c,x2,y,iw,ih,10);c.stroke();c.restore();
   txt(c,'1 channel (0 – 255)',x2+iw/2,y+ih+15,{size:11.5,col:PC,font:'mono'});
-  marker(c,[[x1+iw+10,y+ih/2],[x2-10,y+ih/2]],at(ph,10,45),PC,2.6);
+  marker(c,[[x1+iw+10,y+ih/2],[x2-10,y+ih/2]],at(ph,15,65),PC,2.6);
   txt(c,'cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)',W/2,y+ih+52,{size:12.5,col:CL.chalk,font:'mono'});
   txt(c,'Gray = 0.299·R + 0.587·G + 0.114·B',W/2,y+ih+78,{size:12.5,col:CL.dim,font:'mono'});
 }};
 
 VIZ.thresh={cycle:1e9,draw(c,W,H,f){
   c.imageSmoothingEnabled=false;
-  const iw=Math.min((W-70)/2,250),ih=iw/AR,y=H/2-ih/2-52,x1=8,x2=W-iw-8;
+  // Controlled dimensions ensuring ZERO overlap and generous 17px margins:
+  // DW = 520. iw = 196, ih = 123.
+  // Left image ends at: x1 + iw = 16 + 196 = 212.
+  // Right image starts at: x2 = 520 - 196 - 16 = 308.
+  // Total gap = 96px!
+  // Center badge: width = 62px (from 229 to 291).
+  // Left clearance = 17px, Right clearance = 17px. Complete separation!
+  const iw=196,ih=Math.round(iw/AR),y=H/2-ih/2-50,x1=16,x2=W-iw-16;
   
-  // Moderate, purposeful animation cycle (360 frames = 6.0 seconds):
-  // 1. [0..90]   (1.5s): HOLD at Code Reference T = 127
-  // 2. [90..150]  (1.0s): Smoothly sweep down from 127 to 65
-  // 3. [150..210] (1.0s): HOLD at T = 65 (Demonstrating lower threshold => brighter)
-  // 4. [210..280] (1.16s): Smoothly sweep up from 65 to 190
-  // 5. [280..330] (0.84s): HOLD at T = 190 (Demonstrating higher threshold => darker)
-  // 6. [330..360] (0.5s): Smoothly return back to T = 127
-  const cycle=360, ph=f%cycle;
+  // Moderate, calm, educational cycle (720 frames = 12.0 seconds):
+  // 1. [0..180]   (3.0s): Solid HOLD at Code Reference T = 127
+  // 2. [180..270] (1.5s): Smooth, gentle sweep down from 127 to 70
+  // 3. [270..420] (2.5s): Solid HOLD at T = 70 (lower T => brighter)
+  // 4. [420..530] (1.83s): Smooth, gentle sweep up from 70 to 185
+  // 5. [530..660] (2.17s): Solid HOLD at T = 185 (higher T => darker)
+  // 6. [660..720] (1.0s): Smooth return back to T = 127
+  const cycle=720, ph=f%cycle;
   let T=127, statusText='', isCodeRef=false;
   
-  if(ph<90){
+  if(ph<180){
     T=127;
     isCodeRef=true;
     statusText='Code standard: T = 127  (Balanced B&W)';
-  } else if(ph<150){
-    const p=ease((ph-90)/60);
-    T=Math.round(lerp(127,65,p));
+  } else if(ph<270){
+    const p=ease((ph-180)/90);
+    T=Math.round(lerp(127,70,p));
     statusText='Decreasing T → More pixels exceed T → Brighter';
-  } else if(ph<210){
-    T=65;
-    statusText='Lower T (65) → Most pixels become White (255)';
-  } else if(ph<280){
-    const p=ease((ph-210)/70);
-    T=Math.round(lerp(65,190,p));
+  } else if(ph<420){
+    T=70;
+    statusText='Lower T (70) → Most pixels become White (255)';
+  } else if(ph<530){
+    const p=ease((ph-420)/110);
+    T=Math.round(lerp(70,185,p));
     statusText='Increasing T → Fewer pixels exceed T → Darker';
-  } else if(ph<330){
-    T=190;
-    statusText='Higher T (190) → Only brightest spots stay White';
+  } else if(ph<660){
+    T=185;
+    statusText='Higher T (185) → Only brightest spots stay White';
   } else {
-    const p=ease((ph-330)/30);
-    T=Math.round(lerp(190,127,p));
+    const p=ease((ph-660)/60);
+    T=Math.round(lerp(185,127,p));
     statusText='Returning to code threshold T = 127';
   }
 
   // Draw Left: Grayscale source image
   pic(c,GRAYC,x1,y,iw,ih,'gray · single channel',CL.cyan);
   
-  // Draw Middle: Transformation Arrow & Comparison Badge
+  // Draw Middle: Transformation Arrow & Comparison Badge (No overlap!)
   const midX=W/2, midY=y+ih/2;
-  marker(c,[[x1+iw+8,midY],[x2-8,midY]],1,PC,2.2);
+  const badgeW=62, badgeH=26;
+  marker(c,[[x1+iw+6,midY],[midX-badgeW/2-4,midY]],1,PC,2);
+  marker(c,[[midX+badgeW/2+4,midY],[x2-12,midY]],1,PC,2);
+  
+  // Directional arrow head pointing cleanly to binary image
   c.save();
-  rr(c,midX-36,midY-13,72,26,7);
+  c.fillStyle=PC;
+  c.beginPath();
+  c.moveTo(x2-5,midY);
+  c.lineTo(x2-13,midY-5);
+  c.lineTo(x2-13,midY+5);
+  c.closePath();
+  c.fill();
+  c.restore();
+
+  // Central Comparison Badge with generous margins
+  c.save();
+  rr(c,midX-badgeW/2,midY-badgeH/2,badgeW,badgeH,7);
   c.fillStyle=isLight?'#ffffff':'#141322';
   c.fill();
-  c.strokeStyle=isCodeRef?PC:rgba(PC,.6);
-  c.lineWidth=isCodeRef?2:1.2;
+  c.strokeStyle=isCodeRef?PC:rgba(PC,.65);
+  c.lineWidth=isCodeRef?2:1.3;
+  if(isCodeRef){c.shadowColor=PC;c.shadowBlur=8;}
   c.stroke();
-  txt(c,'> '+T+' ?',midX,midY,{size:11.5,col:isCodeRef?PC:CL.chalk,font:'mono',weight:800});
+  txt(c,'> '+T+' ?',midX,midY,{size:11,col:isCodeRef?PC:CL.chalk,font:'mono',weight:800});
   c.restore();
 
   // Draw Right: Synchronized Binary Image matching T
@@ -1671,7 +1694,7 @@ VIZ.thresh={cycle:1e9,draw(c,W,H,f){
   pic(c,binCanvas,x2,y,iw,ih,`binary · ${isCodeRef?'T = 127 [Code]':'T = '+T}`,isCodeRef?PC:CL.pink);
 
   // Bottom Slider Bar
-  const bx=10,bw=W-20,by=y+ih+46,g=c.createLinearGradient(bx,0,bx+bw,0);
+  const bx=16,bw=W-32,by=y+ih+46,g=c.createLinearGradient(bx,0,bx+bw,0);
   g.addColorStop(0,'#050508');g.addColorStop(1,'#ffffff');
   c.save();rr(c,bx,by,bw,14,7);c.fillStyle=g;c.fill();c.strokeStyle=CL.axis;c.lineWidth=1;c.stroke();c.restore();
 
@@ -1711,12 +1734,12 @@ VIZ.thresh={cycle:1e9,draw(c,W,H,f){
 
 VIZ.resize={cycle:1e9,draw(c,W,H,f){
   c.imageSmoothingEnabled=false;
-  const cycle=240, ph=f%cycle;
+  const cycle=400, ph=f%cycle;
   let p=0;
-  if(ph>=30 && ph<90) p=ease((ph-30)/60);
-  else if(ph>=90 && ph<160) p=1;
-  else if(ph>=160 && ph<210) p=1-ease((ph-160)/50);
-  else if(ph>=210) p=0;
+  if(ph>=50 && ph<130) p=ease((ph-50)/80);
+  else if(ph>=130 && ph<280) p=1;
+  else if(ph>=280 && ph<350) p=1-ease((ph-280)/70);
+  else if(ph>=350) p=0;
   const k=.7,w=Math.round(lerp(160,300,p)),h=Math.round(lerp(100,300,p)),bw=w*k,bh=h*k,cx=W/2,cy=H/2-40;
   c.drawImage(IMG,cx-bw/2,cy-bh/2,bw,bh);
   c.save();c.strokeStyle=rgba(PC,.8);c.lineWidth=1.8;rr(c,cx-bw/2,cy-bh/2,bw,bh,10);c.stroke();c.restore();
@@ -1728,10 +1751,10 @@ VIZ.resize={cycle:1e9,draw(c,W,H,f){
 const ROT=[['cv2.ROTATE_90_CLOCKWISE',90],['cv2.ROTATE_180',180],['cv2.ROTATE_90_COUNTERCLOCKWISE',270]];
 VIZ.rotate={cycle:1e9,draw(c,W,H,f){
   c.imageSmoothingEnabled=false;
-  const cycle=360, ph=f%cycle;
-  const k=Math.floor(ph/120)%3, stepPh=ph%120;
+  const cycle=540, ph=f%cycle;
+  const k=Math.floor(ph/180)%3, stepPh=ph%180;
   const baseAngle=k*90;
-  const turnProg=ease(at(stepPh,15,65));
+  const turnProg=ease(at(stepPh,25,85));
   const angleDeg=baseAngle+turnProg*90;
   const a=angleDeg*Math.PI/180;
   const cx=W/2,cy=H/2-44,iw=190,ih=iw/AR;
@@ -1745,11 +1768,11 @@ VIZ.rotate={cycle:1e9,draw(c,W,H,f){
 
 VIZ.win={cycle:1e9,draw(c,W,H,f){
   c.imageSmoothingEnabled=false;
-  const cycle=260, ph=f%cycle;
+  const cycle=420, ph=f%cycle;
   let open=0, step=0;
-  if(ph<35){ open=ease(ph/35); step=0; }
-  else if(ph<180){ open=1; step=1; }
-  else if(ph<220){ open=1-ease((ph-180)/40); step=2; }
+  if(ph<45){ open=ease(ph/45); step=0; }
+  else if(ph<280){ open=1; step=1; }
+  else if(ph<340){ open=1-ease((ph-280)/60); step=2; }
   else { open=0; step=2; }
   const ww=Math.min(W*.58,290),ih=ww/AR,wh=ih+30,cx=W/2,cy=H/2-wh/2-14,sc=.88+.12*open;
   c.save();c.globalAlpha=open;c.translate(cx,cy+wh/2);c.scale(sc,sc);c.translate(-ww/2,-wh/2);
@@ -1761,13 +1784,13 @@ VIZ.win={cycle:1e9,draw(c,W,H,f){
   chips.forEach((t,i)=>{const on=i===step,x=4+i*(cw+8);
     c.save();rr(c,x,yy,cw,34,9);c.fillStyle=rgba(on?PC:CL.dim,on?.2:.08);c.fill();c.strokeStyle=on?PC:CL.axis;c.lineWidth=on?2:1;c.stroke();c.restore();
     txt(c,t,x+cw/2,yy+17,{size:10.5,col:on?CL.chalk:CL.dim,font:'mono',weight:700})});
-  const msg=step===0?'window opens':step===1?(ph<160?(Math.floor(f/25)%2===0?'waiting for key press…':'waiting for key press'):'key pressed!'):'window closed, memory released';
+  const msg=step===0?'window opens':step===1?(ph<250?(Math.floor(f/30)%2===0?'waiting for key press…':'waiting for key press'):'key pressed!'):'window closed, memory released';
   txt(c,msg,W/2,yy+60,{size:12.5,col:PC,font:'mono',weight:700});
 }};
 
 VIZ.recap={cycle:1e9,draw(c,W,H,f){
   c.imageSmoothingEnabled=false;
-  const n=5,gap=14,tw=Math.min((W-gap*(n-1)-16)/n,128),th=tw/AR,x0=(W-(n*tw+(n-1)*gap))/2,y=H/2-tw/2-26,on=Math.floor(f/90)%n;
+  const n=5,gap=14,tw=Math.min((W-gap*(n-1)-16)/n,128),th=tw/AR,x0=(W-(n*tw+(n-1)*gap))/2,y=H/2-tw/2-26,on=Math.floor(f/140)%n;
   const L=['imread','cvtColor','threshold','resize','rotate'];
   for(let i=0;i<n;i++){
     const x=x0+i*(tw+gap),act=i===on;
@@ -1790,7 +1813,7 @@ VIZ.arr={cycle:1e9,draw(c,W,H,f){
   c.imageSmoothingEnabled=false;
   if(!_ad)_ad=IMG.getContext('2d').getImageData(0,0,IMW,IMH).data;
   const ox=36,oy=32,cols=6,rows=4,cs=Math.min(46,(W*.5)/cols),gx=44,gy=34;
-  const k=Math.floor(f/35)%(cols*rows),sx=(k*5)%cols,sy=Math.floor((k*5)/cols)%rows;
+  const k=Math.floor(f/70)%(cols*rows),sx=(k*5)%cols,sy=Math.floor((k*5)/cols)%rows;
   const X=ox+sx,Y=oy+sy,o=(Y*IMW+X)*4,B=_ad[o+2],G=_ad[o+1],R=_ad[o],g=GV[Y*IMW+X];
   txt(c,'a 6 × 4 patch of the image, zoomed in',gx,12,{size:11.5,col:CL.dim,align:'left',font:'mono'});
   for(let i=0;i<cols;i++)txt(c,'x='+(ox+i),gx+i*cs+cs/2,gy-8,{size:9,col:i===sx?PC:CL.dim,font:'mono'});
@@ -1884,7 +1907,7 @@ VIZ.tokens.draw=function(c,W,H,f){
   _tokDraw.call(this,c,W,H,f);
   if(!_hd)_hd=[IMG,GRAYC,BINC].map(o=>o.getContext('2d').getImageData(0,0,IMW,IMH).data);
   const cw=400,ch=cw/AR,x=W-46-cw,y=H/2-ch/2-22,S=[IMG,GRAYC,BINC];
-  const cycle=160,K=Math.floor(f/cycle)%3,ph=f%cycle,p=ease(at(ph,14,56));
+  const cycle=360,K=Math.floor(f/cycle)%3,ph=f%cycle,p=ease(at(ph,20,75));
   const prev=S[(K+2)%3],cur=S[K],sx=x+cw*p;
   /* card */
   c.save();c.shadowColor=PC;c.shadowBlur=isLight?18:30;rr(c,x-6,y-6,cw+12,ch+12,18);c.fillStyle=isLight?'#ffffff':'#0d0d18';c.fill();c.restore();
