@@ -174,8 +174,8 @@ code{font-family:var(--mono);font-size:.92em;color:var(--c);background:rgba(128,
 .herobg{position:absolute;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none}
 
 /* Split Layouts & Tasks */
-.task{display:grid;grid-template-columns:1fr 1fr;gap:24px;flex:1;min-height:0;height:100%;align-items:center;}
-.tleft{display:flex;flex-direction:column;gap:10px;justify-content:center;min-width:0;overflow-y:auto;padding-right:4px}
+.task{display:grid;grid-template-columns:1fr 1fr;gap:24px;flex:1;min-height:0;height:100%;align-items:stretch;}
+.tleft{display:flex;flex-direction:column;gap:8px;justify-content:flex-start;margin:auto 0;min-width:0;max-height:100%;overflow-y:auto;overflow-x:hidden;padding-right:6px}
 .chip{align-self:flex-start;padding:3px 10px;border-radius:999px;background:rgba(128,128,128,.1);border:1px solid var(--card-border);color:var(--c);font-weight:800;font-size:10.5px;letter-spacing:.4px;text-transform:uppercase}
 .req{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
 .req li{position:relative;padding-left:22px;font-size:13px;line-height:1.45;color:var(--tp)}
@@ -236,7 +236,7 @@ body.light-mode .code-window{
 }
 
 .codecard{
-  padding:14px 18px; overflow-x:auto; overflow-y:auto;
+  padding:12px 16px; overflow-x:auto; overflow-y:auto; max-height:210px;
 }
 pre.code{margin:0; font:500 13px/1.55 var(--mono); color:#e8e6ff; white-space:pre; tab-size:4; width:100%;}
 pre.code .k{color:#ff79c6; font-weight:700}
@@ -2309,16 +2309,14 @@ c_resize:`resized = cv2.resize(img, (300, 300))
 c_rot:`rotated = cv2.rotate(img, cv2.ROTATE_90_CLOCKWISE)
 # cv2.ROTATE_180
 # cv2.ROTATE_90_COUNTERCLOCKWISE`,
-c_show:`import matplotlib.pyplot as plt
-
-# 1. Color image: convert BGR -> RGB for Matplotlib
+c_show:`# 1. Color: convert BGR -> RGB for Matplotlib
 img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 plt.imshow(img_rgb)
 plt.title('Color Image (RGB)')
 plt.axis('off')     # hides x & y coordinate ticks
 plt.show()
 
-# 2. Grayscale image: MUST include cmap='gray'!
+# 2. Grayscale: MUST include cmap='gray'!
 plt.imshow(gray, cmap='gray')
 plt.title('Grayscale Image')
 plt.axis('off')
@@ -2452,7 +2450,11 @@ const SL=[
 {part:'part-rules',lbl:'Interactive Predictor',h2:'Check 2: <em>Threshold</em>',sub:'Compare the pixel with the threshold.',mcq:true,q:'<b>A gray pixel has the value 200. What does it become after threshold with 127 and max value 255?</b>',options:['0','127','200','255'],answer:'255',explain:'<b>Correct!</b> <code>200 &gt; 127</code>, so the pixel becomes white: <code>255</code>.',hint:'Is 200 greater than 127?',code:'c_q2',next:'Resize'},
 {part:'part-rep',lbl:'Step 4 · Resize Image',h2:'<em>resize</em> — change the dimensions',split:true,viz:'resize',chip:'cv2.resize',req:['<code>cv2.resize(src, dsize)</code> enlarges or shrinks an image.','The new size is given as <code>(Width, Height)</code>, in pixels.'],code:'c_resize',trap:'Careful: <code>img.shape</code> gives <code>(Height, Width)</code>, but resize takes <code>(Width, Height)</code>.',next:'Rotate'},
 {part:'part-rep',lbl:'Step 5 · Rotate Image',h2:'<em>rotate</em> — right angles, no distortion',split:true,viz:'rotate',chip:'cv2.rotate',req:['<code>cv2.rotate</code> turns an image by ready-made right angles, fast and with no loss of detail.','<code>ROTATE_90_CLOCKWISE</code>: 90 degrees clockwise.','<code>ROTATE_180</code>: flips the image upside down.','<code>ROTATE_90_COUNTERCLOCKWISE</code>: 90 degrees counterclockwise (or 270).'],code:'c_rot',next:'Show image'},
-{part:'part-fn',lbl:'Step 6 · Plot with Matplotlib',h2:'<em>plt.imshow</em> — titles, cmap & clean axes',split:true,viz:'win',chip:'plt.imshow',req:['<code>plt.imshow(img)</code> renders the pixel grid. Convert BGR to RGB first (<code>cv2.cvtColor(img, cv2.COLOR_BGR2RGB)</code>) for accurate color.','<code>plt.title(\'Title\')</code> sets a clear, readable header above the displayed image.','<code>cmap=\'gray\'</code>: <b>mandatory for 2D grayscale!</b> Without it, Matplotlib renders a false-color viridis heatmap.','<code>plt.axis(\'off\')</code> hides coordinate ticks (x & y numbers) and borders for a clean photograph appearance.','<code>plt.show()</code> displays figures inline in Google Colab, Jupyter Notebooks, or script windows.'],trap:'Always convert BGR to RGB for color images, and always pass <code>cmap=\'gray\'</code> for grayscale or binary images.',code:'c_show',next:'Check 3'},
+{part:'part-fn',lbl:'Step 6 · Plot with Matplotlib',h2:'<em>plt.imshow</em> — titles, cmap & clean axes',split:true,viz:'win',chip:'plt.imshow',req:[
+  '<b>Color (RGB):</b> OpenCV loads BGR — convert with <code>cv2.cvtColor(img, cv2.COLOR_BGR2RGB)</code> for true, natural colors.',
+  '<b>Grayscale (cmap=\'gray\'):</b> <b>Mandatory for 2D arrays!</b> Without it, Matplotlib displays a false-color viridis heatmap.',
+  '<b>Titles & Clean Axes:</b> Add <code>plt.title(\'...\')</code> to label the figure, and <code>plt.axis(\'off\')</code> to strip graph coordinates.'
+],trap:'<b>Colab Note:</b> <code>plt.show()</code> displays plots inline inside notebooks without GUI freezes or extra windows.',code:'c_show',next:'Check 3'},
 {part:'part-rules',lbl:'Interactive Predictor',h2:'Check 3: <em>Matplotlib Colormap</em>',sub:'What happens without the color map parameter?',mcq:true,q:'<b>What happens if you display a grayscale image with <code>plt.imshow(gray)</code> without <code>cmap=\'gray\'</code>?</b>',options:['Displays as a false-color heatmap (viridis) instead of gray','Python throws a ValueError','The image displays completely black','Matplotlib automatically converts it to BGR'],answer:'Displays as a false-color heatmap (viridis) instead of gray',explain:'<b>Correct!</b> Matplotlib treats 2D single-channel arrays as scalar data and applies its default heatmap colormap (viridis). To view actual gray intensities, always pass <code>cmap=\'gray\'</code>.',hint:'Matplotlib defaults 2D arrays to a colored heatmap (viridis).',code:'c_q3',next:'Full script'},
 {part:'part-fn',lbl:'All Together',h2:'The <em>complete script</em>',sub:'Every step in one Colab & notebook-ready file. Grab it with the Download Code button.',task:{chip:'Full script',req:['<b>Check:</b> make sure <code>img</code> is not <code>None</code> before any processing.','<b>Process:</b> grayscale (<code>cvtColor</code>), binary (<code>threshold</code>), resize, rotate.','<b>Plot:</b> display results with <code>plt.imshow</code>, setting <code>plt.title()</code>, <code>plt.axis(\'off\')</code>, and <code>cmap=\'gray\'</code> for monochrome images.'],code:'c_full'},next:'Student Task'},
 {part:'part-fn',lbl:'Student Task',h2:'Threshold, size and <em>shape</em> hunt',sub:'Edit the code, then compare your results.',tt:{chip:'Task 1',req:['Change the threshold to <code>100</code> and compare the binary image with the one at <code>127</code>.','Resize to <code>(150, 150)</code> and print <code>resized.shape</code>.','Rotate by <code>180</code> degrees and print <code>rotated.shape</code>, then try 90 degrees.','Plot your binary result cleanly with <code>plt.imshow</code> using <code>cmap=\'gray\'</code>.'],trap:'Remember: a 90 degree rotation swaps height and width; 180 degrees does not.',title:'Expected results',lines:[[['img.shape     -> (H, W, 3)','pink']],[['gray.shape    -> (H, W)','amber']],[['binary values -> 0 and 255','green']],[['resized.shape -> (150, 150, 3)','green']],[['rotated 180   -> (H, W, 3)','amber']]]},sol:'c_sol',solTitle:'Reference Solution',solNotes:['<b>A lower threshold</b> (100) turns more pixels white.','<b>shape</b> is <code>(H, W, 3)</code> for color and just <code>(H, W)</code> for grayscale.','<b>A 90 degree rotation</b> swaps <code>H</code> and <code>W</code>; <code>ROTATE_180</code> keeps them.']},
