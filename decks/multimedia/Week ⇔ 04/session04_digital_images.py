@@ -1,208 +1,224 @@
 # ============================================================================
 # Course: Multimedia Systems & Programming
-# Session: 04 - Digital Images in Python: Matrix Grid, Transformations & Filtering
+# Session: 04 - Digital Images with OpenCV
 # Instructor: Eng. Muhammad Ali Abdul Kareem — Sinai University
 # ============================================================================
+# Description:
+# Hands-on Python script covering the 6 core image processing operations 
+# taught in Session 04 slides:
+#   1. Input image (cv2.imread & path check)
+#   2. Grayscale conversion (cv2.cvtColor)
+#   3. Binary thresholding (cv2.threshold)
+#   4. Resizing dimensions (cv2.resize)
+#   5. Orthogonal rotation (cv2.rotate)
+#   6. Display image (cv2.imshow / Colab cv2_imshow)
+# Plus the Complete Pipeline Script & Student Practice Task Solution.
+# ============================================================================
 
+import os
 import cv2
 import numpy as np
-import matplotlib.pyplot as plt
+
+# Detect environment: Google Colab vs Local Desktop
+try:
+    from google.colab.patches import cv2_imshow
+    IS_COLAB = True
+except ImportError:
+    IS_COLAB = False
+
+def show_image(title, image):
+    """Unified display helper that works on both Google Colab and Local Python."""
+    if IS_COLAB:
+        print(f"\n--- [Display: {title}] ---")
+        cv2_imshow(image)
+    else:
+        cv2.imshow(title, image)
+        print(f"Showing '{title}'. Press any key in the image window to continue...")
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
+
 
 print("==================================================")
-print("  Session 04: Digital Image Processing in Python  ")
+print("  Session 04: Digital Images with OpenCV (cv2)   ")
 print("==================================================\n")
 
 # ============================================================================
-# HELPER: Generate a clean synthetic test image (if no file is present)
+# 0. IMAGE PATH SETUP & FALLBACK TEST IMAGE
 # ============================================================================
-def generate_sample_image(height=160, width=200):
-    """
-    Creates a colorful synthetic landscape image with sky, sun, mountains,
-    and grass to clearly demonstrate colors, rotation, and grayscale.
-    """
-    img = np.zeros((height, width, 3), dtype=np.uint8)
-    
-    # Sky (Blue gradient in RGB, Blue channel in BGR)
-    for y in range(height):
-        # BGR format: [B, G, R]
-        b = int(220 - y * 0.4)
-        g = int(140 - y * 0.3)
-        r = int(50 + y * 0.2)
-        img[y, :] = [b, g, r]
-        
-    # Sun (Yellow circle)
-    cv2.circle(img, (width - 45, 45), 26, (0, 215, 255), -1) # BGR Yellow
-    
-    # Mountains (Triangles)
-    pts1 = np.array([[10, height - 30], [80, 50], [150, height - 30]], np.int32)
-    pts2 = np.array([[90, height - 30], [150, 65], [210, height - 30]], np.int32)
-    cv2.fillPoly(img, [pts1], (80, 70, 110))
-    cv2.fillPoly(img, [pts2], (95, 85, 130))
-    
-    # Grass ground (Green)
-    cv2.rectangle(img, (0, height - 35), (width, height), (35, 150, 45), -1)
-    
-    return img
+# In Google Colab, upload your image file and it will be located in '/content/'
+IMAGE_PATH = "/content/image_name.jpg"
 
-# Load image from disk or fallback to synthetic sample
-img_bgr = generate_sample_image()
+# Fallback check: if running locally or image hasn't been uploaded yet,
+# create a clean sample image so students can execute the code immediately!
+if not os.path.exists(IMAGE_PATH):
+    local_sample = "image_name.jpg"
+    if not os.path.exists(local_sample):
+        # Create a sample colorful test pattern (240x320x3)
+        sample = np.zeros((240, 320, 3), dtype=np.uint8)
+        # Background gradient
+        for y in range(240):
+            sample[y, :] = [int(180 - y * 0.4), int(100 + y * 0.5), int(50 + y * 0.7)]
+        # Bright geometric shapes to test grayscale and thresholding
+        cv2.circle(sample, (160, 110), 60, (0, 215, 255), -1)   # Yellow Sun/Circle
+        cv2.rectangle(sample, (40, 150), (280, 225), (60, 180, 75), -1) # Green Ground
+        cv2.putText(sample, "Sinai Univ", (75, 120), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (255, 255, 255), 2)
+        cv2.imwrite(local_sample, sample)
+    IMAGE_PATH = local_sample
+    print(f"[Info] Running with sample image: '{IMAGE_PATH}'")
+
 
 # ============================================================================
-# 1. INPUT IMAGE (MATRIX REPRESENTATION & PROPERTIES)
+# 1. READ IMAGE & THE NUMPY ARRAY (Core Idea & Step 1)
 # ============================================================================
-# An image in Python/NumPy is a 3D Tensor of shape (Height, Width, Channels).
-# Coordinates: img[row, col] -> y is row (Height), x is col (Width).
-h, w, c = img_bgr.shape
-print("1. Image Input & Matrix Properties:")
-print(f"   - Dimensions (Shape) : {img_bgr.shape} (Height={h}, Width={w}, Channels={c})")
-print(f"   - Data Type (dtype)  : {img_bgr.dtype} (8-bit unsigned integer: 0..255)")
-print(f"   - Total Pixels       : {img_bgr.size // 3} pixels ({img_bgr.size} color bytes)")
-print(f"   - Top-Left Pixel BGR : {img_bgr[0, 0]}")
-print()
+# cv2.imread turns a file into a NumPy array of shape (Height, Width, 3).
+# Important: OpenCV loads colors in BGR order (Blue, Green, Red), NOT RGB!
+img = cv2.imread(IMAGE_PATH)
 
-# ============================================================================
-# 2. SHOW IMAGE & THE BGR vs RGB CHANNEL TRAP
-# ============================================================================
-# OpenCV loads images in BGR order (historical reason for IBM PC framegrabbers).
-# Matplotlib and standard screens expect RGB order.
-# If displayed directly without conversion, Red and Blue swap!
-img_rgb = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2RGB)
+if img is None:
+    print("Error: image not found! Check the path.")
+    exit(1)
 
-# Alternative NumPy slicing technique to invert channel order:
-# img_rgb_slice = img_bgr[:, :, ::-1]
+h, w, c = img.shape
+print("\n[Step 1: Input Image & Array Properties]")
+print(f"   • img.shape  : {img.shape}  -> (Height={h}, Width={w}, Channels={c})")
+print(f"   • Data Type  : {img.dtype}  -> (8-bit unsigned integer: 0..255)")
+print(f"   • Top-Left   : img[0, 0] = {img[0, 0]}  -> [Blue, Green, Red]")
 
-plt.figure(figsize=(10, 4))
-plt.subplot(1, 2, 1)
-plt.imshow(img_bgr) # Incorrect: Blue and Red swapped
-plt.title("2.a Wrong: Raw BGR in Matplotlib")
-plt.axis("off")
-
-plt.subplot(1, 2, 2)
-plt.imshow(img_rgb) # Correct: Converted to RGB
-plt.title("2.b Correct: cv2.cvtColor(BGR ➔ RGB)")
-plt.axis("off")
-plt.tight_layout()
-plt.show()
 
 # ============================================================================
-# 3. ROTATE (ORTHOGONAL & ARBITRARY AFFINE ANGLES)
+# 2. CONVERT RGB/BGR TO GRAYSCALE (Step 2)
 # ============================================================================
-# Method A: Fast 90-degree orthogonal steps (no interpolation needed)
-rot_90_cw = cv2.rotate(img_rgb, cv2.ROTATE_90_CLOCKWISE)
-rot_180   = cv2.rotate(img_rgb, cv2.ROTATE_180)
+# cv2.cvtColor converts between color spaces.
+# Color image has 3 channels (B, G, R); Grayscale has only 1 channel: (H, W).
+# Intensity ranges from 0 (pure black) to 255 (pure white).
+gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
-# Method B: Arbitrary angle rotation (Affine Transformation Matrix)
-center = (w // 2, h // 2)
-angle = 45 # degrees counter-clockwise
-scale = 1.0
-M = cv2.getRotationMatrix2D(center, angle, scale)
-rot_45 = cv2.warpAffine(img_rgb, M, (w, h), borderMode=cv2.BORDER_REFLECT)
+print("\n[Step 2: Grayscale Conversion]")
+print(f"   • gray.shape : {gray.shape}  -> (Height={h}, Width={w}) [1 channel]")
+print(f"   • Pixel [0,0]: {gray[0, 0]} intensity level (0..255)")
 
-plt.figure(figsize=(12, 3.5))
-plt.subplot(1, 4, 1); plt.imshow(img_rgb); plt.title("Original"); plt.axis("off")
-plt.subplot(1, 4, 2); plt.imshow(rot_90_cw); plt.title("Rotate 90° CW"); plt.axis("off")
-plt.subplot(1, 4, 3); plt.imshow(rot_180); plt.title("Rotate 180°"); plt.axis("off")
-plt.subplot(1, 4, 4); plt.imshow(rot_45); plt.title("Affine 45° Matrix"); plt.axis("off")
-plt.tight_layout()
-plt.show()
 
 # ============================================================================
-# 4. RESIZE (DOWNSAMPLING, UPSAMPLING & INTERPOLATION)
+# 3. CONVERT GRAYSCALE TO BINARY (Step 3: Thresholding)
 # ============================================================================
-# Notice the size order in cv2.resize: (Width, Height), opposite of shape (H, W)!
-# Interpolation algorithms:
-# - INTER_NEAREST: Fastest, blocky pixelated results.
-# - INTER_LINEAR : Bilinear default, smooth and fast.
-# - INTER_CUBIC  : Bicubic 4x4 neighborhood, highest quality for upsampling.
-# - INTER_AREA   : Best pixel area relation for downsampling / shrinking.
+# cv2.threshold turns a single-channel grayscale image into pure black & white.
+# Rule: If gray[y, x] > 127 => 255 (White), otherwise => 0 (Black).
+# Returns two values: the threshold cutoff (_) and the resulting binary image.
+_, binary = cv2.threshold(gray, 127, 255, cv2.THRESH_BINARY)
 
-# Downscale to 50%
-downscaled = cv2.resize(img_rgb, (w // 2, h // 2), interpolation=cv2.INTER_AREA)
+print("\n[Step 3: Binary Thresholding]")
+print(f"   • binary.shape : {binary.shape}")
+print(f"   • Unique values: {np.unique(binary)} (Only 0 and 255)")
 
-# Upscale back to 200% comparing Nearest Neighbor vs Bilinear
-upscaled_nearest = cv2.resize(downscaled, (w * 2, h * 2), interpolation=cv2.INTER_NEAREST)
-upscaled_linear  = cv2.resize(downscaled, (w * 2, h * 2), interpolation=cv2.INTER_LINEAR)
-
-plt.figure(figsize=(10, 3.5))
-plt.subplot(1, 3, 1); plt.imshow(downscaled); plt.title(f"Downscale 50% ({w//2}x{h//2})"); plt.axis("off")
-plt.subplot(1, 3, 2); plt.imshow(upscaled_nearest); plt.title("Upscale (Nearest Neighbor)"); plt.axis("off")
-plt.subplot(1, 3, 3); plt.imshow(upscaled_linear); plt.title("Upscale (Bilinear Linear)"); plt.axis("off")
-plt.tight_layout()
-plt.show()
 
 # ============================================================================
-# 5. CONVERT RGB TO GRAY LEVEL (LUMINANCE WEIGHTING)
+# 4. RESIZE IMAGE (Step 4)
 # ============================================================================
-# Why not simple average (R+G+B)/3?
-# The human eye has far more Green cones than Red or Blue!
-# ITU-R BT.601 formula:
-#   Gray = 0.299 * R + 0.587 * G + 0.114 * B
-# (Green gets ~59%, Red gets ~30%, Blue gets only ~11%)
+# cv2.resize changes image dimensions.
+# TRAP from slides: img.shape is (Height, Width), but cv2.resize takes (Width, Height)!
+new_width = 300
+new_height = 300
+resized = cv2.resize(img, (new_width, new_height))
 
-# OpenCV implementation
-gray_cv = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2GRAY)
+print("\n[Step 4: Resize Image]")
+print(f"   • Target size  : (Width={new_width}, Height={new_height})")
+print(f"   • resized.shape: {resized.shape} -> (Height={resized.shape[0]}, Width={resized.shape[1]}, Channels={resized.shape[2]})")
 
-# Manual NumPy implementation from RGB channels
-R = img_rgb[:, :, 0].astype(np.float32)
-G = img_rgb[:, :, 1].astype(np.float32)
-B = img_rgb[:, :, 2].astype(np.float32)
-gray_manual = np.round(0.299 * R + 0.587 * G + 0.114 * B).astype(np.uint8)
-
-print("5. Grayscale Conversion Metrics:")
-print(f"   - Grayscale Shape : {gray_cv.shape} (2D Matrix, single intensity channel)")
-print(f"   - Max diff between cv2 and manual formula: {np.max(np.abs(gray_cv.astype(int) - gray_manual.astype(int)))} levels")
-print()
-
-plt.figure(figsize=(10, 4))
-plt.subplot(1, 2, 1); plt.imshow(img_rgb); plt.title("Original Color RGB"); plt.axis("off")
-plt.subplot(1, 2, 2); plt.imshow(gray_cv, cmap='gray'); plt.title("Grayscale (Y = 0.3R + 0.59G + 0.11B)"); plt.axis("off")
-plt.tight_layout()
-plt.show()
 
 # ============================================================================
-# 6. CONVERT GRAY LEVEL TO BINARY (THRESHOLDING & MASKS)
+# 5. ROTATE IMAGE (Step 5)
 # ============================================================================
-# Binarization reduces 8-bit depth (256 levels) down to 1-bit (0 or 255).
-# Rule: If Gray[r, c] > Threshold => 255 (White), else 0 (Black).
+# cv2.rotate turns the image by fixed orthogonal angles without distortion.
+# Options:
+#   • cv2.ROTATE_90_CLOCKWISE        (swaps height and width)
+#   • cv2.ROTATE_180                 (keeps height and width)
+#   • cv2.ROTATE_90_COUNTERCLOCKWISE (or 270 degrees)
+rotated_90 = cv2.rotate(img, cv2.ROTATE_90_CLOCKWISE)
+rotated_180 = cv2.rotate(img, cv2.ROTATE_180)
 
-# OpenCV threshold function
-threshold_val = 128
-max_val = 255
-ret, binary_cv = cv2.threshold(gray_cv, threshold_val, max_val, cv2.THRESH_BINARY)
+print("\n[Step 5: Rotate Image]")
+print(f"   • Original shape  : {img.shape}")
+print(f"   • Rotated 90° CW  : {rotated_90.shape} (H and W are swapped)")
+print(f"   • Rotated 180°    : {rotated_180.shape} (H and W are preserved)")
 
-# Manual NumPy boolean vectorization
-binary_manual = np.where(gray_cv > threshold_val, 255, 0).astype(np.uint8)
-
-# Inverted binary mask (Foreground / Background inversion)
-_, binary_inv = cv2.threshold(gray_cv, threshold_val, max_val, cv2.THRESH_BINARY_INV)
-
-plt.figure(figsize=(12, 3.5))
-plt.subplot(1, 4, 1); plt.imshow(gray_cv, cmap='gray'); plt.title("Input Grayscale"); plt.axis("off")
-plt.subplot(1, 4, 2); plt.imshow(binary_cv, cmap='gray'); plt.title(f"Binary (T = {threshold_val})"); plt.axis("off")
-plt.subplot(1, 4, 3); plt.imshow(binary_inv, cmap='gray'); plt.title("Inverted Binary"); plt.axis("off")
-
-# Histogram of grayscale intensities
-plt.subplot(1, 4, 4)
-plt.hist(gray_cv.ravel(), bins=32, range=(0, 256), color='#a855f7', alpha=0.85)
-plt.axvline(threshold_val, color='#ef4444', linestyle='--', label=f'T = {threshold_val}')
-plt.title("Intensity Histogram & Cutoff")
-plt.xlabel("Gray Level [0..255]"); plt.ylabel("Count")
-plt.legend(loc='upper right')
-plt.tight_layout()
-plt.show()
 
 # ============================================================================
-# 7. STUDENT PRACTICE TASKS & SOLUTIONS
+# 6. SHOW IMAGE (Step 6)
 # ============================================================================
+# Local Python uses:
+#   cv2.imshow('Title', img)
+#   cv2.waitKey(0)           # waits forever for a key press
+#   cv2.destroyAllWindows()  # closes windows and frees memory
+#
+# Google Colab cannot open desktop windows, so we use:
+#   from google.colab.patches import cv2_imshow
+#   cv2_imshow(img)
+print("\n[Step 6: Displaying Images]")
+show_image("Original Image (BGR)", img)
+show_image("Grayscale Image (cv2.COLOR_BGR2GRAY)", gray)
+show_image("Binary Image (Threshold = 127)", binary)
+show_image("Resized Image (300x300)", resized)
+show_image("Rotated 90 CW", rotated_90)
 
-# Task 1: Color Channel Isolation (Split into R, G, B)
-b_ch, g_ch, r_ch = cv2.split(img_bgr)
-print(f"Task 1: Mean intensities -> Red: {r_ch.mean():.1f}, Green: {g_ch.mean():.1f}, Blue: {b_ch.mean():.1f}")
 
-# Task 2: Custom Multi-Threshold Binarization
-for t in (80, 128, 180):
-    bin_t = (gray_cv > t).astype(np.uint8) * 255
-    white_ratio = (bin_t == 255).mean() * 100
-    print(f"Task 2: Threshold T = {t:3d} ➔ White pixels = {white_ratio:.1f}%")
+# ============================================================================
+# 7. ALL TOGETHER: THE COMPLETE SCRIPT (Slide 13)
+# ============================================================================
+print("\n" + "="*50)
+print("  Slide 13: Complete Colab-Ready Pipeline Script  ")
+print("="*50)
+complete_code_sample = """
+import cv2
+from google.colab.patches import cv2_imshow
 
-print("\n✓ Session 04 Python pipeline executed successfully.")
+# 1. read the image (uploaded to /content)
+img = cv2.imread('/content/image_name.jpg')
+
+if img is None:
+    print("Error: image not found! Check the path.")
+else:
+    # 2. grayscale   3. binary
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    _, binary = cv2.threshold(gray, 127, 255, cv2.THRESH_BINARY)
+
+    # 4. resize   5. rotate
+    resized = cv2.resize(img, (300, 300))
+    rotated = cv2.rotate(img, cv2.ROTATE_90_CLOCKWISE)
+
+    # 6. show (cv2_imshow replaces cv2.imshow on Colab)
+    cv2_imshow(img)
+    cv2_imshow(gray)
+    cv2_imshow(binary)
+    cv2_imshow(resized)
+    cv2_imshow(rotated)
+"""
+print(complete_code_sample.strip())
+
+
+# ============================================================================
+# 8. STUDENT PRACTICE TASK & SOLUTION (Slide 14)
+# ============================================================================
+# Requirements from Slide 14:
+#   1. Change threshold to 100 and compare binary image with 127
+#   2. Resize to (150, 150) and print resized.shape
+#   3. Rotate by 180 degrees and print rotated.shape, then try 90 degrees
+print("\n" + "="*50)
+print("  Slide 14: Student Task Reference Solution       ")
+print("="*50)
+
+# 1. Threshold at 100 vs 127
+_, binary_100 = cv2.threshold(gray, 100, 255, cv2.THRESH_BINARY)
+white_at_100 = np.mean(binary_100 == 255) * 100
+white_at_127 = np.mean(binary == 255) * 100
+print(f"Task 1: Threshold = 100 -> {white_at_100:.1f}% white pixels (more white than T=127: {white_at_127:.1f}%)")
+
+# 2. Resize to (150, 150)
+task_resized = cv2.resize(img, (150, 150))
+print(f"Task 2: resized.shape   -> {task_resized.shape} (Width=150, Height=150)")
+
+# 3. Rotate 180 degrees vs 90 degrees
+task_rot_180 = cv2.rotate(img, cv2.ROTATE_180)
+print(f"Task 3: rotated 180°    -> {task_rot_180.shape} (Shape preserved)")
+print(f"        rotated 90° CW  -> {rotated_90.shape} (Shape transposed)")
+
+print("\n✓ Session 04 Python code executed successfully!")
