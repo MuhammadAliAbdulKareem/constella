@@ -1560,6 +1560,17 @@ const GV=(()=>{const d=IMG.getContext('2d').getImageData(0,0,IMW,IMH).data,v=new
 function toCv(fn){const o=document.createElement('canvas');o.width=IMW;o.height=IMH;const c=o.getContext('2d'),id=c.createImageData(IMW,IMH);
   for(let i=0;i<GV.length;i++){const v=fn(GV[i]);id.data[i*4]=id.data[i*4+1]=id.data[i*4+2]=v;id.data[i*4+3]=255}c.putImageData(id,0,0);return o}
 const GRAYC=toCv(v=>v),BINC=toCv(v=>v>127?255:0),_tc=toCv(v=>v);
+const VIRIDISC=(()=>{
+  const o=document.createElement('canvas');o.width=IMW;o.height=IMH;const c=o.getContext('2d'),id=c.createImageData(IMW,IMH);
+  for(let i=0;i<GV.length;i++){
+    const t=GV[i]/255;
+    id.data[i*4]=Math.min(255,Math.max(0,Math.round(68*(1-t)*(1-t) + 33*2*t*(1-t) + 253*t*t)));
+    id.data[i*4+1]=Math.min(255,Math.max(0,Math.round(1*(1-t)*(1-t) + 145*2*t*(1-t) + 231*t*t)));
+    id.data[i*4+2]=Math.min(255,Math.max(0,Math.round(84*(1-t)*(1-t) + 140*2*t*(1-t) + 37*t*t)));
+    id.data[i*4+3]=255;
+  }
+  c.putImageData(id,0,0);return o;
+})();
 const ROTC=(()=>{const o=document.createElement('canvas');o.width=IMH;o.height=IMW;const c=o.getContext('2d');c.translate(IMH,0);c.rotate(Math.PI/2);c.drawImage(IMG,0,0);return o})();
 const RESIZEC=(()=>{const o=document.createElement('canvas');o.width=IMW;o.height=IMW;const c=o.getContext('2d');c.drawImage(IMG,0,0,IMW,IMW);return o})();
 const _thrCache=new Map();
@@ -1770,24 +1781,161 @@ VIZ.rotate={cycle:1e9,draw(c,W,H,f){
 
 VIZ.win={cycle:1e9,draw(c,W,H,f){
   c.imageSmoothingEnabled=false;
-  const cycle=420, ph=f%cycle;
-  let open=0, step=0;
-  if(ph<45){ open=ease(ph/45); step=0; }
-  else if(ph<280){ open=1; step=1; }
-  else if(ph<340){ open=1-ease((ph-280)/60); step=2; }
-  else { open=0; step=2; }
-  const ww=Math.min(W*.58,290),ih=ww/AR,wh=ih+30,cx=W/2,cy=H/2-wh/2-14,sc=.88+.12*open;
-  c.save();c.globalAlpha=open;c.translate(cx,cy+wh/2);c.scale(sc,sc);c.translate(-ww/2,-wh/2);
-  rr(c,0,0,ww,wh,10);c.fillStyle=isLight?'#f3f1fb':'#13121f';c.fill();c.strokeStyle=rgba(PC,.7);c.lineWidth=1.6;c.stroke();
-  ['#ff5f56','#ffbd2e','#27c93f'].forEach((q,i)=>{c.fillStyle=q;c.beginPath();c.arc(14+i*15,15,4.5,0,7);c.fill()});
-  txt(c,'Image Title',ww/2,15,{size:11,col:CL.dim,font:'mono'});
-  c.drawImage(IMG,4,30,ww-8,ih-4);c.restore();
-  const chips=['cv2.imshow(…)','cv2.waitKey(0)','cv2.destroyAllWindows()'],cw=(W-24)/3,yy=cy+wh+34;
-  chips.forEach((t,i)=>{const on=i===step,x=4+i*(cw+8);
-    c.save();rr(c,x,yy,cw,34,9);c.fillStyle=rgba(on?PC:CL.dim,on?.2:.08);c.fill();c.strokeStyle=on?PC:CL.axis;c.lineWidth=on?2:1;c.stroke();c.restore();
-    txt(c,t,x+cw/2,yy+17,{size:10.5,col:on?CL.chalk:CL.dim,font:'mono',weight:700})});
-  const msg=step===0?'window opens':step===1?(ph<250?(Math.floor(f/30)%2===0?'waiting for key press…':'waiting for key press'):'key pressed!'):'window closed, memory released';
-  txt(c,msg,W/2,yy+60,{size:12.5,col:PC,font:'mono',weight:700});
+  const cycle=540, ph=f%cycle;
+  const step=Math.floor(ph/180);
+  const stepPh=ph%180;
+
+  // Matplotlib Figure Card (resembling a clean notebook figure)
+  const fw=Math.min(W*.84,380), fh=230, fx=(W-fw)/2, fy=18;
+  c.save();
+  rr(c,fx,fy,fw,fh,12);
+  c.fillStyle=isLight?'#ffffff':'#0c0b16';
+  c.fill();
+  c.strokeStyle=rgba(PC,isLight?0.4:0.6);
+  c.lineWidth=1.6;
+  if(!isLight){c.shadowColor=PC;c.shadowBlur=16;}
+  c.stroke();
+  c.restore();
+
+  // Figure Header: Title & Matplotlib status
+  const titles=['plt.title("Original Image (RGB)")', 'plt.title("Grayscale: cmap=\'gray\'")', 'plt.title("plt.axis(\'off\') Clean Photo")'];
+  const curTitle=titles[step];
+  c.save();
+  txt(c,curTitle,fx+fw/2,fy+18,{size:11.5,col:step===0?PC:(step===1?CL.cyan:CL.green),font:'mono',weight:800});
+  c.restore();
+
+  // Image Frame inside Figure
+  const iw=220, ih=Math.round(iw/AR), ix=fx+(fw-iw)/2, iy=fy+36;
+
+  // Draw appropriate image based on step
+  if(step===0){
+    // Step 0: Color Image (RGB) with title
+    c.save();
+    rr(c,ix,iy,iw,ih,6);
+    c.clip();
+    c.drawImage(IMG,ix,iy,iw,ih);
+    c.restore();
+    c.save();
+    c.strokeStyle=rgba(PC,.8);c.lineWidth=1.5;
+    rr(c,ix,iy,iw,ih,6);c.stroke();
+    c.restore();
+  } else if(step===1){
+    // Step 1: cmap='gray' vs viridis trap! Split wipe comparison
+    const p=ease(at(stepPh,25,95));
+    const wipeX=ix+iw*p;
+    c.save();
+    rr(c,ix,iy,iw,ih,6);
+    c.clip();
+    // Left: default viridis (trap)
+    c.drawImage(VIRIDISC,ix,iy,iw,ih);
+    // Right: true grayscale (cmap='gray')
+    c.save();
+    c.beginPath();
+    c.rect(ix,iy,iw*p,ih);
+    c.clip();
+    c.drawImage(GRAYC,ix,iy,iw,ih);
+    c.restore();
+    // Divider line
+    if(p>0&&p<1){
+      c.strokeStyle='#ffffff';c.lineWidth=2;
+      c.beginPath();c.moveTo(wipeX,iy);c.lineTo(wipeX,iy+ih);c.stroke();
+    }
+    c.restore();
+    c.save();
+    c.strokeStyle=rgba(CL.cyan,.85);c.lineWidth=1.5;
+    rr(c,ix,iy,iw,ih,6);c.stroke();
+    c.restore();
+
+    // Badges inside image
+    c.save();
+    rr(c,ix+6,iy+ih-22,86,16,4);
+    c.fillStyle='rgba(13,11,22,0.85)';c.fill();
+    txt(c,"cmap='gray' ✔",ix+49,iy+ih-14,{size:8.5,col:CL.green,font:'mono',weight:700});
+    rr(c,ix+iw-96,iy+ih-22,90,16,4);
+    c.fillStyle='rgba(13,11,22,0.85)';c.fill();
+    txt(c,"No cmap (viridis) ❌",ix+iw-51,iy+ih-14,{size:8.5,col:CL.pink,font:'mono',weight:700});
+    c.restore();
+  } else {
+    // Step 2: plt.axis('off') vs coordinate ticks
+    const ticksVisible = stepPh < 75;
+    const fade = ticksVisible ? 1 : Math.max(0, 1 - ease((stepPh-75)/30));
+    c.save();
+    rr(c,ix,iy,iw,ih,6);
+    c.clip();
+    c.drawImage(IMG,ix,iy,iw,ih);
+    c.restore();
+    c.save();
+    c.strokeStyle=fade>0.1?rgba(CL.amber,.8):rgba(CL.green,.9);
+    c.lineWidth=1.5;
+    rr(c,ix,iy,iw,ih,6);
+    c.stroke();
+    c.restore();
+
+    // Coordinate ticks simulation
+    if(fade>0.02){
+      c.save();
+      c.globalAlpha=fade;
+      // Bottom x-ticks: 0, 50, 100, 150
+      const xticks=[0, 50, 100, 150];
+      xticks.forEach(tk=>{
+        const tx=ix+(tk/160)*iw;
+        c.strokeStyle=isLight?'#475569':'#94a3b8';c.lineWidth=1;
+        c.beginPath();c.moveTo(tx,iy+ih);c.lineTo(tx,iy+ih+4);c.stroke();
+        txt(c,String(tk),tx,iy+ih+12,{size:8,col:CL.dim,font:'mono'});
+      });
+      // Left y-ticks: 0, 50, 100
+      const yticks=[0, 50, 100];
+      yticks.forEach(tk=>{
+        const ty=iy+(tk/100)*ih;
+        c.strokeStyle=isLight?'#475569':'#94a3b8';c.lineWidth=1;
+        c.beginPath();c.moveTo(ix-4,ty);c.lineTo(ix,ty);c.stroke();
+        txt(c,String(tk),ix-10,ty,{size:8,col:CL.dim,font:'mono',align:'right'});
+      });
+      c.restore();
+    }
+    // Badge showing axis status
+    c.save();
+    const isOff = stepPh >= 75;
+    rr(c,ix+iw/2-74,iy+ih-24,148,18,4);
+    c.fillStyle='rgba(13,11,22,0.9)';c.fill();
+    txt(c,isOff?"plt.axis('off') → Ticks Hidden ✔":"plt.axis('on') → Graph Ticks Visible",ix+iw/2,iy+ih-15,{
+      size:8.5,col:isOff?CL.green:CL.amber,font:'mono',weight:700
+    });
+    c.restore();
+  }
+
+  // Figure sub-caption inside card
+  const cardCaptions=[
+    'plt.title(...) labels the plot · cv2.COLOR_BGR2RGB ensures accurate colors',
+    'cmap="gray" maps 0..255 linearly from black to white (no false color)',
+    'plt.axis("off") strips x & y coordinate markers for clean photo presentation'
+  ];
+  txt(c,cardCaptions[step],fx+fw/2,fy+fh-14,{size:9.5,col:CL.dim,font:'ui',weight:600});
+
+  // 3 Interactive Chips below card
+  const chips=["1. plt.title('…')", "2. cmap='gray'", "3. plt.axis('off')"];
+  const cw=Math.floor((W-36-16)/3), yy=fy+fh+26;
+  chips.forEach((t,i)=>{
+    const on=i===step, x=18+i*(cw+8);
+    c.save();
+    rr(c,x,yy,cw,34,9);
+    c.fillStyle=rgba(on?PC:CL.dim,on?(isLight?.18:.2):(isLight?.05:.07));
+    c.fill();
+    c.strokeStyle=on?PC:(isLight?'rgba(0,0,0,0.1)':'rgba(255,255,255,0.12)');
+    c.lineWidth=on?2:1;
+    if(on&&!isLight){c.shadowColor=PC;c.shadowBlur=10;}
+    c.stroke();
+    c.restore();
+    txt(c,t,x+cw/2,yy+17,{size:11,col:on?CL.chalk:CL.dim,font:'mono',weight:700});
+  });
+
+  // Global dynamic message banner
+  const msgs=[
+    'Step 1: Set figure title & convert BGR to RGB for natural colors',
+    'Step 2: Mandatory cmap="gray" converts 2D scalar arrays to true monochrome',
+    'Step 3: plt.axis("off") eliminates coordinate ticks for pure picture display'
+  ];
+  txt(c,msgs[step],W/2,yy+56,{size:12,col:PC,font:'ui',weight:700});
 }};
 
 VIZ.recap={
@@ -1952,7 +2100,7 @@ VIZ.recap={
     const px1=b.x+22;
     const px2=px1+pw+14;
 
-    // LEFT PANEL: Window Management & Display Lifecycle
+    // LEFT PANEL: Matplotlib Display Pipeline
     c.save();
     rr(c,px1,by,pw,bh,12);
     c.fillStyle=rgba(CL.cyan,isLight?0.05:0.08);
@@ -1967,15 +2115,15 @@ VIZ.recap={
     rr(c,px1+14,by+10,205,18,4);
     c.fillStyle=rgba(CL.cyan,isLight?0.15:0.2);
     c.fill();
-    txt(c,'DISPLAY & WINDOW LIFECYCLE',px1+116,by+19,{size:9.5,col:CL.cyan,font:'mono',weight:800});
+    txt(c,'MATPLOTLIB DISPLAY PIPELINE',px1+116,by+19,{size:9.5,col:CL.cyan,font:'mono',weight:800});
     c.restore();
 
     // Left Panel: 3 Interactive Steps
     const wstep=Math.floor((f%360)/120);
     const wchips=[
-      {fn:'cv2.imshow(win, img)',desc:'Opens OS raster GUI window'},
-      {fn:'cv2.waitKey(0)',desc:'Blocks CPU; waits for key (0 = ∞)'},
-      {fn:'cv2.destroyAllWindows()',desc:'Destroys GUI handles & frees RAM'}
+      {fn:"plt.imshow(img, cmap='gray')",desc:"Maps pixels · RGB for color, cmap for gray"},
+      {fn:"plt.title('Image Title')",desc:"Labels plot with descriptive header"},
+      {fn:"plt.axis('off')",desc:"Hides coordinate ticks & chart borders"}
     ];
     const chipW=pw-28;
     const chipH=26;
@@ -2002,11 +2150,11 @@ VIZ.recap={
 
     // Colab Note at bottom of Left Panel
     const colabY=by+bh-16;
-    txt(c,'⚡ Google Colab: GUI windows blocked → use from google.colab.patches import cv2_imshow',px1+14,colabY,{
-      size:9.5,col:isLight?'#b45309':CL.amber,font:'ui',weight:600,align:'left'
+    txt(c,'⚡ Universal & Colab Ready: plt.show() displays inline without GUI window freezes',px1+14,colabY,{
+      size:9.5,col:isLight?'#0284c7':CL.cyan,font:'ui',weight:600,align:'left'
     });
 
-    // RIGHT PANEL: NumPy Foundation & Session 05 Preview
+    // RIGHT PANEL: NumPy Foundation & Session 05 Preview (Balanced Spacing, Zero Overlap)
     c.save();
     rr(c,px2,by,pw,bh,12);
     c.fillStyle=rgba(CL.violet,isLight?0.05:0.08);
@@ -2024,9 +2172,9 @@ VIZ.recap={
     txt(c,'NUMPY CORE & NEXT SESSION 05',px2+126,by+19,{size:9.5,col:CL.violet,font:'mono',weight:800});
     c.restore();
 
-    // Core Foundation Box
+    // Core Foundation Box (Expanded height coreBoxH=48 for generous vertical margins)
     const coreBoxY=by+34;
-    const coreBoxH=38;
+    const coreBoxH=48;
     c.save();
     rr(c,px2+14,coreBoxY,pw-28,coreBoxH,6);
     c.fillStyle=isLight?'#f3e8ff':'rgba(168,85,247,0.12)';
@@ -2036,15 +2184,15 @@ VIZ.recap={
     c.stroke();
     c.restore();
 
-    txt(c,'“Every image is fundamentally a NumPy ndarray of numbers.”',px2+pw/2,coreBoxY+13,{
+    txt(c,'“Every image is fundamentally a NumPy ndarray of numbers.”',px2+pw/2,coreBoxY+15,{
       size:11,col:isLight?'#6b21a8':CL.chalk,font:'ui',weight:800
     });
-    txt(c,'img[y, x] = [B, G, R]   ·   dtype = uint8 [0..255]   ·   origin: top-left (0, 0)',px2+pw/2,coreBoxY+28,{
+    txt(c,'img[y, x] = [B, G, R]   ·   dtype = uint8 [0..255]   ·   origin: top-left (0, 0)',px2+pw/2,coreBoxY+33,{
       size:9.5,col:isLight?'#7e22ce':CL.pink,font:'mono',weight:600
     });
 
-    // Session 05 Preview Box
-    const nxtY=coreBoxY+coreBoxH+8;
+    // Session 05 Preview Box (Clean 10px separation gap below Core Box)
+    const nxtY=coreBoxY+coreBoxH+10;
     const nxtH=bh-(nxtY-by)-8;
     c.save();
     rr(c,px2+14,nxtY,pw-28,nxtH,6);
@@ -2056,7 +2204,7 @@ VIZ.recap={
     c.restore();
 
     // Mini 3x3 Kernel Matrix Graphic
-    const kx=px2+24,ky=nxtY+8;
+    const kx=px2+24,ky=nxtY+14;
     const ks=13;
     const kvals=['-1','-1','-1','-1',' 8','-1','-1','-1','-1'];
     for(let kr=0;kr<3;kr++){
@@ -2072,13 +2220,13 @@ VIZ.recap={
     }
 
     const infoX=kx+3*ks+12;
-    txt(c,'NEXT UP: Image Filtering & 2D Convolutions',infoX,ky+10,{
+    txt(c,'NEXT UP: Image Filtering & 2D Convolutions',infoX,ky+8,{
       size:10.5,col:isLight?'#9d174d':CL.pink,font:'ui',weight:800,align:'left'
     });
     txt(c,'Because images are arrays, future operations (blur, sharpen, edge detection)',infoX,ky+23,{
       size:9.5,col:isLight?'#475569':CL.dim,font:'ui',weight:500,align:'left'
     });
-    txt(c,'are simply sliding 3×3 matrix kernels over the pixel grid!',infoX,ky+35,{
+    txt(c,'are simply sliding 3×3 matrix kernels over the pixel grid!',infoX,ky+37,{
       size:9.5,col:isLight?'#475569':CL.chalk,font:'ui',weight:600,align:'left'
     });
 
@@ -2112,10 +2260,11 @@ VIZ.arr={cycle:1e9,draw(c,W,H,f){
 }};
 
 const CODE={
-c_setup:`# Colab: OpenCV is pre-installed
-# Local: pip install opencv-python
+c_setup:`# Colab: OpenCV and Matplotlib are pre-installed
+# Local: pip install opencv-python matplotlib
 
-import cv2`,
+import cv2
+import matplotlib.pyplot as plt`,
 c_arr:`img = cv2.imread('/content/image_name.jpg')
 print(img.shape)   # (H, W, 3)
 print(img[0][0])   # [B, G, R] of the top-left pixel`,
@@ -2130,54 +2279,86 @@ c_resize:`resized = cv2.resize(img, (300, 300))
 c_rot:`rotated = cv2.rotate(img, cv2.ROTATE_90_CLOCKWISE)
 # cv2.ROTATE_180
 # cv2.ROTATE_90_COUNTERCLOCKWISE`,
-c_show:`cv2.imshow('Image Title', img)
-cv2.waitKey(0)
-cv2.destroyAllWindows()
+c_show:`import matplotlib.pyplot as plt
 
-# Colab version:
-from google.colab.patches import cv2_imshow
-cv2_imshow(img)`,
+# 1. Color image: convert BGR -> RGB for Matplotlib
+img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+plt.imshow(img_rgb)
+plt.title('Color Image (RGB)')
+plt.axis('off')     # hides x & y coordinate ticks
+plt.show()
+
+# 2. Grayscale image: MUST include cmap='gray'!
+plt.imshow(gray, cmap='gray')
+plt.title('Grayscale Image')
+plt.axis('off')
+plt.show()`,
 c_q1:`img = cv2.imread('/content/image_name.jpg')
 b, g, r = img[0, 0]   # which order?`,
 c_q2:`_, binary = cv2.threshold(
     gray, 127, 255, cv2.THRESH_BINARY)
 # a gray pixel of 200 becomes ?`,
-c_q3:`cv2.imshow('Image Title', img)
-cv2.waitKey(0)
-# the program pauses here`,
+c_q3:`# Grayscale display with Matplotlib:
+plt.imshow(gray, cmap='gray')
+plt.title('Grayscale Image')
+plt.axis('off')    # removes coordinate ticks
+plt.show()`,
 c_full:`import cv2
-from google.colab.patches import cv2_imshow
+import matplotlib.pyplot as plt
 
-# 1. read the image (uploaded to /content)
+# 1. Read the image (uploaded to /content)
 img = cv2.imread('/content/image_name.jpg')
 
 if img is None:
     print("Error: image not found! Check the path.")
 else:
-    # 2. grayscale   3. binary
+    # 2. Grayscale   3. Binary threshold
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     _, binary = cv2.threshold(gray, 127, 255, cv2.THRESH_BINARY)
 
-    # 4. resize   5. rotate
+    # 4. Resize   5. Rotate 90° CW
     resized = cv2.resize(img, (300, 300))
     rotated = cv2.rotate(img, cv2.ROTATE_90_CLOCKWISE)
 
-    # 6. show (cv2_imshow replaces cv2.imshow on Colab)
-    cv2_imshow(img)
-    cv2_imshow(gray)
-    cv2_imshow(binary)
-    cv2_imshow(resized)
-    cv2_imshow(rotated)`,
-c_sol:`img = cv2.imread('/content/image_name.jpg')
+    # 6. Plot with Matplotlib (convert BGR -> RGB)
+    img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+
+    # Display Color Image
+    plt.imshow(img_rgb)
+    plt.title('Original (RGB)')
+    plt.axis('off')
+    plt.show()
+
+    # Display Grayscale (cmap='gray' is essential!)
+    plt.imshow(gray, cmap='gray')
+    plt.title('Grayscale (cmap="gray")')
+    plt.axis('off')
+    plt.show()
+
+    # Display Binary Threshold
+    plt.imshow(binary, cmap='gray')
+    plt.title('Binary Threshold (T=127)')
+    plt.axis('off')
+    plt.show()`,
+c_sol:`import cv2
+import matplotlib.pyplot as plt
+
+img = cv2.imread('/content/image_name.jpg')
 gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 _, binary = cv2.threshold(gray, 100, 255, cv2.THRESH_BINARY)
 resized = cv2.resize(img, (150, 150))
 rotated = cv2.rotate(img, cv2.ROTATE_180)
 
 print(img.shape, gray.shape)
-print(resized.shape, rotated.shape)`
+print(resized.shape, rotated.shape)
+
+# Plot binary result cleanly
+plt.imshow(binary, cmap='gray')
+plt.title('Student Task: Binary (T=100)')
+plt.axis('off')
+plt.show()`
 };
-const HERO_TOKENS=['cv2.imread','BGR','cvtColor','threshold','127','255','resize','(300, 300)','rotate','imshow','waitKey','GRAY','uint8','NumPy','pixel'];
+const HERO_TOKENS=['cv2.imread','BGR','cvtColor','threshold','127','255','resize','(300, 300)','rotate','plt.imshow','cmap=\'gray\'','axis(\'off\')','title','GRAY','uint8','NumPy','pixel'];
 const HERO_STRIPS=[[255,200,128,64,32,0,90,180,240,15],[12,60,127,128,200,255,34,99]];
 const _tokDraw=VIZ.tokens.draw;
 let _hd=null;
@@ -2216,9 +2397,9 @@ VIZ.tokens.draw=function(c,W,H,f){
 const HERO=`
 <div class="lbl">Multimedia Systems · Session 04</div>
 <h1>Digital Images with <em>OpenCV</em></h1>
-<div class="tag">Read an image, turn it into grayscale and binary, resize it, rotate it and show it: six steps with Python and cv2</div>
+<div class="tag">Read an image, turn it into grayscale and binary, resize it, rotate it and plot it: six steps with Python, OpenCV & Matplotlib</div>
 <div class="inst"><div class="avatar">M</div><div><small>Instructor</small><b>Muhammad Ali Abdul Kareem</b></div></div>
-<div class="chips"><span>imread</span><span>Grayscale</span><span>Binary</span><span>Resize</span><span>Rotate</span><span>imshow</span><span>3 MCQs</span><span>Student Task</span></div>`;
+<div class="chips"><span>imread</span><span>Grayscale</span><span>Binary</span><span>Resize</span><span>Rotate</span><span>Matplotlib Plot</span><span>3 MCQs</span><span>Student Task</span></div>`;
 /* Responsive: every visual is drawn on a fixed 520x430 board that is scaled to fit its container */
 const DW=520,DH=430;
 ['read','gray','thresh','resize','rotate','win','arr'].forEach(n=>{
@@ -2232,7 +2413,7 @@ const DW=520,DH=430;
 });
 const SL=[
 {part:'part-intro',hero:true,next:'Setup'},
-{part:'part-intro',lbl:'Lab Goals',h2:'Install, import and <em>get ready</em>',sub:'Six simple steps with OpenCV: read, grayscale, binary, resize, rotate, show.',task:{chip:'Setup',req:['<b>On Colab:</b> OpenCV is already installed. Upload your image from the Files panel and it lands in <code>/content</code>.','<b>Locally:</b> install once with <code>pip install opencv-python</code>.','<b>Import:</b> bring the library into your code with <code>import cv2</code>.'],trap:'On Colab the image path is <code>/content/image_name.jpg</code>. Replace <code>image_name.jpg</code> with your own file name.',code:'c_setup'},next:'The array'},
+{part:'part-intro',lbl:'Lab Goals',h2:'Install, import and <em>get ready</em>',sub:'Six simple steps with OpenCV & Matplotlib: read, grayscale, binary, resize, rotate, plot.',task:{chip:'Setup',req:['<b>On Colab:</b> OpenCV and Matplotlib are pre-installed. Upload your image from the Files panel and it lands in <code>/content</code>.','<b>Locally:</b> install once with <code>pip install opencv-python matplotlib</code>.','<b>Import:</b> bring both libraries into your code with <code>import cv2</code> and <code>import matplotlib.pyplot as plt</code>.'],trap:'On Colab the image path is <code>/content/image_name.jpg</code>. Replace <code>image_name.jpg</code> with your own file name.',code:'c_setup'},next:'The array'},
 {part:'part-intro',lbl:'Core Idea',h2:'An image is just an <em>array</em>',split:true,viz:'arr',chip:'NumPy array',req:['An image is a grid of pixels. OpenCV keeps that grid in a NumPy array: rows are the height, columns are the width.','Each color pixel holds 3 numbers, <code>img[y][x] = [B, G, R]</code>, every one from 0 to 255.','Every function today is math on that array: <code>cvtColor</code> makes 3 numbers into 1, <code>threshold</code> makes a number 0 or 255, <code>resize</code> builds a new array, <code>rotate</code> rearranges rows and columns.'],code:'c_arr',trap:'Index order is <code>img[y][x]</code>: row first, then column.',next:'Read image'},
 {part:'part-seq',lbl:'Step 1 · Input Image',h2:'<em>imread</em> — file to NumPy array',split:true,viz:'read',chip:'cv2.imread',req:['<code>cv2.imread</code> reads an image file and turns it into an array of numbers.','The input is the file path. On Colab, uploaded files live in <code>/content/</code>, so the path is <code>/content/image_name.jpg</code>.','Important: OpenCV reads colors in <code>BGR</code> order, not <code>RGB</code>.'],code:'c_read',trap:'A wrong path does not raise an error: it returns <code>None</code>. Always check <code>img is None</code>.',next:'Grayscale'},
 {part:'part-seq',lbl:'Step 2 · Convert RGB to Grayscale',h2:'<em>cvtColor</em> — three channels to one',split:true,viz:'gray',chip:'cv2.cvtColor',req:['<code>cv2.cvtColor(src, code)</code> converts an image from one color space to another.','A color image has 3 channels (B, G, R); a grayscale image has only one.','Each pixel value now ranges from <code>0</code> to <code>255</code>.'],code:'c_gray',next:'Check 1'},
@@ -2241,11 +2422,11 @@ const SL=[
 {part:'part-rules',lbl:'Interactive Predictor',h2:'Check 2: <em>Threshold</em>',sub:'Compare the pixel with the threshold.',mcq:true,q:'<b>A gray pixel has the value 200. What does it become after threshold with 127 and max value 255?</b>',options:['0','127','200','255'],answer:'255',explain:'<b>Correct!</b> <code>200 &gt; 127</code>, so the pixel becomes white: <code>255</code>.',hint:'Is 200 greater than 127?',code:'c_q2',next:'Resize'},
 {part:'part-rep',lbl:'Step 4 · Resize Image',h2:'<em>resize</em> — change the dimensions',split:true,viz:'resize',chip:'cv2.resize',req:['<code>cv2.resize(src, dsize)</code> enlarges or shrinks an image.','The new size is given as <code>(Width, Height)</code>, in pixels.'],code:'c_resize',trap:'Careful: <code>img.shape</code> gives <code>(Height, Width)</code>, but resize takes <code>(Width, Height)</code>.',next:'Rotate'},
 {part:'part-rep',lbl:'Step 5 · Rotate Image',h2:'<em>rotate</em> — right angles, no distortion',split:true,viz:'rotate',chip:'cv2.rotate',req:['<code>cv2.rotate</code> turns an image by ready-made right angles, fast and with no loss of detail.','<code>ROTATE_90_CLOCKWISE</code>: 90 degrees clockwise.','<code>ROTATE_180</code>: flips the image upside down.','<code>ROTATE_90_COUNTERCLOCKWISE</code>: 90 degrees counterclockwise (or 270).'],code:'c_rot',next:'Show image'},
-{part:'part-fn',lbl:'Step 6 · Show Image',h2:'<em>imshow</em> — windows and keys',split:true,viz:'win',chip:'cv2.imshow',req:['<code>cv2.imshow</code> opens a window with the given title and shows the image inside it.','<code>cv2.waitKey(0)</code> pauses the program until the user presses any key; 0 means wait forever.','<code>cv2.destroyAllWindows()</code> closes every window and frees the memory.'],trap:'Colab cannot open windows, so <code>cv2.imshow</code> fails there. Use <code>cv2_imshow(img)</code> from <code>google.colab.patches</code>.',code:'c_show',next:'Check 3'},
-{part:'part-rules',lbl:'Interactive Predictor',h2:'Check 3: <em>waitKey</em>',sub:'What happens on the second line?',mcq:true,q:'<b>What does <code>cv2.waitKey(0)</code> do?</b>',options:['Closes the window immediately','Waits forever for a key press','Waits 0 seconds','Saves the image'],answer:'Waits forever for a key press',explain:'<b>Correct!</b> A value of 0 means wait indefinitely until the user presses any key.',hint:'The zero is not a zero-length delay.',code:'c_q3',next:'Full script'},
-{part:'part-fn',lbl:'All Together',h2:'The <em>complete script</em>',sub:'Every step in one Colab-ready file. Grab it with the Download Code button.',task:{chip:'Full script',req:['<b>Check:</b> make sure <code>img</code> is not <code>None</code> before any processing.','<b>Process:</b> grayscale, binary, resize, rotate.','<b>Show:</b> five images with <code>cv2_imshow</code>, the Colab replacement for <code>imshow</code>.'],code:'c_full'},next:'Student Task'},
-{part:'part-fn',lbl:'Student Task',h2:'Threshold, size and <em>shape</em> hunt',sub:'Edit the code, then compare your results.',tt:{chip:'Task 1',req:['Change the threshold to <code>100</code> and compare the binary image with the one at <code>127</code>.','Resize to <code>(150, 150)</code> and print <code>resized.shape</code>.','Rotate by <code>180</code> degrees and print <code>rotated.shape</code>, then try 90 degrees.'],trap:'Remember: a 90 degree rotation swaps height and width; 180 degrees does not.',title:'Expected results',lines:[[['img.shape     -> (H, W, 3)','pink']],[['gray.shape    -> (H, W)','amber']],[['binary values -> 0 and 255','green']],[['resized.shape -> (150, 150, 3)','green']],[['rotated 180   -> (H, W, 3)','amber']]]},sol:'c_sol',solTitle:'Reference Solution',solNotes:['<b>A lower threshold</b> (100) turns more pixels white.','<b>shape</b> is <code>(H, W, 3)</code> for color and just <code>(H, W)</code> for grayscale.','<b>A 90 degree rotation</b> swaps <code>H</code> and <code>W</code>; <code>ROTATE_180</code> keeps them.']},
-{part:'part-fn',lbl:'Recap & Synthesis',h2:'Session 04 — <em>Pixels to pictures</em> and what comes next',sub:'We read an image, made it gray and binary, resized and rotated it, then showed it.',viz:'recap',next:'Thank you'}
+{part:'part-fn',lbl:'Step 6 · Plot with Matplotlib',h2:'<em>plt.imshow</em> — titles, cmap & clean axes',split:true,viz:'win',chip:'plt.imshow',req:['<code>plt.imshow(img)</code> renders the pixel grid. Convert BGR to RGB first (<code>cv2.cvtColor(img, cv2.COLOR_BGR2RGB)</code>) for accurate color.','<code>plt.title(\'Title\')</code> sets a clear, readable header above the displayed image.','<code>cmap=\'gray\'</code>: <b>mandatory for 2D grayscale!</b> Without it, Matplotlib renders a false-color viridis heatmap.','<code>plt.axis(\'off\')</code> hides coordinate ticks (x & y numbers) and borders for a clean photograph appearance.','<code>plt.show()</code> displays figures inline in Google Colab, Jupyter Notebooks, or script windows.'],trap:'Always convert BGR to RGB for color images, and always pass <code>cmap=\'gray\'</code> for grayscale or binary images.',code:'c_show',next:'Check 3'},
+{part:'part-rules',lbl:'Interactive Predictor',h2:'Check 3: <em>Matplotlib Colormap</em>',sub:'What happens without the color map parameter?',mcq:true,q:'<b>What happens if you display a grayscale image with <code>plt.imshow(gray)</code> without <code>cmap=\'gray\'</code>?</b>',options:['Displays as a false-color heatmap (viridis) instead of gray','Python throws a ValueError','The image displays completely black','Matplotlib automatically converts it to BGR'],answer:'Displays as a false-color heatmap (viridis) instead of gray',explain:'<b>Correct!</b> Matplotlib treats 2D single-channel arrays as scalar data and applies its default heatmap colormap (viridis). To view actual gray intensities, always pass <code>cmap=\'gray\'</code>.',hint:'Matplotlib defaults 2D arrays to a colored heatmap (viridis).',code:'c_q3',next:'Full script'},
+{part:'part-fn',lbl:'All Together',h2:'The <em>complete script</em>',sub:'Every step in one Colab & notebook-ready file. Grab it with the Download Code button.',task:{chip:'Full script',req:['<b>Check:</b> make sure <code>img</code> is not <code>None</code> before any processing.','<b>Process:</b> grayscale (<code>cvtColor</code>), binary (<code>threshold</code>), resize, rotate.','<b>Plot:</b> display results with <code>plt.imshow</code>, setting <code>plt.title()</code>, <code>plt.axis(\'off\')</code>, and <code>cmap=\'gray\'</code> for monochrome images.'],code:'c_full'},next:'Student Task'},
+{part:'part-fn',lbl:'Student Task',h2:'Threshold, size and <em>shape</em> hunt',sub:'Edit the code, then compare your results.',tt:{chip:'Task 1',req:['Change the threshold to <code>100</code> and compare the binary image with the one at <code>127</code>.','Resize to <code>(150, 150)</code> and print <code>resized.shape</code>.','Rotate by <code>180</code> degrees and print <code>rotated.shape</code>, then try 90 degrees.','Plot your binary result cleanly with <code>plt.imshow</code> using <code>cmap=\'gray\'</code>.'],trap:'Remember: a 90 degree rotation swaps height and width; 180 degrees does not.',title:'Expected results',lines:[[['img.shape     -> (H, W, 3)','pink']],[['gray.shape    -> (H, W)','amber']],[['binary values -> 0 and 255','green']],[['resized.shape -> (150, 150, 3)','green']],[['rotated 180   -> (H, W, 3)','amber']]]},sol:'c_sol',solTitle:'Reference Solution',solNotes:['<b>A lower threshold</b> (100) turns more pixels white.','<b>shape</b> is <code>(H, W, 3)</code> for color and just <code>(H, W)</code> for grayscale.','<b>A 90 degree rotation</b> swaps <code>H</code> and <code>W</code>; <code>ROTATE_180</code> keeps them.']},
+{part:'part-fn',lbl:'Recap & Synthesis',h2:'Session 04 — <em>Pixels to pictures</em> and what comes next',sub:'We read an image, converted to grayscale and binary, resized, rotated, and plotted with Matplotlib.',viz:'recap',next:'Thank you'}
 ];
 const N=SL.length;
 

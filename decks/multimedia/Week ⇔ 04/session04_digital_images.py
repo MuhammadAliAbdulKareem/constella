@@ -6,13 +6,7 @@
 
 import cv2
 import numpy as np
-
-# Colab display compatibility check
-try:
-    from google.colab.patches import cv2_imshow
-    IS_COLAB = True
-except ImportError:
-    IS_COLAB = False
+import matplotlib.pyplot as plt
 
 
 # ============================================================================
@@ -88,25 +82,61 @@ if img is not None:
 
 
 # ============================================================================
-# 6. DISPLAY IMAGES (cv2.imshow / Colab cv2_imshow)
+# 6. PLOT IMAGES WITH MATPLOTLIB (plt.imshow)
 # ============================================================================
+# Matplotlib is the standard image display tool in data science and notebooks.
+# Key Display Parameters Explained:
+#   1. RGB Conversion (cv2.cvtColor):
+#      OpenCV loads images in BGR format, whereas Matplotlib expects RGB.
+#      If not converted, reds and blues appear inverted (blue skin tones!).
+#   2. Title (plt.title):
+#      Sets a descriptive heading above the plotted image.
+#   3. Axis Visibility (plt.axis('off')):
+#      Hides x-ticks and y-ticks (coordinate numbers) so the image looks like
+#      a clean photo rather than a mathematical 2D coordinate graph.
+#   4. Colormap (cmap='gray'):
+#      Single-channel 2D arrays (Grayscale, Binary) MUST use cmap='gray'.
+#      Without it, Matplotlib defaults to the 'viridis' heatmap (false green/purple).
 if img is not None:
-    print("\n=== 6. Displaying Images ===")
-    if IS_COLAB:
-        cv2_imshow(img)
-        cv2_imshow(gray)
-        cv2_imshow(binary)
-        cv2_imshow(resized)
-        cv2_imshow(rotated_90)
-    else:
-        cv2.imshow("1. Original (BGR)", img)
-        cv2.imshow("2. Grayscale", gray)
-        cv2.imshow("3. Binary Threshold", binary)
-        cv2.imshow("4. Resized (300x300)", resized)
-        cv2.imshow("5. Rotated 90 CW", rotated_90)
-        print("Press any key in image windows to close them...")
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
+    print("\n=== 6. Plotting Images with Matplotlib ===")
+
+    # 1. Color Image: Convert BGR -> RGB for accurate colors
+    img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    plt.figure(figsize=(5, 4))
+    plt.imshow(img_rgb)
+    plt.title("1. Original Image (RGB)")
+    plt.axis("off")   # hides coordinate ticks and border
+    plt.show()
+
+    # 2. Grayscale Image: cmap='gray' is mandatory!
+    plt.figure(figsize=(5, 4))
+    plt.imshow(gray, cmap="gray")
+    plt.title("2. Grayscale Image (cmap='gray')")
+    plt.axis("off")   # clean borderless presentation
+    plt.show()
+
+    # 3. Binary Image: pure black (0) and pure white (255)
+    plt.figure(figsize=(5, 4))
+    plt.imshow(binary, cmap="gray")
+    plt.title("3. Binary Threshold Image")
+    plt.axis("off")
+    plt.show()
+
+    # 4. Resized Image
+    resized_rgb = cv2.cvtColor(resized, cv2.COLOR_BGR2RGB)
+    plt.figure(figsize=(4, 4))
+    plt.imshow(resized_rgb)
+    plt.title("4. Resized (300x300)")
+    plt.axis("off")
+    plt.show()
+
+    # 5. Rotated Image (90° Clockwise)
+    rotated_rgb = cv2.cvtColor(rotated_90, cv2.COLOR_BGR2RGB)
+    plt.figure(figsize=(4, 5))
+    plt.imshow(rotated_rgb)
+    plt.title("5. Rotated 90° Clockwise")
+    plt.axis("off")
+    plt.show()
 
 
 # ============================================================================
@@ -116,6 +146,7 @@ if img is not None:
 #   1. Change threshold to 100 and compare binary image with 127
 #   2. Resize to (150, 150) and print resized.shape
 #   3. Rotate by 180 degrees and print rotated.shape, then try 90 degrees
+#   4. Plot binary result cleanly using plt.imshow with title, cmap='gray' & axis('off')
 if img is not None:
     print("\n=== 7. Student Practice Task Solution ===")
 
@@ -132,3 +163,10 @@ if img is not None:
     task_rotated_90 = cv2.rotate(img, cv2.ROTATE_90_CLOCKWISE)
     print("• task_rotated_180.shape:", task_rotated_180.shape)  # (H, W, 3)
     print("• task_rotated_90.shape :", task_rotated_90.shape)   # (W, H, 3)
+
+    # 4. Display result with Matplotlib
+    plt.figure(figsize=(4, 4))
+    plt.imshow(binary_100, cmap="gray")
+    plt.title("Student Task: Binary (T=100)")
+    plt.axis("off")
+    plt.show()
