@@ -197,21 +197,42 @@ body.light-mode .code-window{
 }
 .code-header{
   display:flex; align-items:center; justify-content:space-between;
-  padding:7px 14px; background:rgba(255,255,255,.04); border-bottom:1px solid rgba(255,255,255,.07);
-  flex-shrink:0;
+  padding:8px 14px; background:rgba(255,255,255,.04); border-bottom:1px solid rgba(255,255,255,.07);
+  flex-shrink:0; min-height:40px;
 }
-.dots{display:flex; gap:5px;}
-.dots span{width:8px; height:8px; border-radius:50%;}
+.code-header-left{display:flex; align-items:center; gap:10px;}
+.dots{display:flex; gap:5.5px; align-items:center;}
+.dots span{width:9px; height:9px; border-radius:50%;}
 .dots span:nth-child(1){background:#ff5f56;}
 .dots span:nth-child(2){background:#ffbd2e;}
 .dots span:nth-child(3){background:#27c93f;}
-.copy-btn{
-  background:transparent; border:1px solid rgba(255,255,255,.15); color:#a5a0c2;
-  font:600 10.5px Inter,system-ui; padding:2px 8px; border-radius:5px; cursor:pointer;
-  transition:.2s; display:flex; align-items:center; gap:4px;
+.code-lang{
+  font-family:var(--mono); font-size:10.5px; font-weight:600;
+  color:rgba(255,255,255,.5); letter-spacing:.4px; text-transform:lowercase;
 }
-.copy-btn:hover{color:#ffffff; border-color:var(--c); background:rgba(255,255,255,.08);}
-.copy-btn.copied{color:#34d399; border-color:#34d399;}
+.code-actions{display:flex; align-items:center; gap:8px;}
+.copy-btn, .run-online-btn{
+  height:26px; box-sizing:border-box;
+  font:600 11px Inter,system-ui,sans-serif;
+  border-radius:6px; cursor:pointer;
+  display:inline-flex; align-items:center; justify-content:center;
+  gap:5px; line-height:1; transition:all .18s ease;
+  white-space:nowrap;
+}
+.copy-btn{
+  background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.16);
+  color:#cbd5e1; padding:0 10px;
+}
+.copy-btn:hover{
+  color:#ffffff; border-color:var(--c); background:rgba(255,255,255,.15);
+  transform:translateY(-1px);
+}
+.copy-btn.copied{
+  color:#34d399 !important; border-color:#34d399 !important; background:rgba(52,211,153,.16) !important;
+}
+.copy-btn.copied{
+  color:#34d399 !important; border-color:#34d399 !important; background:rgba(52,211,153,.12) !important;
+}
 
 .codecard{
   padding:14px 18px; overflow-x:auto; overflow-y:auto;
@@ -1807,9 +1828,14 @@ function renderCodeWindow(k){
   return `
   <div class="code-window">
     <div class="code-header">
-      <div class="dots"><span></span><span></span><span></span></div>
-      <button class="copy-btn" data-target="${id}">📋 Copy</button>
+      <div class="code-header-left">
+        <div class="dots"><span></span><span></span><span></span></div>
+        <span class="code-lang">cpp</span>
+      </div>
+      <div class="code-actions">
+        <button class="copy-btn" data-target="${id}">📋 Copy</button>
         <button class="run-online-btn" data-compiler="https://www.online-cpp.com/" data-lang="C++" data-target="${id}">⚡ Online C++ ↗</button>
+      </div>
     </div>
     <div class="codecard">
       <pre class="code" id="${id}">${highlight(raw)}</pre>
