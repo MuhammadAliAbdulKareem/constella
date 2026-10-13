@@ -2215,10 +2215,10 @@ VIZ.recap={
     c.restore();
 
     txt(c,'“Every image is fundamentally a NumPy ndarray of numbers.”',px2+pw/2,coreBoxY+15,{
-      size:11,col:isLight?'#6b21a8':CL.chalk,font:'ui',weight:800
+      size:10.5,col:isLight?'#6b21a8':CL.chalk,font:'ui',weight:800
     });
-    txt(c,'img[y, x] = [B, G, R]   ·   dtype = uint8 [0..255]   ·   origin: top-left (0, 0)',px2+pw/2,coreBoxY+33,{
-      size:9.5,col:isLight?'#7e22ce':CL.pink,font:'mono',weight:600
+    txt(c,'img[y, x] = [B, G, R]  ·  uint8 [0..255]  ·  origin: (0, 0)',px2+pw/2,coreBoxY+33,{
+      size:8.5,col:isLight?'#7e22ce':CL.pink,font:'mono',weight:600
     });
 
     // Session 05 Preview Box (Clean 10px separation gap below Core Box)
