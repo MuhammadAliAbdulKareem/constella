@@ -406,11 +406,118 @@ body.light-mode .m-pill-counter{background:rgba(255,255,255,.72);color:#524d70}
 .small #fitbox{border-radius:0!important}
 
 /* Zero-Overlap Top Clearance for Mobile Slides */
-.small .slide{padding:64px 28px 18px!important;overflow-y:auto!important}
-.small .hero-slide{padding:68px 34px 18px!important}
+.small .slide{
+  padding-top:var(--mobile-top-pad, 180px)!important;
+  padding-left:28px!important;
+  padding-right:28px!important;
+  padding-bottom:28px!important;
+  overflow-y:auto!important;
+  -webkit-overflow-scrolling:touch;
+}
+.small .hero-slide{
+  padding-top:var(--mobile-top-pad, 160px)!important;
+  padding-left:32px!important;
+  padding-right:32px!important;
+  padding-bottom:24px!important;
+}
 .small .hero-slide h1{font-size:44px!important;line-height:1.1!important;margin:6px 0 10px!important}
 .small .hero-slide .tag{font-size:15px!important;line-height:1.4!important}
-.small .sol{padding:74px 34px 24px!important;z-index:1000}
+.small .sol{
+  padding-top:calc(var(--mobile-top-pad, 180px) + 14px)!important;
+  padding-left:32px!important;
+  padding-right:32px!important;
+  z-index:1000;
+  overflow-y:auto!important;
+  -webkit-overflow-scrolling:touch;
+}
+
+/* Portrait Mobile Optimization: stack panels vertically, utilize tall mobile screens, eliminate voids & squeeze */
+body.small.portrait .task,
+body.small:not(.landscape) .task{
+  display:flex!important;
+  flex-direction:column!important;
+  gap:20px!important;
+  height:auto!important;
+  min-height:0!important;
+  align-items:stretch!important;
+  justify-content:flex-start!important;
+}
+
+body.small.portrait .tleft,
+body.small:not(.landscape) .tleft{
+  margin:0!important;
+  max-height:none!important;
+  overflow:visible!important;
+  flex:none!important;
+  width:100%!important;
+  padding-right:0!important;
+}
+
+body.small.portrait .tright,
+body.small:not(.landscape) .tright{
+  width:100%!important;
+  flex:none!important;
+  justify-content:flex-start!important;
+  min-height:440px!important;
+  height:auto!important;
+}
+
+body.small.portrait .tright .code-window,
+body.small:not(.landscape) .tright .code-window,
+body.small.portrait .tleft .code-window,
+body.small:not(.landscape) .tleft .code-window{
+  max-height:none!important;
+  width:100%!important;
+}
+
+body.small.portrait .codecard,
+body.small:not(.landscape) .codecard{
+  max-height:none!important;
+}
+
+body.small.portrait .tright .viz,
+body.small:not(.landscape) .tright .viz{
+  position:relative!important;
+  inset:auto!important;
+  width:100%!important;
+  height:440px!important;
+  min-height:440px!important;
+}
+
+body.small.portrait .cards,
+body.small:not(.landscape) .cards{
+  display:flex!important;
+  flex-direction:column!important;
+  gap:16px!important;
+  height:auto!important;
+}
+
+body.small.portrait .sol-body,
+body.small:not(.landscape) .sol-body{
+  display:flex!important;
+  flex-direction:column!important;
+  gap:16px!important;
+  height:auto!important;
+}
+
+body.small.portrait .stage,
+body.small:not(.landscape) .stage{
+  flex:none!important;
+  height:auto!important;
+  min-height:0!important;
+  margin-top:14px!important;
+  margin-bottom:20px!important;
+  justify-content:flex-start!important;
+}
+
+body.small.portrait .slide .viz,
+body.small:not(.landscape) .slide .viz{
+  position:relative!important;
+  inset:auto!important;
+  width:100%!important;
+  height:460px!important;
+  min-height:460px!important;
+}
 
 /* Desktop Home Link — Unified with Constella Cosmic Identity */
 .desktop-home-link{
@@ -594,18 +701,57 @@ body.light-mode .m-compiler-btn:hover{
   border-color:#0284c7 !important;
   color:#0369a1 !important;
 }
+.small #mPenToggle{
+  display:none !important;
+}
+.small .m-compiler-btn{
+  width:30px !important;
+  height:30px !important;
+  padding:0 !important;
+  justify-content:center;
+}
+.small .m-compiler-btn span{
+  display:none;
+}
+.small .m-compiler-btn svg{
+  width:12px;
+  height:12px;
+}
 @media (max-width: 480px){
-  .m-compiler-btn{
-    width:30px !important;
-    padding:0 !important;
-    justify-content:center;
+  .small .m-nav-hud{
+    left:max(6px, env(safe-area-inset-left));
+    right:max(6px, env(safe-area-inset-right));
+    gap:4px;
   }
-  .m-compiler-btn span{
+  .m-pill{
+    height:28px;
+    padding:0 9px;
+  }
+  .m-pill-btn{
+    width:28px;
+    height:28px;
+  }
+  .m-pill-counter{
+    height:26px;
+    padding:0 7px;
+    font-size:10px;
+  }
+  .small .m-compiler-btn{
+    width:28px !important;
+    height:28px !important;
+  }
+}
+
+@media (max-width: 380px){
+  .m-pill-home .m-pill-spark{
     display:none;
   }
-  .m-compiler-btn svg{
-    width:13px;
-    height:13px;
+  .m-pill-home{
+    padding:0 8px;
+    font-size:10.5px;
+  }
+  #mFsToggle{
+    display:none !important;
   }
 }
 
@@ -1130,7 +1276,10 @@ body.light-mode .constella-toast{
   try{
     var W=window.innerWidth,H=window.innerHeight;
     var isLandscape=W>=H;
-    var small=W<768||(!isLandscape&&W<900);
+    var small=W<768||(!isLandscape&&W<900)||(isLandscape&&H<550);
+    document.body.classList.toggle('small', small);
+    document.body.classList.toggle('portrait', small && !isLandscape);
+    document.body.classList.toggle('landscape', small && isLandscape);
     var fit=document.getElementById('fitbox'),d=document.getElementById('deck');
     if(fit&&d){
       if(!small){
@@ -1148,6 +1297,8 @@ body.light-mode .constella-toast{
         fit.style.height=(isLandscape?H:Math.round(dh*s))+'px';
         d.style.transformOrigin='top left';
         d.style.transform='scale('+s+')';
+        var mobilePad = Math.ceil(((isLandscape?40:48) + 16) / s);
+        document.documentElement.style.setProperty('--mobile-top-pad', mobilePad + 'px');
       }
     }
   }catch(_){}
@@ -2457,7 +2608,7 @@ const SL=[
 ],trap:'<b>Colab Note:</b> <code>plt.show()</code> displays plots inline inside notebooks without GUI freezes or extra windows.',code:'c_show',next:'Check 3'},
 {part:'part-rules',lbl:'Interactive Predictor',h2:'Check 3: <em>Matplotlib Colormap</em>',sub:'What happens without the color map parameter?',mcq:true,q:'<b>What happens if you display a grayscale image with <code>plt.imshow(gray)</code> without <code>cmap=\'gray\'</code>?</b>',options:['Displays as a false-color heatmap (viridis) instead of gray','Python throws a ValueError','The image displays completely black','Matplotlib automatically converts it to BGR'],answer:'Displays as a false-color heatmap (viridis) instead of gray',explain:'<b>Correct!</b> Matplotlib treats 2D single-channel arrays as scalar data and applies its default heatmap colormap (viridis). To view actual gray intensities, always pass <code>cmap=\'gray\'</code>.',hint:'Matplotlib defaults 2D arrays to a colored heatmap (viridis).',code:'c_q3',next:'Full script'},
 {part:'part-fn',lbl:'All Together',h2:'The <em>complete script</em>',sub:'Every step in one Colab & notebook-ready file. Grab it with the Download Code button.',task:{chip:'Full script',req:['<b>Check:</b> make sure <code>img</code> is not <code>None</code> before any processing.','<b>Process:</b> grayscale (<code>cvtColor</code>), binary (<code>threshold</code>), resize, rotate.','<b>Plot:</b> display results with <code>plt.imshow</code>, setting <code>plt.title()</code>, <code>plt.axis(\'off\')</code>, and <code>cmap=\'gray\'</code> for monochrome images.'],code:'c_full'},next:'Student Task'},
-{part:'part-fn',lbl:'Student Task',h2:'Threshold, size and <em>shape</em> hunt',sub:'Edit the code, then compare your results.',tt:{chip:'Task 1',req:['Change the threshold to <code>100</code> and compare the binary image with the one at <code>127</code>.','Resize to <code>(150, 150)</code> and print <code>resized.shape</code>.','Rotate by <code>180</code> degrees and print <code>rotated.shape</code>, then try 90 degrees.','Plot your binary result cleanly with <code>plt.imshow</code> using <code>cmap=\'gray\'</code>.'],trap:'Remember: a 90 degree rotation swaps height and width; 180 degrees does not.',title:'Expected results',lines:[[['img.shape     -> (H, W, 3)','pink']],[['gray.shape    -> (H, W)','amber']],[['binary values -> 0 and 255','green']],[['resized.shape -> (150, 150, 3)','green']],[['rotated 180   -> (H, W, 3)','amber']]]},sol:'c_sol',solTitle:'Reference Solution',solNotes:['<b>A lower threshold</b> (100) turns more pixels white.','<b>shape</b> is <code>(H, W, 3)</code> for color and just <code>(H, W)</code> for grayscale.','<b>A 90 degree rotation</b> swaps <code>H</code> and <code>W</code>; <code>ROTATE_180</code> keeps them.']},
+{part:'part-fn',lbl:'Student Task',h2:'Threshold, size and <em>shape</em> hunt',sub:'Edit the code, then compare your results.',tt:{chip:'Task 1',req:['Change the threshold to <code>100</code> and compare the binary image with the one at <code>127</code>.','Resize to <code>(150, 150)</code> and print <code>resized.shape</code>.','Rotate by <code>180</code> degrees and print <code>rotated.shape</code>, then try 90 degrees.','Plot your binary result cleanly with <code>plt.imshow</code> using <code>cmap=\'gray\'</code>.'],trap:'Remember: a 90 degree rotation swaps height and width; 180 degrees does not.',title:'Expected results',lines:[[['img.shape     -> (H, W, 3)','pink']],[['gray.shape    -> (H, W)','amber']],[['binary values -> 0 and 255','green']],[['resized.shape -> (150, 150, 3)','green']],[['rotated 180   -> (H, W, 3)','amber']]]},sol:'c_sol',solTitle:'Reference Solution',solNotes:['<b>A lower threshold</b> (100) turns more pixels white.','<b>shape</b> is <code>(H, W, 3)</code> for color and just <code>(H, W)</code> for grayscale.','<b>A 90 degree rotation</b> swaps <code>H</code> and <code>W</code>; <code>ROTATE_180</code> keeps them.'],next:'Recap'},
 {part:'part-fn',lbl:'Recap & Synthesis',h2:'Session 04 — <em>Pixels to pictures</em> and what comes next',sub:'We read an image, converted to grayscale and binary, resized, rotated, and plotted with Matplotlib.',viz:'recap',next:'Thank you'}
 ];
 const N=SL.length;
@@ -2815,8 +2966,10 @@ function layout(){
   const isLandscape = W >= H;
   // Adaptive Mobile Mode: only for actual mobile phones or narrow portrait screens (<768px wide)
   // Laptops and desktop screens in normal window or fullview use uniform proportional scaling!
-  const small = W < 768 || (!isLandscape && W < 900);
+  const small = W < 768 || (!isLandscape && W < 900) || (isLandscape && H < 550);
   document.body.classList.toggle('small', small);
+  document.body.classList.toggle('portrait', small && !isLandscape);
+  document.body.classList.toggle('landscape', small && isLandscape);
 
   if(!small){
     const s = Math.min((W - 16) / 1100, (H - 16) / 707);
@@ -2827,6 +2980,7 @@ function layout(){
     deck.style.transformOrigin = 'top left';
     deck.style.transform = `scale(${s})`;
     SC = Math.max(.2, s);
+    document.documentElement.style.removeProperty('--mobile-top-pad');
     return;
   }
 
@@ -2847,6 +3001,16 @@ function layout(){
   deck.style.transformOrigin = 'top left';
   deck.style.transform = `scale(${s})`;
   SC = Math.max(.2, s);
+
+  // Dynamic Zero-Overlap Top Clearance for Mobile HUD
+  const navHud = document.querySelector('.m-nav-hud');
+  let hudBottom = isLandscape ? 40 : 46;
+  if(navHud){
+    const rect = navHud.getBoundingClientRect();
+    if(rect.bottom > 0) hudBottom = rect.bottom;
+  }
+  const clearance = Math.ceil((hudBottom + 16) / s);
+  document.documentElement.style.setProperty('--mobile-top-pad', clearance + 'px');
 }
 addEventListener('resize',layout);
 addEventListener('orientationchange',()=>setTimeout(layout,120));
