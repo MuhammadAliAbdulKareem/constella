@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Data Structures — Session 03 · Arrays with OOP in C++</title>
-<meta name="description" content="Data Structures with C++ — Session 03: Arrays with OOP in C++ by Eng. Muhammad Ali Abdul Kareem, Sinai University.">
+<title>Data Structures — Session 03 · Pointers & Memory in C++</title>
+<meta name="description" content="Data Structures with C++ — Session 03: Pointers and Memory in C++ by Eng. Muhammad Ali Abdul Kareem, Sinai University.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&family=Lemonada:wght@400;600;700&display=swap" rel="stylesheet">
@@ -1073,9 +1073,6 @@ body.light-mode .constella-toast{
 
   <div class="m-pill-cluster">
     <span class="m-pill m-pill-counter" id="mCounter">1 / 1</span>
-    <a href="ArrayList.cpp" download="ArrayList.cpp" class="m-pill m-pill-btn" aria-label="Download C++ Code" title="Download Code">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" width="13" height="13" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-    </a>
     <a href="https://www.online-cpp.com/" target="_blank" rel="noopener noreferrer" class="m-pill m-compiler-btn" aria-label="Online C++" title="Online C++">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" width="11" height="11" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
       <span>C++ ↗</span>
@@ -1104,26 +1101,22 @@ body.light-mode .constella-toast{
         <span class="m-pill-text">Constella</span>
         <span class="m-pill-spark">✦</span>
       </a>
-      <!-- Array Contiguous Memory & Pointer Emblem -->
-      <div class="brand-icon" title="Arrays & Memory">
+      <!-- Session 03 Emblem -->
+      <div class="brand-icon" title="Pointers &amp; Memory">
         <svg viewBox="0 0 24 24">
-          <rect x="2.5" y="8" width="19" height="9" rx="2" stroke-width="1.9"/>
-          <line x1="8.8" y1="8" x2="8.8" y2="17" stroke-width="1.8"/>
-          <line x1="15.1" y1="8" x2="15.1" y2="17" stroke-width="1.8"/>
-          <path d="M12 2.5v3.8M10.2 4.5L12 6.3l1.8-1.8" stroke-width="1.9"/>
-          <circle cx="12" cy="12.5" r="1.5" fill="#ffffff" stroke="none"/>
+          <rect x="2.5" y="3" width="9" height="6.5" rx="1.5" stroke-width="1.9"/>
+          <circle cx="7" cy="6.25" r="1.4" fill="#ffffff" stroke="none"/>
+          <path d="M7 7.6V15a2 2 0 0 0 2 2h3.4" stroke-width="1.9"/>
+          <path d="M10.6 15.3L12.6 17l-2 1.7" stroke-width="1.9"/>
+          <rect x="13.5" y="13" width="8" height="8" rx="1.5" stroke-width="1.9"/>
         </svg>
       </div>
       <div>
         <div class="brand-name">Data Structures</div>
-        <div class="brand-sub">Session 03 · Arrays &amp; OOP in C++</div>
+        <div class="brand-sub">Session 03 · Pointers &amp; Memory in C++</div>
       </div>
     </div>
     <div class="brand-right">
-      <a href="ArrayList.cpp" download="ArrayList.cpp" style="padding:5px 11px;border-radius:6px;border:1px solid var(--card-border);background:transparent;color:var(--tp);cursor:pointer;font:600 11.5px Inter,sans-serif;text-decoration:none;display:inline-flex;align-items:center;gap:5px;transition:border-color .2s,background .2s;" onmouseover="this.style.borderColor='var(--c)';this.style.background='rgba(255,255,255,.08)'" onmouseout="this.style.borderColor='var(--card-border)';this.style.background='transparent'">
-        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
-        <span>Download Code</span>
-      </a>
             <a href="https://www.online-cpp.com/" target="_blank" rel="noopener noreferrer" class="top-compiler-btn" title="Open Online C++ (online-cpp.com)">
         <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
         <span>Online C++ ↗</span>
@@ -2158,14 +2151,14 @@ sol_rev:`void ArrayList::reverse() {
     }
 }`
 };
-const HERO_TOKENS=['data[i]','new int[n]','delete[]','private:','size','capacity','insertAt()','~ArrayList()','int* data','grow()','0x1000','O(1)','O(n)','class'];
-const HERO_STRIPS=[[12,45,7,23,9,31],[10,20,99,30,40,50]];
+const HERO_TOKENS=['int* p','&x','*p','0x1000','new int[n]','delete[]','stack','heap','int* data','address','value','int x = 10'];
+const HERO_STRIPS=[[10,20,30,40,50]];
 const HERO=`
 <div class="lbl">Data Structures · Session 03</div>
-<h1>Arrays, the <em>OOP</em> way</h1>
-<div class="tag">Wrap a dynamic array in a C++ class: constructor, destructor, insert, delete, search, update, grow, deep copy and 2D layout, with live Auto / Manual visual labs</div>
+<h1>Pointers &amp; <em>Memory</em></h1>
+<div class="tag">What a pointer stores, where data lives (stack vs heap), why data is a pointer, and how new[] and delete[] work as a pair, with animated visuals and a concept check</div>
 <div class="inst"><div class="avatar">M</div><div><small>Instructor</small><b>Muhammad Ali Abdul Kareem</b></div></div>
-<div class="chips"><span>class ArrayList</span><span>Auto &amp; Manual Labs</span><span>Rule of Three</span><span>2D Arrays</span><span>6 Interactive MCQs</span><span>Student Tasks 1–2</span></div>`;
+<div class="chips"><span>Value vs Address</span><span>int* p</span><span>Stack vs Heap</span><span>new[] / delete[]</span><span>1 Interactive MCQ</span></div>`;
 
 const SL=[
 {part:'part-intro',hero:true,next:'Pointer Basics'},
@@ -2180,70 +2173,7 @@ const SL=[
  chip:'Allocate and free in pairs',req:['<code>new int</code> → <code>delete</code>','<code>new int[n]</code> → <code>delete[]</code>','The constructor allocates; the destructor frees the same block.'],code:'c_pair',next:'Concept check'},
 {part:'part-rules',lbl:'Interactive Predictor',h2:'Concept check: <em>What does data store?</em>',sub:'Pointer, address and heap in one question.',mcq:true,
  q:'<b>What does <code>data</code> store in the following declaration?</b>',options:['The entire array','The number of elements','The address of the first element','The capacity'],answer:'The address of the first element',
- explain:'<b>Correct!</b> <code>data</code> is a pointer. It stores the address of the first element of the dynamically allocated array.',hint:'A pointer stores an address, not the values themselves.',code:'c_q0',next:'Where does the array fit?'},
-{part:'part-intro',lbl:'Big Picture',h2:'Where does the <em>Array</em> fit?',sub:'Every data structure is Primitive or Non-Primitive. Follow the branches to find the Array.',viz:'classtree',next:'Spot the difference'},
-{part:'part-intro',lbl:'Big Picture',h2:'Spot the <em>difference</em>',sub:'Three families, one picture each. Ask: how many "next" items can a value have?',viz:'classcmp',next:'Procedural vs OOP'},
-{part:'part-classes',lbl:'Paradigm Shift',h2:'Procedural vs <em>OOP</em> Arrays',sub:'Same operations, very different safety.',
- cards:{fs:13,items:[{h:'Procedural (Week 03 style)',code:'c_proc',n:'The array and <code>arrLength</code> are loose variables: any code can break them.'},{h:'OOP (today)',code:'c_oop',n:'<b>Encapsulation:</b> state is private, and methods enforce the rules.'}]},next:'Anatomy of the class'},
-{part:'part-classes',lbl:'Class Anatomy',h2:'Anatomy of <em>ArrayList</em>',sub:'Private state on the left, public interface below, heap storage on the right.',viz:'cls',next:'size vs capacity'},
-{part:'part-seq',lbl:'Size vs Capacity',h2:'<em>size</em> vs <em>capacity</em>',sub:'Room available vs elements actually stored.',split:1,viz:'sizecap',
- chip:'capacity = 8 · size = 5',req:['<code>capacity</code> = total available slots; <code>size</code> = elements currently stored.','Unused slots sit between <code>size</code> and <code>capacity</code>.','Valid data is in indices <code>0</code> to <code>size - 1</code>.'],code:'c_sizecap',
- key:'<b>Connect it:</b> <code>size == capacity</code> means no free slot is left, so the list must grow.',next:'Why index 0?'},
-{part:'part-seq',lbl:'Array Index',h2:'Why does Array Index start at <em>0</em>?',sub:'An index is a distance from the beginning of the array.',split:1,viz:'idx0',
- chip:'Index = offset',req:['Index 0 is offset 0: no steps from the beginning. Index 1 is one element away.','First index = <code>0</code>, last index = <code>capacity - 1</code>.','<code>data[i]</code> is conceptually <code>*(data + i)</code>.'],code:'c_index',
- key:'<b>Intro only:</b> <code>data + i</code> moves <code>i</code> elements forward (i × 4 bytes for int).',next:'Constructor & Destructor'},
-{part:'part-rules',lbl:'Lifecycle',h2:'Constructor &amp; <em>Destructor</em>',sub:'The class owns its memory: allocate on creation, free on destruction.',
- task:{chip:'RAII Idea',req:['<code>new int[capacity]</code> allocates the array on the heap.','Constructor sets <code>size = 0</code>: capacity is room, size is what is used.','<code>delete[]</code> in the destructor frees it automatically at scope end.'],trap:'Use <code>delete[]</code> (not <code>delete</code>) for arrays, or memory leaks and undefined behavior follow.',code:'c_ctor'},next:'readInt()'},
-{part:'part-seq',lbl:'Safe Input',h2:'<em>readInt()</em> — never trust the keyboard',sub:'One helper keeps asking until the user types a real number.',split:1,viz:'readint',
- chip:'Validation helper',req:['The user types letters like <code>abc</code>: <code>cin &gt;&gt; x</code> fails.','<code>cin.fail()</code> asks: did the read fail?','<code>clear()</code> + <code>ignore()</code> fix <code>cin</code>, then we ask again.'],code:'c_read',
- key:'<b>Why a helper?</b> We write the checking once; every method that needs a number just calls <code>readInt()</code>.',next:'fillFromUser()'},
-{part:'part-seq',lbl:'Method 1 · User Input',h2:'<em>fillFromUser()</em> — write each slot',lab:'fill',chip:'Auto demo or type your own values',req:['<b>Validate first:</b> <code>n</code> must be in <code>0 … capacity − size</code>, otherwise return and change nothing.','Each value comes from <code>readInt()</code>, so it is always a real int.','Writes at <code>data[size]</code>, then <code>size++</code>.'],code:'c_fill',next:'display()'},
-{part:'part-seq',lbl:'Method 2',h2:'<em>display()</em> — traverse',lab:'show',chip:'Read-only traversal',req:['Visits index <code>0</code> to <code>size - 1</code>.','Marked <code>const</code>: it reads but never modifies.'],code:'c_show',next:'insertAt()'},
-{part:'part-sel',lbl:'Method 3 · User Input',h2:'<em>insertAt()</em> — shift right, then place',lab:'ins',chip:'Try any value and position',req:['Validates <code>pos</code> and free capacity first.','Shifts from the end down to <code>pos</code>.'],code:'c_ins',trap:'Try pos 7, or insert until the list is full: it returns <code>false</code> instead of corrupting memory.',next:'deleteAt()'},
-{part:'part-sel',lbl:'Method 4 · User Input',h2:'<em>deleteAt()</em> — shift left, then shrink',lab:'del',chip:'Try any position',req:['Valid range is <code>0 ≤ pos &lt; size</code>.','Shifts left, then <code>size--</code>.'],code:'c_del',next:'searchByValue()'},
-{part:'part-rep',lbl:'Method 5 · User Input',h2:'<em>searchByValue()</em> — linear search',lab:'search',chip:'Found vs not found',req:['Compares each element with <code>target</code> from index 0.','Returns the index, or <code>-1</code> if the loop finishes.'],code:'c_search',trap:'Auto mode shows both cases: 23 is found at index 3, then 50 scans all 6 elements and fails.',next:'updateAt()'},
-{part:'part-rep',lbl:'Method 6 · User Input',h2:'<em>updateAt()</em> — direct write',lab:'update',chip:'No shifting needed',req:['Jumps straight to <code>data[pos]</code> using the index.','Same bounds check as <code>deleteAt</code>; cost is O(1).'],code:'c_update',next:'Knowledge check'},
-{part:'part-rules',lbl:'Interactive Predictor',h2:'Check 1: <em>Will the insert succeed?</em>',sub:'Capacity is 4 and the list is full.',mcq:true,
- q:'Read the code on the right. <b>What does insertAt return?</b>',options:['true','false','crash','undefined'],answer:'false',
- explain:'<b>Correct!</b> <code>size == capacity</code> (4 == 4), so <code>insertAt</code> returns <code>false</code> and nothing is shifted. The class protects itself.',hint:'Check the first condition inside insertAt: size vs capacity.',code:'c_q1',next:'Check 2'},
-{part:'part-rules',lbl:'Interactive Predictor',h2:'Check 2: <em>Cost of deleting the first element</em>',sub:'Shifting is where the time goes.',mcq:true,
- q:'<b>How many element copies does deleteAt(0) perform?</b>',options:['0','1','n - 1','n²'],answer:'n - 1',
- explain:'<b>Correct!</b> Every element after index 0 moves one slot left: <code>n - 1</code> copies, so deleteAt is <code>O(n)</code> in the worst case.',hint:'Every element after the deleted one has to move.',code:'c_q2',next:'Dynamic resize'},
-{part:'part-fn',lbl:'Dynamic Capacity · User Input',h2:'<em>push()</em> and <em>grow()</em> — resize by doubling',lab:'push',chip:'Fill it, then watch it double',req:['When <code>size == capacity</code>, allocate a block twice as big.','Copy, <code>delete[]</code> the old block, then continue.'],code:'c_push',next:'Check 3'},
-{part:'part-rules',lbl:'Interactive Predictor',h2:'Check 3: <em>Capacity after grow()</em>',sub:'The list is full and a new value arrives.',mcq:true,
- q:'<b>What is the capacity after push(50)?</b>',options:['4','5','8','16'],answer:'8',
- explain:'<b>Correct!</b> <code>grow()</code> doubles: <code>4 × 2 = 8</code>. The copy costs O(n) once, but the next pushes are O(1) until it fills again.',hint:'grow() uses capacity * 2.',code:'c_q3',next:'Copy constructor'},
-{part:'part-classes',lbl:'Rule of Three',h2:'Shallow vs <em>Deep Copy</em>',sub:'A class that owns memory must copy that memory.',split:1,viz:'copy',
- chip:'Why the default copy is dangerous',req:['Default copy duplicates the <b>pointer</b>, not the array.','Two objects then free the same block.','Own <code>new[]</code> in the copy constructor fixes it.'],code:'c_copy',next:'Check 4'},
-{part:'part-rules',lbl:'Interactive Predictor',h2:'Check 4: <em>The hidden crash</em>',sub:'No custom copy constructor was written.',mcq:true,
- q:'<b>What goes wrong when the scope ends?</b>',options:['Nothing','Double delete[] crash','Compile error','Leak only'],answer:'Double delete[] crash',
- explain:'<b>Correct!</b> <code>a.data</code> and <code>b.data</code> point to the same block. <code>~b()</code> frees it, then <code>~a()</code> frees it again: undefined behavior.',hint:'Think about what the default copy does to the pointer.',code:'c_q4',next:'2D arrays'},
-{part:'part-seq',lbl:'2D Arrays · User Input',h2:'<em>2D Arrays</em> in one flat block',lab:'grid',chip:'Row-major layout',req:['Rows are stored one after another in a single block.','<code>index = row × cols + col</code> gives O(1) access.'],code:'c_grid',next:'main() output'},
-{part:'part-rep',lbl:'Putting It Together',h2:'<em>main()</em> and its expected output',sub:'Create, fill, show, delete, show again.',split:1,viz:'terminal',
- data:{title:'Console Output (input: 3, then 10 20 30)',lines:[
-  [['How many elements? ','dim'],['3','amber']],
-  [['Enter element 1: ','dim'],['10','amber']],
-  [['Enter element 2: ','dim'],['20','amber']],
-  [['Enter element 3: ','dim'],['30','amber']],
-  [['Index 0 = 10','green']],[['Index 1 = 20','green']],[['Index 2 = 30','green']],
-  [['-- after deleteAt(1) --','cyan']],
-  [['Index 0 = 10','green']],[['Index 1 = 30','green']]]},
- chip:'Execution Order',req:['The constructor runs at <code>ArrayList list(n + 2)</code>.','Methods run in order: fill → display → deleteAt → display.','The destructor frees the block at <code>return 0</code>.'],code:'c_main',next:'Student Task 1'},
-{part:'part-rules',lbl:'Student Task 1',h2:'Task 1: <em>findMax()</em>',sub:'Applied practice · scan and keep the best index.',
- tt:{chip:'Student Task 1 · Applied Practice',req:['Add <code>int findMax() const;</code> to <code>ArrayList</code>.','Return the <b>index</b> of the largest element, or <code>-1</code> if empty.','Use one pass and remember the best index so far.','<b>Time Complexity:</b> a single loop over n elements: <b>O(n)</b>.'],
-  trap:'<b>Trap:</b> guard the empty list first. Reading <code>data[0]</code> when <code>size == 0</code> returns garbage.',
-  title:'Console Output (Expected)',lines:[[['Enter 5 values: ','dim'],['3 9 4 1 7','amber']],[['findMax() returned index 1','green']],[['Max value = 9','green']]]},
- sol:'sol_max',solTitle:'Task 1 Solution &amp; Complexity Walkthrough',solNotes:['<b>1. Time Complexity: O(n)</b> — the loop visits each element once and does one comparison each.','<b>2. Return an index, not a value</b> — the caller can use it with <code>updateAt</code> or <code>deleteAt</code>.','<b>3. Empty guard</b> — <code>size == 0</code> returns <code>-1</code>, the same "not found" convention as <code>searchByValue</code>.'],next:'Student Task 2'},
-{part:'part-rules',lbl:'Student Task 2',h2:'Task 2: <em>reverse()</em> in place',sub:'Applied practice · two-pointer swap.',
- tt:{chip:'Student Task 2 · Applied Practice',req:['Add <code>void reverse();</code> to <code>ArrayList</code>.','Swap <code>data[i]</code> with <code>data[j]</code>; <code>i</code> starts at the front, <code>j</code> at the back.','Move the two indices toward each other and stop when they meet.','<b>Complexity:</b> O(n) time, O(1) extra memory.'],
-  trap:'<b>Trap:</b> do not loop to <code>size</code>. Swapping every pair twice puts the array back as it was. Stop at the middle.',
-  title:'Console Output (Expected)',lines:[[['Before: ','dim'],['10 20 30 40 50','amber']],[['reverse()','cyan']],[['After:  ','dim'],['50 40 30 20 10','green']]]},
- sol:'sol_rev',solTitle:'Task 2 Solution &amp; Complexity Walkthrough',solNotes:['<b>1. Time Complexity: O(n)</b> — only n/2 swaps, which is still linear.','<b>2. In place</b> — one temporary variable, no second array: O(1) extra memory.','<b>3. Stop condition</b> — <code>i &lt; j</code> handles both even and odd sizes; the middle element stays put.'],next:'Check 5'},
-{part:'part-rules',lbl:'Interactive Predictor',h2:'Check 5: <em>Searching for a missing value</em>',sub:'Worst case of linear search.',mcq:true,
- q:'<b>How many comparisons run, and what is returned?</b>',options:['1 and -1','8 and -1','8 and 0','0 and -1'],answer:'8 and -1',
- explain:'<b>Correct!</b> The value is absent, so the loop compares all 8 elements and then returns <code>-1</code>. Worst case is <code>O(n)</code>.',hint:'The loop only stops early when it finds the target.',code:'c_q5',next:'Summary'},
-{part:'part-fn',lbl:'Wrap-up',h2:'Key <em>Takeaways</em>',sub:'Access and update are O(1); insert, delete and search are O(n).',viz:'sum',next:'Recap & next session'},
-{part:'part-intro',lbl:'Recap &amp; Next Session',h2:'Session 03 — <em>What we learned</em>, what is next',sub:'Five things you can now do, and where Session 04 picks up.',viz:'recap',next:'Thank you'}
+ explain:'<b>Correct!</b> <code>data</code> is a pointer. It stores the address of the first element of the dynamically allocated array.',hint:'A pointer stores an address, not the values themselves.',code:'c_q0',next:'Session 04 · Data Types &amp; Arrays'},
 ];
 const N=SL.length;
 
@@ -2271,7 +2201,6 @@ function renderCodeWindow(k){
       <div style="display:flex;gap:6px;align-items:center">
         <button class="copy-btn" data-target="${id}">📋 Copy</button>
         <button class="run-online-btn" data-compiler="https://www.online-cpp.com/" data-lang="C++" data-target="${id}">⚡ Online C++ ↗</button>
-        <button class="dl-btn" data-code="${k}" title="Download complete ArrayList.cpp">💾 Download .cpp</button>
       </div>
     </div>
     <div class="codecard">

@@ -126,16 +126,29 @@ window.SITE = {
         },
         {
           week: 3,
-          title: "Arrays with OOP in C++",
-          titleAr: "المصفوفات بالبرمجة كائنية التوجه (OOP)",
-          topics: ["pointers & dynamic memory", "class ArrayList", "constructor & destructor", "safe input (readInt)", "insert & delete", "linear search", "grow() dynamic resize", "Rule of Three", "2D arrays", "student tasks"],
-          keywordsAr: ["مصفوفات", "مصفوفة", "مؤشرات", "ذاكرة ديناميكية", "كلاس", "حذف", "إضافة", "بحث خطي", "قاعدة الثلاثة", "مصفوفات ثنائية", "سعة"],
+          title: "Pointers & Memory in C++",
+          titleAr: "المؤشرات وإدارة الذاكرة في C++ (Pointers & Memory)",
+          topics: ["value vs address", "pointer basics (int* p)", "dereferencing (*p) & address-of (&)", "stack vs heap", "why data is a pointer", "dynamic allocation (new[] & delete[])", "checkpoint & interactive concept check"],
+          keywordsAr: ["مؤشرات", "بوينتر", "ذاكرة", "ستاك", "هيب", "عنوان", "قيمة", "حجز ديناميكي", "سي بلس بلس", "إدارة الذاكرة"],
           file: "decks/data-structures/Week ⇔ 03/Session ⇔ 03.html",
-          codeFile: "decks/data-structures/Week ⇔ 03/ArrayList.cpp",
-          codeName: "ArrayList.cpp",
+          codeFile: "decks/data-structures/Week ⇔ 03/Pointers.cpp",
+          codeName: "Pointers.cpp",
           date: "2026-10-06",
           duration: "75 min",
-          slides: 33
+          slides: 6
+        },
+        {
+          week: 4,
+          title: "Arrays with OOP in C++",
+          titleAr: "أنواع البيانات والمصفوفات بالبرمجة كائنية التوجه (OOP)",
+          topics: ["primitive vs non-primitive", "linear vs non-linear", "class ArrayList", "constructor & destructor", "safe input (readInt)", "insert & delete", "linear search", "grow() dynamic resize", "Rule of Three", "2D arrays", "student tasks"],
+          keywordsAr: ["مصفوفات", "مصفوفة", "أنواع البيانات", "كائنية", "أوب", "كلاس", "حذف", "إضافة", "بحث خطي", "قاعدة الثلاثة", "مصفوفات ثنائية", "سعة", "خطي وغير خطي"],
+          file: "decks/data-structures/Week ⇔ 04/Session ⇔ 04.html",
+          codeFile: "decks/data-structures/Week ⇔ 04/ArrayList.cpp",
+          codeName: "ArrayList.cpp",
+          date: "2026-10-13",
+          duration: "75 min",
+          slides: 28
         },
         {
           week: 5,

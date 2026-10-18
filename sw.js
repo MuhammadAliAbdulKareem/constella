@@ -2,7 +2,7 @@
    Constella Service Worker — Offline Course Portal & PWA Engine
    ===================================================================== */
 
-const CACHE_NAME = 'constella-v2.7.1';
+const CACHE_NAME = 'constella-v2.8.0';
 
 // Core application shell assets and session decks to pre-cache on install
 const CORE_ASSETS = [
@@ -30,14 +30,17 @@ const CORE_ASSETS = [
   './decks/data-structures/Week ⇔ 02/Session ⇔ 02.html',
   './decks/data-structures/Week ⇔ 02/Complexity_BigO.cpp',
   './decks/data-structures/Week ⇔ 03/Session ⇔ 03.html',
-  './decks/data-structures/Week ⇔ 03/ArrayList.cpp',
+  './decks/data-structures/Week ⇔ 03/Pointers.cpp',
+  './decks/data-structures/Week ⇔ 04/Session ⇔ 04.html',
+  './decks/data-structures/Week ⇔ 04/ArrayList.cpp',
   './decks/data-structures/Week ⇔ 05/Session ⇔ 05.html',
   './decks/data-structures/Week ⇔ 05/ArrayList.cpp',
   './decks/data-structures/Week ⇔ 05/Sorting_ArrayList.cpp'
 ];
 
-// Pre-cache core assets
+// Pre-cache core assets & activate immediately
 self.addEventListener('install', (event) => {
+  self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       return cache.addAll(CORE_ASSETS).catch((err) => {
@@ -146,8 +149,22 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Navigation (HTML pages) and dynamic course definition (courses.js) -> Network First
-  if (request.mode === 'navigate' || url.pathname.endsWith('courses.js') || url.pathname.endsWith('.html') || url.pathname.endsWith('/')) {
+  // Dynamic course definition (courses.js) -> Network with cache fallback (always fresh when online)
+  if (url.pathname.endsWith('courses.js')) {
+    event.respondWith(
+      fetch(request, { cache: 'no-cache' }).then((networkResponse) => {
+        if (networkResponse && networkResponse.status === 200) {
+          const responseClone = networkResponse.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(request, responseClone));
+        }
+        return networkResponse;
+      }).catch(() => caches.match(request))
+    );
+    return;
+  }
+
+  // Navigation (HTML pages) -> Network First
+  if (request.mode === 'navigate' || url.pathname.endsWith('.html') || url.pathname.endsWith('/')) {
     event.respondWith(networkFirst(request));
     return;
   }
