@@ -136,8 +136,20 @@ window.SITE = {
           date: "2026-10-06",
           duration: "75 min",
           slides: 33
+        },
+        {
+          week: 5,
+          title: "Sorting & Searching in ArrayList",
+          titleAr: "خوارزميات الترتيب والبحث في مصفوفة ArrayList",
+          topics: ["procedural vs OOP sorting", "swapAt & safe readInt", "bubbleSort & early exit", "selectionSort", "insertionSort", "sorting stability", "insertSorted", "binarySearch", "student tasks: isSorted & bubbleSortPasses"],
+          keywordsAr: ["ترتيب", "فرز", "بحث ثنائي", "بابل سورت", "سليكشن سورت", "انسيرشن سورت", "مصفوفات", "خوارزميات", "تعقيد زمني", "ثبات الترتيب"],
+          file: "decks/data-structures/Week ⇔ 05/Session ⇔ 05.html",
+          codeFile: "decks/data-structures/Week ⇔ 05/Sorting_ArrayList.cpp",
+          codeName: "Sorting_ArrayList.cpp",
+          date: "2026-10-20",
+          duration: "75 min",
+          slides: 27
         }
-        // ,{ week: 4, title: "…", topics: ["…"], file: "decks/data-structures/Week ⇔ 04/Session ⇔ 04.html", date: "2026-10-13" }
       ]
     }
   ]
