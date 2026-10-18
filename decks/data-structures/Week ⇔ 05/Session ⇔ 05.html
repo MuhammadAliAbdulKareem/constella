@@ -1646,15 +1646,30 @@ VIZ.sortree={cycle:700,draw(c,W,H,f,frame){
 }};
 
 VIZ.cls2={cycle:600,draw(c,W,H,f,frame){
- const b=board(c,W,H,{title:'class ArrayList + sorting',frame}),x=b.x+30,w=340,p1=ease(at(f,10,60)),p2=ease(at(f,60,120)),p3=ease(at(f,130,190));
- const box=(y,h,col,t,L,p)=>{c.save();c.globalAlpha=p;rr(c,x,y,w,h,12);c.fillStyle=rgba(col,.1);c.fill();c.strokeStyle=col;c.lineWidth=1.8;c.stroke();c.restore();
-  txt(c,t,x+16,y+20,{size:11.5,col,align:'left',a:p,weight:800});L.forEach((s,i)=>txt(c,s,x+18,y+44+i*22,{size:13,font:'mono',align:'left',a:p}))};
- box(b.y+56,118,CL.pink,'🔒 PRIVATE — hidden',['int* data;  int size;  int capacity;','int readInt();  void swapAt(int i, int j);','void grow();'],p1);
- box(b.y+186,176,CL.green,'🔓 PUBLIC — interface',['fillFromUser · display · insertAt','bubbleSort()      ← new','selectionSort()   ← new','insertionSort()   ← new','insertSorted(v) · binarySearch(t)'],p2);
- const ax=x+w+40,ay=b.y+120;marker(c,[[x+w,ay],[ax,ay]],p3,CL.cyan,2.4);
- for(let k=0;k<5;k++){const v=ease(at(f,150+k*8,180+k*8));c.save();c.globalAlpha=v;rr(c,ax+k*50,ay-22,44,44,8);c.fillStyle=rgba(CL.cyan,.15);c.fill();c.strokeStyle=CL.cyan;c.lineWidth=1.5;c.stroke();c.restore();txt(c,'['+k+']',ax+k*50+22,ay,{size:11.5,font:'mono',a:v})}
+ const b=board(c,W,H,{title:'class ArrayList + sorting',frame});
+ const pad=Math.max(20,Math.min(32,Math.floor(b.w*0.03)));
+ const x=b.x+pad;
+ const w=Math.min(410,Math.max(330,Math.floor((b.w-pad*3)*0.43)));
+ const p1=ease(at(f,6,32)),p2=ease(at(f,24,54)),p3=ease(at(f,46,76));
+ const box=(y,h,col,t,L,p)=>{
+  c.save();c.globalAlpha=p;rr(c,x,y,w,h,12);c.fillStyle=rgba(col,.1);c.fill();c.strokeStyle=col;c.lineWidth=1.8;c.stroke();c.restore();
+  txt(c,t,x+16,y+20,{size:11.5,col,align:'left',a:p,weight:800});
+  const fsz=Math.min(12.5,Math.max(10.5,(w-36)/28));
+  L.forEach((s,i)=>txt(c,s,x+16,y+44+i*22,{size:fsz,font:'mono',align:'left',a:p}));
+ };
+ box(b.y+54,118,CL.pink,'🔒 PRIVATE — hidden',['int* data;  int size;  int capacity;','void swapAt(int i, int j);','int readInt();  void grow();'],p1);
+ box(b.y+184,176,CL.green,'🔓 PUBLIC — interface',['fillFromUser · display · insertAt','bubbleSort()      ← new','selectionSort()   ← new','insertionSort()   ← new','insertSorted(v) · binarySearch(t)'],p2);
+ const ax=x+w+Math.max(28,Math.min(48,Math.floor((b.w-pad*2-w-270)*0.35)));
+ const ay=b.y+98;
+ marker(c,[[x+w,ay],[ax,ay]],p3,CL.cyan,2.4);
+ for(let k=0;k<5;k++){
+  const v=ease(at(f,64+k*7,88+k*7));
+  c.save();c.globalAlpha=v;rr(c,ax+k*50,ay-22,44,44,8);c.fillStyle=rgba(CL.cyan,.15);c.fill();c.strokeStyle=CL.cyan;c.lineWidth=1.5;c.stroke();c.restore();
+  txt(c,'['+k+']',ax+k*50+22,ay,{size:11.5,font:'mono',a:v});
+ }
  txt(c,'heap: new int[capacity]',ax,ay+42,{size:11.5,col:CL.dim,font:'mono',align:'left',a:p3});
- ['Sorts use the object’s own data and size.','No array or length is passed in.','Only 0 … size − 1 is ever touched.','swapAt() is private: one safe way to swap.'].forEach((s,i)=>txt(c,s,ax,b.y+222+i*30,{size:12.5,col:i?CL.chalk:CL.amber,align:'left',a:ease(at(f,200+i*30,230+i*30))}))}};
+ ['Sorts use the object’s own data and size.','No array or length is passed in.','Only 0 … size − 1 is ever touched.','swapAt() is private: one safe way to swap.'].forEach((s,i)=>txt(c,s,ax,b.y+188+i*30,{size:12.5,col:i?CL.chalk:CL.amber,align:'left',a:ease(at(f,90+i*16,114+i*16))}));
+}};
 
 VIZ.stable={cycle:700,draw(c,W,H,f,frame){
  const b=board(c,W,H,{title:'Stability: do equal items keep their order?',frame});
