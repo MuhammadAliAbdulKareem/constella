@@ -1032,21 +1032,25 @@
 
         // 6. Manual "Check for updates" button in footer
         if (checkUpdateBtn) {
+          var defaultBtnHtml = '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg> <span>Check for updates</span>';
           checkUpdateBtn.addEventListener('click', function () {
-            checkUpdateBtn.textContent = 'Checking...';
+            checkUpdateBtn.disabled = true;
+            checkUpdateBtn.innerHTML = '<svg class="btn-spin" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg> <span>Checking...</span>';
             reg.update().then(function () {
               setTimeout(function () {
+                checkUpdateBtn.disabled = false;
                 if (reg.waiting) {
                   promptUserForUpdate(reg.waiting);
-                  checkUpdateBtn.textContent = 'Update available!';
-                  setTimeout(function () { checkUpdateBtn.textContent = 'Check for updates'; }, 3000);
+                  checkUpdateBtn.innerHTML = '<span>✦ Update available!</span>';
+                  setTimeout(function () { checkUpdateBtn.innerHTML = defaultBtnHtml; }, 3500);
                 } else {
-                  checkUpdateBtn.textContent = 'Up to date ✓';
-                  setTimeout(function () { checkUpdateBtn.textContent = 'Check for updates'; }, 2500);
+                  checkUpdateBtn.innerHTML = '<span>✓ Up to date</span>';
+                  setTimeout(function () { checkUpdateBtn.innerHTML = defaultBtnHtml; }, 2500);
                 }
-              }, 1200);
+              }, 900);
             }).catch(function () {
-              checkUpdateBtn.textContent = 'Check for updates';
+              checkUpdateBtn.disabled = false;
+              checkUpdateBtn.innerHTML = defaultBtnHtml;
             });
           });
         }
