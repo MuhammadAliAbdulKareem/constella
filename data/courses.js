@@ -85,6 +85,19 @@ window.SITE = {
           date: "2026-10-13",
           duration: "75 min",
           slides: 15
+        },
+        {
+          week: 5,
+          title: "Image Histogram with Python & OpenCV",
+          titleAr: "مدرج تكرار الصورة (Image Histogram)",
+          topics: ["imread & ravel (1D flattening)", "plt.hist (Matplotlib)", "manual counting with np.zeros", "cv2.calcHist (5 arguments)", "plt.plot (intensity vs count)", "color histogram (BGR)", "masking regions", "histSize bins (16 vs 256)"],
+          keywordsAr: ["مدرج تكراري", "هيستوجرام", "توزيع البكسل", "حساب الهيستوجرام", "بايثون صور", "قناع", "أوبن سي في", "مات بلوت ليب", "مصفوفة", "ألوان", "BGR", "رمادي"],
+          file: "decks/multimedia/Week ⇔ 05/Session ⇔ 05.html",
+          codeFile: "decks/multimedia/Week ⇔ 05/session05_histogram.py",
+          codeName: "session05_histogram.py",
+          date: "2026-10-20",
+          duration: "75 min",
+          slides: 18
         }
       ]
     },

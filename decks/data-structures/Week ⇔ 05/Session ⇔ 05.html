@@ -14,7 +14,36 @@
     if (t === 'light') document.documentElement.classList.add('light-mode');
   } catch(e){}
 
-
+  /* Early viewport measurement to prevent FOUC & zero-pad flash */
+  (function(){
+    try{
+      var W=window.innerWidth,H=window.innerHeight;
+      var isLandscape=W>=H;
+      var small=W<768||(!isLandscape&&W<900)||(isLandscape&&H<550);
+      document.body.classList.toggle('small', small);
+      document.body.classList.toggle('portrait', small && !isLandscape);
+      document.body.classList.toggle('landscape', small && isLandscape);
+      var fit=document.getElementById('fitbox'),d=document.getElementById('deck');
+      if(fit&&d){
+        if(!small){
+          var s=Math.min((W-16)/1100,(H-16)/707);
+          fit.style.width=Math.round(1100*s)+'px';
+          fit.style.height=Math.round(707*s)+'px';
+          d.style.transform='scale('+s+')';
+        }else{
+          var s=isLandscape?(H/619):(W/1100);
+          var dw=isLandscape?Math.max(1100,Math.round(W/s)):1100;
+          var dh=isLandscape?619:Math.max(619,Math.round(H/s));
+          fit.style.width=(isLandscape?W:Math.round(dw*s))+'px';
+          fit.style.height=(isLandscape?H:Math.round(dh*s))+'px';
+          d.style.transformOrigin='top left';
+          d.style.transform='scale('+s+')';
+          var mobilePad = Math.ceil(((isLandscape?40:48) + 16) / s);
+          document.documentElement.style.setProperty('--mobile-top-pad', mobilePad + 'px');
+        }
+      }
+    }catch(_){}
+  })();
 </script>
 <style>
 :root{
@@ -371,11 +400,118 @@ body.light-mode .m-pill-counter{background:rgba(255,255,255,.72);color:#524d70}
 .small #fitbox{border-radius:0!important}
 
 /* Zero-Overlap Top Clearance for Mobile Slides */
-.small .slide{padding:64px 28px 18px!important;overflow-y:auto!important}
-.small .hero-slide{padding:68px 34px 18px!important}
+.small .slide{
+  padding-top:var(--mobile-top-pad, 180px)!important;
+  padding-left:28px!important;
+  padding-right:28px!important;
+  padding-bottom:28px!important;
+  overflow-y:auto!important;
+  -webkit-overflow-scrolling:touch;
+}
+.small .hero-slide{
+  padding-top:var(--mobile-top-pad, 160px)!important;
+  padding-left:32px!important;
+  padding-right:32px!important;
+  padding-bottom:24px!important;
+}
 .small .hero-slide h1{font-size:44px!important;line-height:1.1!important;margin:6px 0 10px!important}
 .small .hero-slide .tag{font-size:15px!important;line-height:1.4!important}
-.small .sol{padding:74px 34px 24px!important;z-index:1000}
+.small .sol{
+  padding-top:calc(var(--mobile-top-pad, 180px) + 14px)!important;
+  padding-left:32px!important;
+  padding-right:32px!important;
+  z-index:1000;
+  overflow-y:auto!important;
+  -webkit-overflow-scrolling:touch;
+}
+
+/* Portrait Mobile Optimization: stack panels vertically, utilize tall mobile screens, eliminate voids & squeeze */
+body.small.portrait .task,
+body.small:not(.landscape) .task{
+  display:flex!important;
+  flex-direction:column!important;
+  gap:20px!important;
+  height:auto!important;
+  min-height:0!important;
+  align-items:stretch!important;
+  justify-content:flex-start!important;
+}
+
+body.small.portrait .tleft,
+body.small:not(.landscape) .tleft{
+  margin:0!important;
+  max-height:none!important;
+  overflow:visible!important;
+  flex:none!important;
+  width:100%!important;
+  padding-right:0!important;
+}
+
+body.small.portrait .tright,
+body.small:not(.landscape) .tright{
+  width:100%!important;
+  flex:none!important;
+  justify-content:flex-start!important;
+  min-height:440px!important;
+  height:auto!important;
+}
+
+body.small.portrait .tright .code-window,
+body.small:not(.landscape) .tright .code-window,
+body.small.portrait .tleft .code-window,
+body.small:not(.landscape) .tleft .code-window{
+  max-height:none!important;
+  width:100%!important;
+}
+
+body.small.portrait .codecard,
+body.small:not(.landscape) .codecard{
+  max-height:none!important;
+}
+
+body.small.portrait .tright .viz,
+body.small:not(.landscape) .tright .viz{
+  position:relative!important;
+  inset:auto!important;
+  width:100%!important;
+  height:440px!important;
+  min-height:440px!important;
+}
+
+body.small.portrait .cards,
+body.small:not(.landscape) .cards{
+  display:flex!important;
+  flex-direction:column!important;
+  gap:16px!important;
+  height:auto!important;
+}
+
+body.small.portrait .sol-body,
+body.small:not(.landscape) .sol-body{
+  display:flex!important;
+  flex-direction:column!important;
+  gap:16px!important;
+  height:auto!important;
+}
+
+body.small.portrait .stage,
+body.small:not(.landscape) .stage{
+  flex:none!important;
+  height:auto!important;
+  min-height:0!important;
+  margin-top:14px!important;
+  margin-bottom:20px!important;
+  justify-content:flex-start!important;
+}
+
+body.small.portrait .slide .viz,
+body.small:not(.landscape) .slide .viz{
+  position:relative!important;
+  inset:auto!important;
+  width:100%!important;
+  height:460px!important;
+  min-height:460px!important;
+}
 
 /* Desktop Home Link — Unified with Constella Cosmic Identity */
 .desktop-home-link{
@@ -489,6 +625,40 @@ body.light-mode .pen-action-btn:hover{background:rgba(0,0,0,.1);color:#0f172a}
 
 
 /* ═══════════════ CONSTELLA SUITE: Overview Drawer, Boards, Shortcuts & Online Compiler ═══════════════ */
+/* Top Bar Download Code Button - Adaptive Dark/Light */
+.top-code-btn{
+  padding:5px 11px;
+  border-radius:6px;
+  border:1px solid rgba(255,255,255,.2);
+  background:transparent;
+  color:#e9edff;
+  cursor:pointer;
+  font:600 11.5px Inter,sans-serif;
+  text-decoration:none;
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  transition:all .2s ease;
+}
+.top-code-btn:hover{
+  border-color:var(--c);
+  background:rgba(255,255,255,.08);
+  color:#ffffff;
+  transform:translateY(-1px);
+}
+body.light-mode .top-code-btn{
+  background:rgba(255,255,255,.8);
+  border-color:rgba(120,110,160,.35);
+  color:#181528;
+  box-shadow:0 2px 8px rgba(100,90,140,.1);
+}
+body.light-mode .top-code-btn:hover{
+  background:#ffffff;
+  border-color:var(--c);
+  color:var(--c);
+  box-shadow:0 4px 14px rgba(100,90,140,.18);
+}
+
 .top-compiler-btn{
   padding:5px 11px;
   border-radius:6px;
@@ -559,18 +729,57 @@ body.light-mode .m-compiler-btn:hover{
   border-color:#0284c7 !important;
   color:#0369a1 !important;
 }
+.small #mPenToggle{
+  display:none !important;
+}
+.small .m-compiler-btn{
+  width:30px !important;
+  height:30px !important;
+  padding:0 !important;
+  justify-content:center;
+}
+.small .m-compiler-btn span{
+  display:none;
+}
+.small .m-compiler-btn svg{
+  width:12px;
+  height:12px;
+}
 @media (max-width: 480px){
-  .m-compiler-btn{
-    width:30px !important;
-    padding:0 !important;
-    justify-content:center;
+  .small .m-nav-hud{
+    left:max(6px, env(safe-area-inset-left));
+    right:max(6px, env(safe-area-inset-right));
+    gap:4px;
   }
-  .m-compiler-btn span{
+  .m-pill{
+    height:28px;
+    padding:0 9px;
+  }
+  .m-pill-btn{
+    width:28px;
+    height:28px;
+  }
+  .m-pill-counter{
+    height:26px;
+    padding:0 7px;
+    font-size:10px;
+  }
+  .small .m-compiler-btn{
+    width:28px !important;
+    height:28px !important;
+  }
+}
+
+@media (max-width: 380px){
+  .m-pill-home .m-pill-spark{
     display:none;
   }
-  .m-compiler-btn svg{
-    width:13px;
-    height:13px;
+  .m-pill-home{
+    padding:0 8px;
+    font-size:10.5px;
+  }
+  #mFsToggle{
+    display:none !important;
   }
 }
 
@@ -1119,7 +1328,7 @@ body.light-mode .constella-toast{
       </div>
     </div>
     <div class="brand-right">
-      <a href="Sorting_ArrayList.cpp" download="Sorting_ArrayList.cpp" style="padding:5px 11px;border-radius:6px;border:1px solid var(--card-border);background:transparent;color:var(--tp);cursor:pointer;font:600 11.5px Inter,sans-serif;text-decoration:none;display:inline-flex;align-items:center;gap:5px;transition:border-color .2s,background .2s;" onmouseover="this.style.borderColor='var(--c)';this.style.background='rgba(255,255,255,.08)'" onmouseout="this.style.borderColor='var(--card-border)';this.style.background='transparent'">
+      <a href="Sorting_ArrayList.cpp" download="Sorting_ArrayList.cpp" class="top-code-btn" title="Download Code">
         <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
         <span>Download Code</span>
       </a>
@@ -2281,17 +2490,26 @@ const fitbox=document.getElementById('fitbox'),deck=document.getElementById('dec
 function layout(){
   const W=window.innerWidth,H=window.innerHeight;
   const isLandscape = W >= H;
-  const small = W < 768 || (!isLandscape && W < 900);
+  // Adaptive Mobile Mode: only for actual mobile phones or narrow portrait screens (<768px wide)
+  // Laptops and desktop screens in normal window or fullview use uniform proportional scaling!
+  const small = W < 768 || (!isLandscape && W < 900) || (isLandscape && H < 550);
   document.body.classList.toggle('small', small);
+  document.body.classList.toggle('portrait', small && !isLandscape);
+  document.body.classList.toggle('landscape', small && isLandscape);
+
   if(!small){
     const s = Math.min((W - 16) / 1100, (H - 16) / 707);
     vp.style.width = '1100px'; vp.style.height = '619px';
     deck.style.width = '1100px'; deck.style.height = '707px';
     fitbox.style.width = Math.round(1100 * s) + 'px';
     fitbox.style.height = Math.round(707 * s) + 'px';
-    deck.style.transformOrigin = 'top left'; deck.style.transform = `scale(${s})`;
-    SC = Math.max(.2, s); return;
+    deck.style.transformOrigin = 'top left';
+    deck.style.transform = scale();
+    SC = Math.max(.2, s);
+    document.documentElement.style.removeProperty('--mobile-top-pad');
+    return;
   }
+
   let s, dw, dh;
   if(isLandscape){
     s = H / 619;
@@ -2307,8 +2525,18 @@ function layout(){
   fitbox.style.width = (isLandscape ? W : Math.round(dw * s)) + 'px';
   fitbox.style.height = (isLandscape ? H : Math.round(dh * s)) + 'px';
   deck.style.transformOrigin = 'top left';
-  deck.style.transform = `scale(${s})`;
+  deck.style.transform = scale();
   SC = Math.max(.2, s);
+
+  // Dynamic Zero-Overlap Top Clearance for Mobile HUD
+  const navHud = document.querySelector('.m-nav-hud');
+  let hudBottom = isLandscape ? 40 : 46;
+  if(navHud){
+    const rect = navHud.getBoundingClientRect();
+    if(rect.bottom > 0) hudBottom = rect.bottom;
+  }
+  const clearance = Math.ceil((hudBottom + 16) / s);
+  document.documentElement.style.setProperty('--mobile-top-pad', clearance + 'px');
 }
 addEventListener('resize', layout);
 addEventListener('orientationchange', () => setTimeout(layout, 120));
