@@ -2504,7 +2504,7 @@ function layout(){
     fitbox.style.width = Math.round(1100 * s) + 'px';
     fitbox.style.height = Math.round(707 * s) + 'px';
     deck.style.transformOrigin = 'top left';
-    deck.style.transform = scale();
+    deck.style.transform = `scale(${s})`;
     SC = Math.max(.2, s);
     document.documentElement.style.removeProperty('--mobile-top-pad');
     return;
@@ -2525,7 +2525,7 @@ function layout(){
   fitbox.style.width = (isLandscape ? W : Math.round(dw * s)) + 'px';
   fitbox.style.height = (isLandscape ? H : Math.round(dh * s)) + 'px';
   deck.style.transformOrigin = 'top left';
-  deck.style.transform = scale();
+  deck.style.transform = `scale(${s})`;
   SC = Math.max(.2, s);
 
   // Dynamic Zero-Overlap Top Clearance for Mobile HUD
@@ -2568,17 +2568,55 @@ function aurora(f){
   v.addColorStop(1,isLight?'rgba(235,233,245,.65)':'rgba(5,5,9,.7)');
   ctx.fillStyle=v;ctx.fillRect(0,0,W,H);
 }
+let isTabVisible = !document.hidden;
+let rafId = null;
+
+function startAnimLoop() {
+  if (rafId === null && isTabVisible) {
+    rafId = requestAnimationFrame(tick);
+  }
+}
+
+function stopAnimLoop() {
+  if (rafId !== null) {
+    cancelAnimationFrame(rafId);
+    rafId = null;
+  }
+}
+
+document.addEventListener('visibilitychange', () => {
+  isTabVisible = !document.hidden;
+  if (isTabVisible) {
+    startAnimLoop();
+  } else {
+    stopAnimLoop();
+  }
+});
+window.addEventListener('pageshow', () => {
+  isTabVisible = !document.hidden;
+  if (isTabVisible) startAnimLoop();
+});
+window.addEventListener('pagehide', () => {
+  stopAnimLoop();
+});
+
 function tick(){
-  frame++;aurora(frame);
+  rafId = null;
+  if(!isTabVisible) return;
+  frame++;
+  const isSmall = document.body.classList.contains('small');
+  if(!isSmall || frame % 2 === 0){ aurora(frame); }
   for(const o of live){
     if(o.slide!==cur)continue;
     o.s.rs();const{ctx,W,H}=o.s;if(!W)continue;
     ctx.clearRect(0,0,W,H);CW=W;
     o.def.draw(ctx,W,H,(frame-t0)%o.def.cycle,frame,o);
   }
-  requestAnimationFrame(tick);
+  if(isTabVisible){
+    rafId = requestAnimationFrame(tick);
+  }
 }
-go(0);tick();
+go(0);startAnimLoop();
 
 /* ═══════════════ Live Drawing Pen (Annotation Engine) ═══════════════ */
 let penCanvas = null;
@@ -2586,7 +2624,7 @@ let penCtx = null;
 let penToolbar = null;
 let penToggleBtn = null;
 let mPenToggleBtn = null;
-let penActive = false;
+var penActive = false;
 let penTool = 'pen'; // 'pen', 'highlighter', 'eraser'
 let penColor = '#c084fc';
 let strokes = [];

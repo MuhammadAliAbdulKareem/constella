@@ -883,28 +883,54 @@
   }
 
   var lastFrameTime = 0;
+  var rafSky = null;
   function loop(now) {
+    rafSky = null;
     if (!isPageVisible) return;
     // On touch/mobile devices, throttle rendering to ~30 FPS to eliminate heating & battery drain
     if (isTouch) {
       if (now - lastFrameTime < 32) {
-        requestAnimationFrame(loop);
+        if (isPageVisible) rafSky = requestAnimationFrame(loop);
         return;
       }
     }
     lastFrameTime = now;
     var dt = last ? Math.min(0.05, (now - last) / 1000) : 0.016; last = now;
     draw(now, dt, false);
-    requestAnimationFrame(loop);
+    if (isPageVisible) {
+      rafSky = requestAnimationFrame(loop);
+    }
+  }
+
+  function startSky() {
+    if (rafSky === null && isPageVisible) {
+      last = performance.now();
+      rafSky = requestAnimationFrame(loop);
+    }
+  }
+
+  function stopSky() {
+    if (rafSky !== null) {
+      cancelAnimationFrame(rafSky);
+      rafSky = null;
+    }
   }
 
   /* Page visibility battery saver */
   document.addEventListener('visibilitychange', function () {
     isPageVisible = !document.hidden;
     if (isPageVisible) {
-      last = performance.now();
-      requestAnimationFrame(loop);
+      startSky();
+    } else {
+      stopSky();
     }
+  });
+  window.addEventListener('pageshow', function () {
+    isPageVisible = !document.hidden;
+    if (isPageVisible) startSky();
+  });
+  window.addEventListener('pagehide', function () {
+    stopSky();
   });
 
   window.addEventListener('pointermove', function (e) { if (e.pointerType !== 'touch') { mx = e.clientX; my = e.clientY; } }, { passive: true });
@@ -912,7 +938,7 @@
   var rz; window.addEventListener('resize', function () { clearTimeout(rz); rz = setTimeout(initSky, 200); });
   initSky();
   nextShoot = performance.now() + 4500;
-  requestAnimationFrame(loop);
+  startSky();
 
   /* =====================================================================
      PWA Integration: Service Worker Auto-Update & Immediate Activation
@@ -986,9 +1012,16 @@
   }
 
   if ('serviceWorker' in navigator) {
+    var hasExistingController = Boolean(navigator.serviceWorker.controller);
+
     // When the new worker takes control, reload seamlessly to render new content
     navigator.serviceWorker.addEventListener('controllerchange', function () {
       if (refreshing) return;
+      // Do not reload for first-time visitors when service worker claims for the first time
+      if (!hasExistingController) {
+        hasExistingController = true;
+        return;
+      }
       refreshing = true;
       window.location.reload();
     });

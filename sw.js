@@ -2,7 +2,7 @@
    Constella Service Worker — Offline Course Portal & PWA Engine
    ===================================================================== */
 
-const CACHE_NAME = 'constella-v2.9.0';
+const CACHE_NAME = 'constella-v2.9.2';
 
 // Core application shell assets and session decks to pre-cache on install
 const CORE_ASSETS = [
@@ -40,9 +40,8 @@ const CORE_ASSETS = [
   './decks/data-structures/Week ⇔ 05/Sorting_ArrayList.cpp'
 ];
 
-// Pre-cache core assets & activate immediately
+// Pre-cache core assets on install (waits in 'waiting' state until user confirms update)
 self.addEventListener('install', (event) => {
-  self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       return cache.addAll(CORE_ASSETS).catch((err) => {

@@ -1227,18 +1227,45 @@ layout();
 /* ═══════════════ Ambient Aurora ═══════════════ */
 const amb = fit(document.getElementById('amb'));
 const blobs = [[.2,.3,'#6366f1'],[.75,.25,'#a855f7'],[.55,.75,'#ec4899'],[.15,.8,'#6366f1']];
-let isTabVisible = true;
+let isTabVisible = !document.hidden;
+let rafId = null;
+
+function startAnimLoop() {
+  if (rafId === null && isTabVisible) {
+    rafId = requestAnimationFrame(tick);
+  }
+}
+
+function stopAnimLoop() {
+  if (rafId !== null) {
+    cancelAnimationFrame(rafId);
+    rafId = null;
+  }
+}
+
 document.addEventListener('visibilitychange', () => {
   isTabVisible = !document.hidden;
-  if (isTabVisible) requestAnimationFrame(tick);
+  if (isTabVisible) {
+    startAnimLoop();
+  } else {
+    stopAnimLoop();
+  }
+});
+window.addEventListener('pageshow', () => {
+  isTabVisible = !document.hidden;
+  if (isTabVisible) startAnimLoop();
+});
+window.addEventListener('pagehide', () => {
+  stopAnimLoop();
 });
 
 function tick(){
+  rafId = null;
   if (!isTabVisible) return;
   frame++;
   const isSmall = document.body.classList.contains('small');
   if (isSmall && frame % 2 !== 0) {
-    requestAnimationFrame(tick);
+    if (isTabVisible) rafId = requestAnimationFrame(tick);
     return;
   }
   amb.rs(); const {ctx, W, H} = amb;
@@ -1262,10 +1289,12 @@ function tick(){
     v.addColorStop(1, isLight ? 'rgba(235,233,245,.65)' : 'rgba(5,5,9,.7)');
     ctx.fillStyle = v; ctx.fillRect(0,0,W,H);
   }
-  requestAnimationFrame(tick);
+  if (isTabVisible) {
+    rafId = requestAnimationFrame(tick);
+  }
 }
 go(0);
-tick();
+startAnimLoop();
 
 /* ═══════════════ Live Drawing Pen (Annotation Engine) ═══════════════ */
 let penCanvas = null;
@@ -1273,7 +1302,7 @@ let penCtx = null;
 let penToolbar = null;
 let penToggleBtn = null;
 let mPenToggleBtn = null;
-let penActive = false;
+var penActive = false;
 let penTool = 'pen'; // 'pen', 'highlighter', 'eraser'
 let penColor = '#c084fc';
 let strokes = [];
